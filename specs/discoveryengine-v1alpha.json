@@ -1,5 +1,4 @@
 {
-  "baseUrl": "https://discoveryengine.googleapis.com/",
   "resources": {
     "billingAccounts": {
       "resources": {
@@ -12533,10 +12532,28 @@
       }
     }
   },
-  "canonicalName": "Discovery Engine",
-  "id": "discoveryengine:v1alpha",
-  "ownerDomain": "google.com",
+  "version": "v1alpha",
   "batchPath": "batch",
+  "fullyEncodeReservedExpansion": true,
+  "kind": "discovery#restDescription",
+  "canonicalName": "Discovery Engine",
+  "servicePath": "",
+  "ownerDomain": "google.com",
+  "protocol": "rest",
+  "basePath": "",
+  "name": "discoveryengine",
+  "version_module": true,
+  "baseUrl": "https://discoveryengine.googleapis.com/",
+  "title": "Discovery Engine API",
+  "discoveryVersion": "v1",
+  "documentationLink": "https://cloud.google.com/generative-ai-app-builder/docs/",
+  "icons": {
+    "x16": "http://www.google.com/images/icons/product/search-16.gif",
+    "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  },
+  "id": "discoveryengine:v1alpha",
+  "description": "Discovery Engine API.",
+  "rootUrl": "https://discoveryengine.googleapis.com/",
   "schemas": {
     "GoogleCloudNotebooklmV1alphaCreateAudioOverviewRequest": {
       "id": "GoogleCloudNotebooklmV1alphaCreateAudioOverviewRequest",
@@ -18717,6 +18734,32 @@
           "items": {
             "type": "string"
           }
+        },
+        "toolspecOverride": {
+          "description": "Optional. Custom toolspec overrides for this connection. For Enterprise BAP connectors that support admin-curated tool definitions, this holds the (simplified) per-tool overrides. On Get, populated by the server by merging persisted overrides with live runtime tool definitions and trimming the result for UI consumption. On Update, the supplied value replaces the persisted overrides after server-side validation and merging: the `base_version` field MUST match the server's current base toolspec version (otherwise the request is rejected with a user-facing error directing the admin to re-download the latest tools first).",
+          "$ref": "GoogleCloudDiscoveryengineV1alphaBAPConfigToolspecOverride"
+        }
+      }
+    },
+    "GoogleCloudDiscoveryengineV1alphaBAPConfigToolspecOverride": {
+      "id": "GoogleCloudDiscoveryengineV1alphaBAPConfigToolspecOverride",
+      "description": "Customer-facing view of the admin-curated toolspec for a BAP connection. Holds the (simplified) per-tool definitions surfaced to and editable by the admin in the Discovery Engine UI. Mirrors the shape of the backend `google.cloud.connectorexecution.v1.ToolspecOverride` message, but is intentionally kept as a separate public type so the Discovery Engine API surface can evolve independently of the fed-API surface (AIP-215). Handlers convert between the two via helpers in //cloud/ml/discoveryengine/external_service/v1main/data_connector_service/lib:bap_custom_tool_util.",
+      "type": "object",
+      "properties": {
+        "tools": {
+          "description": "Required. Tool definitions (one Struct per tool) that the admin has customised on top of the base toolspec returned by the fed API. REQUIRED because it is the only user-editable field in the modify API; the request must carry at least one tool.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "any",
+              "description": "Properties of the object."
+            }
+          }
+        },
+        "baseVersion": {
+          "description": "Required. Base toolspec version against which `tools` were authored. On Update, MUST match the server's current stable toolspec version for the connection; mismatch is rejected with a user-facing error directing the admin to re-download the latest tools first.",
+          "type": "string"
         }
       }
     },
@@ -23768,7 +23811,7 @@
           "type": "boolean"
         },
         "features": {
-          "description": "Optional. Feature config for the engine to opt in or opt out of features. Supported keys: * `*`: all features, if it's present, all other feature state settings are ignored. * `agent-gallery` * `no-code-agent-builder` * `prompt-gallery` * `model-selector` * `notebook-lm` * `people-search` * `people-search-org-chart` * `bi-directional-audio` * `feedback` * `session-sharing` * `personalization-memory` * `personalization-suggested-highlights` * `disable-mobile-app-access` * `disable-agent-sharing` * `disable-image-generation` * `disable-video-generation` * `disable-onedrive-upload` * `disable-talk-to-content` * `disable-google-drive-upload` * `disable-welcome-emails` * `disable-canvas` * `disable-canvas-workspace` * `disable-skills` * `enable-end-user-sharing-with-groups`",
+          "description": "Optional. Feature config for the engine to opt in or opt out of features. Supported keys: * `*`: all features, if it's present, all other feature state settings are ignored. * `agent-gallery` * `no-code-agent-builder` * `prompt-gallery` * `model-selector` * `notebook-lm` * `people-search` * `people-search-org-chart` * `bi-directional-audio` * `feedback` * `session-sharing` * `personalization-memory` * `personalization-suggested-highlights` * `disable-mobile-app-access` * `disable-agent-sharing` * `disable-image-generation` * `disable-video-generation` * `disable-onedrive-upload` * `disable-talk-to-content` * `disable-google-drive-upload` * `disable-welcome-emails` * `disable-canvas` * `disable-canvas-workspace` * `disable-skills` * `enable-end-user-sharing-with-groups` * `single-agent-orchestration` * `multi-agent-orchestration`",
           "type": "object",
           "additionalProperties": {
             "type": "string",
@@ -24252,6 +24295,10 @@
       "properties": {
         "workspaceAccessEnabled": {
           "description": "Whether an end user has workspace access enabled.",
+          "type": "boolean"
+        },
+        "customerDomainValid": {
+          "description": "Whether the calling user's customer domain matches the workspace data stores under this engine.",
           "type": "boolean"
         }
       }
@@ -25823,6 +25870,10 @@
             "$ref": "GoogleCloudDiscoveryengineV1alphaPanelInfo"
           }
         },
+        "feedback": {
+          "description": "Optional. This field is optional except for the `add-feedback` event types.",
+          "$ref": "GoogleCloudDiscoveryengineV1alphaFeedback"
+        },
         "entity": {
           "description": "Optional. Represents the entity for customers that may run multiple different entities, domains, sites or regions, for example, `Google US`, `Google Ads`, `Waymo`, `google.com`, `youtube.com`, etc. We recommend that you set `entity` to get better per-entity search, completion, and prediction results.",
           "type": "string"
@@ -26032,6 +26083,124 @@
           "description": "Media progress should be computed using only the media_progress_duration relative to the media total length. This value must be between `[0, 1.0]` inclusive. If this is not a playback or the progress cannot be computed (e.g. ongoing livestream), this field should be unset.",
           "type": "number",
           "format": "float"
+        }
+      }
+    },
+    "GoogleCloudDiscoveryengineV1alphaFeedback": {
+      "id": "GoogleCloudDiscoveryengineV1alphaFeedback",
+      "description": "Information about the user feedback. This information will be used for logging and metrics purpose.",
+      "type": "object",
+      "properties": {
+        "feedbackType": {
+          "description": "Required. Indicate whether the user gives a positive or negative feedback. If the user gives a negative feedback, there might be more feedback details.",
+          "type": "string",
+          "enumDescriptions": [
+            "Unspecified feedback type.",
+            "The user gives a positive feedback.",
+            "The user gives a negative feedback."
+          ],
+          "enum": [
+            "FEEDBACK_TYPE_UNSPECIFIED",
+            "LIKE",
+            "DISLIKE"
+          ]
+        },
+        "reasons": {
+          "description": "Optional. The reason if user gives a thumb down.",
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enumDescriptions": [
+              "Unspecified reason.",
+              "The response is inaccurate.",
+              "The response is not relevant.",
+              "The response is incomprehensive.",
+              "The response is offensive or unsafe.",
+              "The response is not well-formatted.",
+              "The response is not well-associated with the query.",
+              "The expected canvas was not generated for the response.",
+              "The generated canvas is of bad quality (e.g. inaccurate, incomplete, poorly formatted).",
+              "Exporting the generated canvas failed (e.g. download or external export action did not complete successfully)."
+            ],
+            "enum": [
+              "REASON_UNSPECIFIED",
+              "INACCURATE_RESPONSE",
+              "NOT_RELEVANT",
+              "INCOMPREHENSIVE",
+              "OFFENSIVE_OR_UNSAFE",
+              "FORMAT_AND_STYLES",
+              "BAD_CITATION",
+              "CANVAS_NOT_GENERATED",
+              "CANVAS_QUALITY_BAD",
+              "CANVAS_EXPORT_FAILED"
+            ]
+          }
+        },
+        "comment": {
+          "description": "Optional. The additional user comment of the feedback if user gives a thumb down.",
+          "type": "string"
+        },
+        "conversationInfo": {
+          "description": "The related conversation information when user gives feedback.",
+          "$ref": "GoogleCloudDiscoveryengineV1alphaFeedbackConversationInfo"
+        },
+        "llmModelVersion": {
+          "description": "The version of the LLM model that was used to generate the response.",
+          "type": "string"
+        },
+        "feedbackSource": {
+          "description": "Optional. The UI component the user feedback comes from, which could be GOOGLE_CONSOLE, GOOGLE_WIDGET, GOOGLE_WEBAPP.",
+          "type": "string",
+          "enumDescriptions": [
+            "Unspecified feedback source.",
+            "Feedback source is Google Console.",
+            "Feedback source is Google Widget.",
+            "Feedback source is Google Webapp.",
+            "Feedback source is Google AgentSpace Mobile app."
+          ],
+          "enum": [
+            "FEEDBACK_SOURCE_UNSPECIFIED",
+            "GOOGLE_CONSOLE",
+            "GOOGLE_WIDGET",
+            "GOOGLE_WEBAPP",
+            "GOOGLE_AGENTSPACE_MOBILE"
+          ]
+        },
+        "componentVersion": {
+          "description": "Optional. The version of the component that this report is being sent from.",
+          "type": "string"
+        },
+        "dataTermsAccepted": {
+          "description": "Optional. Whether the customer accepted data use terms.",
+          "type": "boolean"
+        }
+      }
+    },
+    "GoogleCloudDiscoveryengineV1alphaFeedbackConversationInfo": {
+      "id": "GoogleCloudDiscoveryengineV1alphaFeedbackConversationInfo",
+      "description": "The conversation information such as the question index and session name.",
+      "type": "object",
+      "properties": {
+        "questionIndex": {
+          "description": "The index of the user input within the conversation messages.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "session": {
+          "description": "Name of the newly generated or continued session.",
+          "type": "string"
+        },
+        "query": {
+          "description": "Required. The user's search query.",
+          "$ref": "GoogleCloudDiscoveryengineV1alphaQuery"
+        },
+        "assistToken": {
+          "description": "Optional. The token which could be used to fetch the assistant log.",
+          "type": "string"
+        },
+        "answerQueryToken": {
+          "description": "Optional. The token which could be used to fetch the answer log.",
+          "type": "string"
         }
       }
     },
@@ -28254,7 +28423,7 @@
           "type": "boolean"
         },
         "features": {
-          "description": "Output only. Feature config for the engine to opt in or opt out of features. Supported keys: * `agent-gallery` * `no-code-agent-builder` * `prompt-gallery` * `model-selector` * `notebook-lm` * `people-search` * `people-search-org-chart` * `bi-directional-audio` * `feedback` * `session-sharing` * `personalization-memory` * `personalization-suggested-highlights` * `disable-mobile-app-access` * `disable-agent-sharing` * `disable-image-generation` * `disable-video-generation` * `disable-onedrive-upload` * `disable-talk-to-content` * `disable-google-drive-upload` * `disable-welcome-emails` * `disable-canvas` * `disable-canvas-workspace` * `disable-skills` * `enable-end-user-sharing-with-groups`",
+          "description": "Output only. Feature config for the engine to opt in or opt out of features. Supported keys: * `agent-gallery` * `no-code-agent-builder` * `prompt-gallery` * `model-selector` * `notebook-lm` * `people-search` * `people-search-org-chart` * `bi-directional-audio` * `feedback` * `session-sharing` * `personalization-memory` * `personalization-suggested-highlights` * `disable-mobile-app-access` * `disable-agent-sharing` * `disable-image-generation` * `disable-video-generation` * `disable-onedrive-upload` * `disable-talk-to-content` * `disable-google-drive-upload` * `disable-welcome-emails` * `disable-canvas` * `disable-canvas-workspace` * `disable-skills` * `enable-end-user-sharing-with-groups` * `single-agent-orchestration` * `multi-agent-orchestration`",
           "readOnly": true,
           "type": "object",
           "additionalProperties": {
@@ -28292,6 +28461,11 @@
         "searchAddonSpec": {
           "description": "Optional. SearchAddonSpec is used to disable add-ons for search. This field is only supported for search requests.",
           "$ref": "GoogleCloudDiscoveryengineV1alphaWidgetConfigUiSettingsSearchAddonSpec"
+        },
+        "modelConfigInfo": {
+          "description": "Output only. The resolved, server-side view of model selector configuration. Holds both the ordered list of models that should appear in the model selector dropdown and the model that should be selected by default. Clients should render this directly without applying their own filtering, ordering, or localization. The legacy `model_configs` map above is retained for backward compatibility with clients that have not yet migrated to consuming this field.",
+          "readOnly": true,
+          "$ref": "GoogleCloudDiscoveryengineV1alphaWidgetConfigUiSettingsModelConfigInfo"
         }
       }
     },
@@ -28371,6 +28545,58 @@
         },
         "generativeAnswerAddOnDisabled": {
           "description": "Optional. If true, generative answer add-on is disabled. Generative answer add-on includes natural language to filters and simple answers.",
+          "type": "boolean"
+        }
+      }
+    },
+    "GoogleCloudDiscoveryengineV1alphaWidgetConfigUiSettingsModelConfigInfo": {
+      "id": "GoogleCloudDiscoveryengineV1alphaWidgetConfigUiSettingsModelConfigInfo",
+      "description": "The resolved, server-side view of model selector configuration for the end-user. The backend computes this per-request by applying, in order: Mendel flag evaluation, regional availability rules based on the engine's location, and admin-panel overrides from `model_configs`. The backend is the single source of truth for this configuration; clients should render `resolved_models` directly in the model selector dropdown, in the order provided, without applying their own filtering, ordering, or localization.",
+      "type": "object",
+      "properties": {
+        "resolvedModels": {
+          "description": "Output only. The list of models that are available to the end-user in the model selector, in the order in which they should be displayed.",
+          "readOnly": true,
+          "type": "array",
+          "items": {
+            "$ref": "GoogleCloudDiscoveryengineV1alphaWidgetConfigUiSettingsModelConfigInfoResolvedModel"
+          }
+        },
+        "defaultModelId": {
+          "description": "Output only. The `model_id` of the model that should be selected by default in the model selector when the end-user has not made an explicit choice. The value is always one of the `model_id`s present in `resolved_models`.",
+          "readOnly": true,
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudDiscoveryengineV1alphaWidgetConfigUiSettingsModelConfigInfoResolvedModel": {
+      "id": "GoogleCloudDiscoveryengineV1alphaWidgetConfigUiSettingsModelConfigInfoResolvedModel",
+      "description": "A single model that is resolved to be available to the end-user in the model selector, with all of its localized display metadata.",
+      "type": "object",
+      "properties": {
+        "modelId": {
+          "description": "Output only. Unique identifier of the model (e.g. `gemini-2.5-flash`, `gemini-3.1-pro-preview`). This is the same identifier that clients pass back to the assistant service to select this model. Virtual / \"pseudo\" models (e.g. `gemini-fast`) are also valid values here; they are resolved to the underlying concrete model on the backend.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "displayName": {
+          "description": "Output only. Localized display name of the model (e.g. `Gemini 3.1 Pro`). Localized server-side based on the LookupWidgetConfigRequest.language_code and LookupWidgetConfigRequest.region_code of the request.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "icon": {
+          "description": "Output only. GM3-compatible icon token associated with the model (e.g. `rocket_launch`, `bolt`, `graph_5`).",
+          "readOnly": true,
+          "type": "string"
+        },
+        "description": {
+          "description": "Output only. Localized description text (e.g. `State-of-the-art reasoning`). Localized using the same locale as `display_name`.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "isPreview": {
+          "description": "Output only. Whether the model is currently in preview. Clients should surface this via a \"Preview\" badge in the selector UI.",
+          "readOnly": true,
           "type": "boolean"
         }
       }
@@ -30471,6 +30697,32 @@
           "items": {
             "type": "string"
           }
+        },
+        "toolspecOverride": {
+          "description": "Optional. Custom toolspec overrides for this connection. For Enterprise BAP connectors that support admin-curated tool definitions, this holds the (simplified) per-tool overrides. On Get, populated by the server by merging persisted overrides with live runtime tool definitions and trimming the result for UI consumption. On Update, the supplied value replaces the persisted overrides after server-side validation and merging: the `base_version` field MUST match the server's current base toolspec version (otherwise the request is rejected with a user-facing error directing the admin to re-download the latest tools first).",
+          "$ref": "GoogleCloudDiscoveryengineV1BAPConfigToolspecOverride"
+        }
+      }
+    },
+    "GoogleCloudDiscoveryengineV1BAPConfigToolspecOverride": {
+      "id": "GoogleCloudDiscoveryengineV1BAPConfigToolspecOverride",
+      "description": "Customer-facing view of the admin-curated toolspec for a BAP connection. Holds the (simplified) per-tool definitions surfaced to and editable by the admin in the Discovery Engine UI. Mirrors the shape of the backend `google.cloud.connectorexecution.v1.ToolspecOverride` message, but is intentionally kept as a separate public type so the Discovery Engine API surface can evolve independently of the fed-API surface (AIP-215). Handlers convert between the two via helpers in //cloud/ml/discoveryengine/external_service/v1main/data_connector_service/lib:bap_custom_tool_util.",
+      "type": "object",
+      "properties": {
+        "tools": {
+          "description": "Required. Tool definitions (one Struct per tool) that the admin has customised on top of the base toolspec returned by the fed API. REQUIRED because it is the only user-editable field in the modify API; the request must carry at least one tool.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "any",
+              "description": "Properties of the object."
+            }
+          }
+        },
+        "baseVersion": {
+          "description": "Required. Base toolspec version against which `tools` were authored. On Update, MUST match the server's current stable toolspec version for the connection; mismatch is rejected with a user-facing error directing the admin to re-download the latest tools first.",
+          "type": "string"
         }
       }
     },
@@ -31450,7 +31702,7 @@
           "type": "boolean"
         },
         "features": {
-          "description": "Optional. Feature config for the engine to opt in or opt out of features. Supported keys: * `*`: all features, if it's present, all other feature state settings are ignored. * `agent-gallery` * `no-code-agent-builder` * `prompt-gallery` * `model-selector` * `notebook-lm` * `people-search` * `people-search-org-chart` * `bi-directional-audio` * `feedback` * `session-sharing` * `personalization-memory` * `personalization-suggested-highlights` * `disable-mobile-app-access` * `disable-agent-sharing` * `disable-image-generation` * `disable-video-generation` * `disable-onedrive-upload` * `disable-talk-to-content` * `disable-google-drive-upload` * `disable-welcome-emails` * `disable-canvas` * `disable-canvas-workspace` * `disable-skills` * `enable-end-user-sharing-with-groups`",
+          "description": "Optional. Feature config for the engine to opt in or opt out of features. Supported keys: * `*`: all features, if it's present, all other feature state settings are ignored. * `agent-gallery` * `no-code-agent-builder` * `prompt-gallery` * `model-selector` * `notebook-lm` * `people-search` * `people-search-org-chart` * `bi-directional-audio` * `feedback` * `session-sharing` * `personalization-memory` * `personalization-suggested-highlights` * `disable-mobile-app-access` * `disable-agent-sharing` * `disable-image-generation` * `disable-video-generation` * `disable-onedrive-upload` * `disable-talk-to-content` * `disable-google-drive-upload` * `disable-welcome-emails` * `disable-canvas` * `disable-canvas-workspace` * `disable-skills` * `enable-end-user-sharing-with-groups` * `single-agent-orchestration` * `multi-agent-orchestration`",
           "type": "object",
           "additionalProperties": {
             "type": "string",
@@ -36214,7 +36466,7 @@
           "type": "boolean"
         },
         "features": {
-          "description": "Optional. Feature config for the engine to opt in or opt out of features. Supported keys: * `*`: all features, if it's present, all other feature state settings are ignored. * `agent-gallery` * `no-code-agent-builder` * `prompt-gallery` * `model-selector` * `notebook-lm` * `people-search` * `people-search-org-chart` * `bi-directional-audio` * `feedback` * `session-sharing` * `personalization-memory` * `personalization-suggested-highlights` * `disable-mobile-app-access` * `disable-agent-sharing` * `disable-image-generation` * `disable-video-generation` * `disable-onedrive-upload` * `disable-talk-to-content` * `disable-google-drive-upload` * `disable-welcome-emails` * `disable-canvas` * `disable-canvas-workspace` * `disable-skills` * `enable-end-user-sharing-with-groups`",
+          "description": "Optional. Feature config for the engine to opt in or opt out of features. Supported keys: * `*`: all features, if it's present, all other feature state settings are ignored. * `agent-gallery` * `no-code-agent-builder` * `prompt-gallery` * `model-selector` * `notebook-lm` * `people-search` * `people-search-org-chart` * `bi-directional-audio` * `feedback` * `session-sharing` * `personalization-memory` * `personalization-suggested-highlights` * `disable-mobile-app-access` * `disable-agent-sharing` * `disable-image-generation` * `disable-video-generation` * `disable-onedrive-upload` * `disable-talk-to-content` * `disable-google-drive-upload` * `disable-welcome-emails` * `disable-canvas` * `disable-canvas-workspace` * `disable-skills` * `enable-end-user-sharing-with-groups` * `single-agent-orchestration` * `multi-agent-orchestration`",
           "type": "object",
           "additionalProperties": {
             "type": "string",
@@ -38843,7 +39095,7 @@
       }
     }
   },
-  "version": "v1alpha",
+  "ownerName": "Google",
   "parameters": {
     "access_token": {
       "type": "string",
@@ -38921,9 +39173,7 @@
       "location": "query"
     }
   },
-  "basePath": "",
-  "revision": "20260524",
-  "mtlsRootUrl": "https://discoveryengine.mtls.googleapis.com/",
+  "revision": "20260531",
   "endpoints": [
     {
       "endpointUrl": "https://discoveryengine.asia-northeast1.rep.googleapis.com/",
@@ -38951,20 +39201,7 @@
       "description": "Regional Endpoint"
     }
   ],
-  "version_module": true,
-  "fullyEncodeReservedExpansion": true,
-  "kind": "discovery#restDescription",
-  "icons": {
-    "x16": "http://www.google.com/images/icons/product/search-16.gif",
-    "x32": "http://www.google.com/images/icons/product/search-32.gif"
-  },
-  "rootUrl": "https://discoveryengine.googleapis.com/",
-  "discoveryVersion": "v1",
-  "protocol": "rest",
-  "documentationLink": "https://cloud.google.com/generative-ai-app-builder/docs/",
-  "servicePath": "",
-  "title": "Discovery Engine API",
-  "ownerName": "Google",
+  "mtlsRootUrl": "https://discoveryengine.mtls.googleapis.com/",
   "auth": {
     "oauth2": {
       "scopes": {
@@ -38985,7 +39222,5 @@
         }
       }
     }
-  },
-  "description": "Discovery Engine API.",
-  "name": "discoveryengine"
+  }
 }
