@@ -1,4 +1,12 @@
 {
+  "description": "",
+  "icons": {
+    "x16": "http://www.google.com/images/icons/product/search-16.gif",
+    "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  },
+  "revision": "20260604",
+  "mtlsRootUrl": "https://homegraph.mtls.googleapis.com/",
+  "batchPath": "batch",
   "parameters": {
     "access_token": {
       "type": "string",
@@ -76,11 +84,30 @@
       "location": "query"
     }
   },
+  "rootUrl": "https://homegraph.googleapis.com/",
+  "ownerDomain": "google.com",
+  "version": "v1",
+  "name": "homegraph",
   "id": "homegraph:v1",
-  "baseUrl": "https://homegraph.googleapis.com/",
-  "documentationLink": "https://developers.home.google.com/cloud-to-cloud/get-started",
-  "title": "HomeGraph API",
+  "protocol": "rest",
+  "servicePath": "",
+  "auth": {
+    "oauth2": {
+      "scopes": {
+        "https://www.googleapis.com/auth/homegraph": {
+          "description": "Private Service: https://www.googleapis.com/auth/homegraph"
+        }
+      }
+    }
+  },
   "fullyEncodeReservedExpansion": true,
+  "canonicalName": "Home Graph Service",
+  "ownerName": "Google",
+  "version_module": true,
+  "title": "HomeGraph API",
+  "baseUrl": "https://homegraph.googleapis.com/",
+  "discoveryVersion": "v1",
+  "documentationLink": "https://developers.home.google.com/cloud-to-cloud/get-started",
   "resources": {
     "devices": {
       "methods": {
@@ -193,19 +220,8 @@
       }
     }
   },
-  "revision": "20260523",
-  "name": "homegraph",
-  "auth": {
-    "oauth2": {
-      "scopes": {
-        "https://www.googleapis.com/auth/homegraph": {
-          "description": "Private Service: https://www.googleapis.com/auth/homegraph"
-        }
-      }
-    }
-  },
-  "version": "v1",
-  "mtlsRootUrl": "https://homegraph.mtls.googleapis.com/",
+  "kind": "discovery#restDescription",
+  "basePath": "",
   "schemas": {
     "RequestSyncDevicesRequest": {
       "id": "RequestSyncDevicesRequest",
@@ -230,7 +246,7 @@
     },
     "ReportStateAndNotificationRequest": {
       "id": "ReportStateAndNotificationRequest",
-      "description": "Request type for the [`ReportStateAndNotification`](#google.home.graph.v1.HomeGraphApiService.ReportStateAndNotification) call. It may include states, notifications, or both. States and notifications are defined per `device_id` (for example, \"123\" and \"456\" in the following example). Example: ```json { \"requestId\": \"ff36a3cc-ec34-11e6-b1a0-64510650abcf\", \"agentUserId\": \"1234\", \"payload\": { \"devices\": { \"states\": { \"123\": { \"on\": true }, \"456\": { \"on\": true, \"brightness\": 10 }, }, } } } ```",
+      "description": "Request type for the [`ReportStateAndNotification`](#google.home.graph.v1.HomeGraphApiService.ReportStateAndNotification) call. It may include states, notifications, home_traits, home_events, or any combination thereof. Smart Home Device Traits (SHDT) `states` and `notifications` are defined per `device_id` (for example, \"123\" and \"456\" in the following example). Google Home Traits `home_traits` and `home_events` are lists of updates or events, each associated with a `device_id` (for example, \"789\" in the following example). Example: ```json { \"requestId\": \"ff36a3cc-ec34-11e6-b1a0-64510650abcf\", \"agentUserId\": \"1234\", \"payload\": { \"devices\": { \"states\": { \"123\": { \"on\": true }, \"456\": { \"on\": true, \"brightness\": 10 }, }, \"homeTraits\": [ { \"deviceId\": \"789\", \"components\": [ { \"componentId\": \"main\", \"traitData\": [ { \"trait\": { \"@type\": \"type.googleapis.com/home.graph.v1.OnOffTrait\", \"onOff\": true } } ] } ] } ], \"homeEvents\": [ { \"deviceId\": \"789\", \"events\": [ { \"componentId\": \"main\", \"events\": [ { \"eventId\": \"event-123\", \"eventTime\": \"2026-01-01T00:00:00Z\", \"event\": { \"@type\": \"type.googleapis.com/home.graph.v1.DoorbellPressTrait.DoorbellPressedEvent\" } } ] } ] } ] } } } ```",
       "type": "object",
       "properties": {
         "requestId": {
@@ -455,6 +471,22 @@
         "includeDeviceMetadata": {
           "description": "Optional. If true, the response will include device metadata in the device_metadata field.",
           "type": "boolean"
+        },
+        "deviceView": {
+          "description": "Optional. Specifies the type of device data to be returned in the response. This allows callers to request traditional Smart Home traits, Unified Device Data Model (UDDM) traits, or both. If unspecified, defaults to SMART_HOME_TRAIT_ONLY.",
+          "type": "string",
+          "enumDescriptions": [
+            "Default value. Equivalent to SMART_HOME_TRAIT_ONLY.",
+            "Return only standard Smart Home traits in the `devices` map.",
+            "Return only Unified Device Data Model (UDDM) traits in the `home_trait_payload` map.",
+            "Return both standard Smart Home traits and UDDM traits."
+          ],
+          "enum": [
+            "DEVICE_VIEW_UNSPECIFIED",
+            "SMART_HOME_TRAIT_ONLY",
+            "HOME_TRAIT_ONLY",
+            "HOME_TRAIT_AND_SMART_HOME_TRAIT"
+          ]
         }
       }
     },
@@ -531,6 +563,13 @@
           "additionalProperties": {
             "$ref": "DeviceMetadata"
           }
+        },
+        "homeTraitPayload": {
+          "description": "Map of device IDs to their Unified Device Data Model (UDDM) trait payloads. This field is populated when `device_view` is set to HOME_TRAIT_ONLY or HOME_TRAIT_AND_SMART_HOME_TRAIT.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "HomeTraitPayload"
+          }
         }
       }
     },
@@ -545,6 +584,49 @@
           "additionalProperties": {
             "type": "string",
             "format": "google-datetime"
+          }
+        }
+      }
+    },
+    "HomeTraitPayload": {
+      "id": "HomeTraitPayload",
+      "description": "Container for UDDM trait data associated with a device.",
+      "type": "object",
+      "properties": {
+        "rootComponent": {
+          "description": "The root component of the device as reported by the provider.",
+          "$ref": "Component"
+        }
+      }
+    },
+    "Component": {
+      "id": "Component",
+      "description": "Component of a provider device.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Required. ID of the component from the device provider.",
+          "type": "string"
+        },
+        "deviceTypes": {
+          "description": "Required. List of Device types associated with this component. Supported device types are defined in cs//depot/google3/home/homeservicelayer/uddm/types/uddm_device_types.proto and the type string is the enum name, for example: ON_OFF_LIGHT => \"ON_OFF_LIGHT\".",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "traitData": {
+          "description": "Required. List of trait data associated with the component.",
+          "type": "array",
+          "items": {
+            "$ref": "TraitData"
+          }
+        },
+        "childComponents": {
+          "description": "Optional. Child components.",
+          "type": "array",
+          "items": {
+            "$ref": "Component"
           }
         }
       }
@@ -729,21 +811,5 @@
         }
       }
     }
-  },
-  "icons": {
-    "x16": "http://www.google.com/images/icons/product/search-16.gif",
-    "x32": "http://www.google.com/images/icons/product/search-32.gif"
-  },
-  "protocol": "rest",
-  "version_module": true,
-  "kind": "discovery#restDescription",
-  "rootUrl": "https://homegraph.googleapis.com/",
-  "basePath": "",
-  "batchPath": "batch",
-  "discoveryVersion": "v1",
-  "description": "",
-  "ownerName": "Google",
-  "servicePath": "",
-  "canonicalName": "Home Graph Service",
-  "ownerDomain": "google.com"
+  }
 }
