@@ -1,327 +1,777 @@
 {
-  "batchPath": "batch",
-  "basePath": "",
-  "version_module": true,
-  "ownerDomain": "google.com",
-  "canonicalName": "CCAI Platform",
-  "parameters": {
-    "alt": {
-      "default": "json",
-      "enum": [
-        "json",
-        "media",
-        "proto"
-      ],
-      "enumDescriptions": [
-        "Responses with Content-Type of application/json",
-        "Media download with context-dependent Content-Type",
-        "Responses with Content-Type of application/x-protobuf"
-      ],
-      "type": "string",
-      "description": "Data format for response.",
-      "location": "query"
-    },
-    "key": {
-      "type": "string",
-      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
-      "location": "query"
-    },
-    "quotaUser": {
-      "type": "string",
-      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
-      "location": "query"
-    },
-    "fields": {
-      "description": "Selector specifying which fields to include in a partial response.",
-      "location": "query",
-      "type": "string"
-    },
-    "access_token": {
-      "description": "OAuth access token.",
-      "location": "query",
-      "type": "string"
-    },
-    "upload_protocol": {
-      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").",
-      "location": "query",
-      "type": "string"
-    },
-    "uploadType": {
-      "type": "string",
-      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
-      "location": "query"
-    },
-    "oauth_token": {
-      "description": "OAuth 2.0 token for the current user.",
-      "location": "query",
-      "type": "string"
-    },
-    "prettyPrint": {
-      "default": "true",
-      "type": "boolean",
-      "description": "Returns response with indentations and line breaks.",
-      "location": "query"
-    },
-    "callback": {
-      "type": "string",
-      "description": "JSONP",
-      "location": "query"
-    },
-    "$.xgafv": {
-      "type": "string",
-      "description": "V1 error format.",
-      "enum": [
-        "1",
-        "2"
-      ],
-      "enumDescriptions": [
-        "v1 error format",
-        "v2 error format"
-      ],
-      "location": "query"
-    }
-  },
-  "version": "v1alpha1",
-  "name": "contactcenteraiplatform",
-  "title": "Contact Center AI Platform API",
-  "rootUrl": "https://contactcenteraiplatform.googleapis.com/",
   "schemas": {
-    "Component": {
-      "id": "Component",
-      "description": "Defines a logical CCAIP component that e.g. “EMAIL”, \"CRM\". For more information see go/ccaip-private-path-v2. Each logical component is associated with a list of service attachments.",
+    "SolverConfig": {
       "type": "object",
       "properties": {
-        "serviceAttachmentNames": {
-          "items": {
-            "type": "string"
-          },
-          "description": "Associated service attachments. The service attachment names that will be used for sending private traffic to the CCAIP tenant project. Example service attachment name: \"projects/${TENANT_PROJECT_ID}/regions/${REGION}/serviceAttachments/ingress-default\".",
-          "type": "array"
+        "maximumProcessingDuration": {
+          "description": "Optional. Maximum time the solver should spend on the problem. If not set, defaults to 1 minute. The choice of a time limit should depend on the size of the problem. To give an example, when solving a 7-day instance with 2 `ShiftTemplates`, each with ~20 possible start times and holding 2 events with ~30 possible start times, and two days off per week, recommended values are: <10s for fast solutions (and likely suboptimal), (10s, 300s) for good quality solutions, and >300s for an exhaustive search. Larger instances may require longer time limits. This value is not a hard limit and it does not account for the communication overhead. The expected latency to solve the problem may slightly exceed this value.",
+          "format": "google-duration",
+          "type": "string"
         },
-        "name": {
-          "description": "Name of the component.",
+        "scheduleType": {
+          "enumDescriptions": [
+            "Unspecified schedule type. Should not be used.",
+            "Each `EmployeeSchedule` will include exactly one shift.",
+            "`EmployeeSchedule`s will include several shifts to generate a week-long schedule. The start and end time of events in a particular `EmployeeSchedule` will be identical. All the shifts have the same start and end time.",
+            "`EmployeeSchedule`s will include several shifts to generate a week-long schedule. The start and end time of events in a particular `EmployeeSchedule` can vary. All the shifts have the same start and end time. This option may result in longer solve times."
+          ],
+          "enum": [
+            "SCHEDULE_TYPE_UNSPECIFIED",
+            "SINGLE_SHIFT",
+            "WEEKLY_WITH_FIXED_EVENTS",
+            "WEEKLY_WITH_VARIABLE_EVENTS"
+          ],
+          "description": "Required. Specifies the type of schedule to generate.",
           "type": "string"
         }
-      }
-    },
-    "Empty": {
-      "type": "object",
-      "properties": {},
-      "id": "Empty",
-      "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }"
-    },
-    "PrivateAccess": {
-      "id": "PrivateAccess",
-      "description": "Defines ingress and egress private traffic settings for CCAIP instances.",
-      "type": "object",
-      "properties": {
-        "ingressSettings": {
-          "description": "List of ingress components that should not be accessed via the Internet. For more information see go/ccaip-private-path-v2.",
-          "type": "array",
-          "items": {
-            "$ref": "Component"
-          }
-        },
-        "egressSettings": {
-          "items": {
-            "$ref": "Component"
-          },
-          "type": "array",
-          "description": "List of egress components that should not be accessed via the Internet. For more information see go/ccaip-private-path-v2."
-        },
-        "pscSetting": {
-          "description": "Private service connect settings.",
-          "$ref": "PscSetting"
-        }
-      }
-    },
-    "CancelOperationRequest": {
-      "id": "CancelOperationRequest",
-      "description": "The request message for Operations.CancelOperation.",
-      "type": "object",
-      "properties": {}
-    },
-    "Date": {
-      "type": "object",
-      "properties": {
-        "month": {
-          "type": "integer",
-          "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.",
-          "format": "int32"
-        },
-        "day": {
-          "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "year": {
-          "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.",
-          "format": "int32",
-          "type": "integer"
-        }
       },
-      "id": "Date",
-      "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values. * A month and day, with a zero year (for example, an anniversary). * A year on its own, with a zero month and a zero day. * A year and month, with a zero day (for example, a credit card expiration date). Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp"
+      "id": "SolverConfig",
+      "description": "Specifies additional parameters for the solver generating shifts."
     },
-    "Critical": {
-      "type": "object",
-      "properties": {
-        "peakHours": {
-          "type": "array",
-          "description": "Required. Hours during which the instance should not be updated.",
-          "items": {
-            "$ref": "WeeklySchedule"
-          }
-        }
-      },
-      "id": "Critical",
-      "description": "Instances in this Channel will receive updates after all instances in `Normal` were updated. They also will only be updated outside of their peak hours."
-    },
-    "EventTemplate": {
-      "id": "EventTemplate",
-      "description": "Template specifying rules for generating a single event that occurs during a shift. An event may represent a meeting, break, lunch, etc.",
+    "ShiftTemplate": {
+      "id": "ShiftTemplate",
+      "description": "Template specifying rules for generating shifts. A shift is a unit of work that specifies a start time, end time, and may contain events (e.g. lunch, breaks etc.). Shifts will be assigned to specific dates in the response.",
       "type": "object",
       "properties": {
         "id": {
-          "description": "Required. Unique ID of this template.",
-          "type": "string"
+          "type": "string",
+          "description": "Required. Unique ID of this template."
+        },
+        "daysOffCountPerWeek": {
+          "description": "Optional. Fixed number of days off per week. An employee has a given day off if they are not assigned to a shift that starts on that day. A week is 7 days and begins on Sunday.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "daysOffDates": {
+          "description": "Optional. Fixed dates when shifts from this template should not be generated.",
+          "$ref": "DateList"
         },
         "startTimeIncrementMinutes": {
-          "type": "integer",
-          "description": "Required. The time increment (in minutes) used to generate the set of possible event start times between `minimum_minutes_after_shift_start` and `maximum_minutes_after_shift_start`. For example, if the minimum minutes after shift start are 30, maximum minutes after shift start are 45, and the start time increment is 5 minutes, the event can take place 30, 35, 40, or 45 minutes after the start of the shift.",
-          "format": "int32"
-        },
-        "minimumMinutesAfterShiftStart": {
-          "description": "Optional. Minimum number of minutes after the beginning of a shift that this event can start.",
+          "description": "Optional. The time increment (in minutes) used to generate the set of possible start times between `earliest_start_time` and `latest_start_time`. For example, if the earliest start time is 8:00, the latest start time is 8:30, and the start time increment is 10 minutes, then all possible start times for this shift template are: 8:00, 8:10, 8:20, and 8:30.",
           "format": "int32",
           "type": "integer"
+        },
+        "assignableEmployeeIds": {
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional. A list of specific employee IDs that can be assigned to shifts generated by this template. If this field is present, there will be `EmployeeSchedule`s in the response for which the `EmployeeSchedule.employee_id` field is set to one of the IDs in this list. The number of employee schedules with an assigned employee ID will be between `minimum_employee_count` and `maximum_employee_count`. If this field is empty, between `minimum_employee_count` and `maximum_employee_count` employees can be assigned to shifts generated by this template and the employee schedules won't have an assigned employee ID. Currently, only one assignable employee ID is supported.",
+          "type": "array"
+        },
+        "minimumEmployeeCount": {
+          "description": "Optional. Minimum number of employees that can be assigned to all shifts generated by this template on working days.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "latestStartTime": {
+          "description": "Required. Latest time in the day that a shift can start. This value is specified with hours and minutes; seconds and nanos are ignored. If this value is less than the `earliest_start_time`, it may imply an overnight shift.",
+          "$ref": "TimeOfDay"
+        },
+        "eventTemplates": {
+          "description": "Optional. Rules for generating events for each shift. Exactly one event will be included in each shift for each `EventTemplate` specified.",
+          "type": "array",
+          "items": {
+            "$ref": "EventTemplate"
+          }
+        },
+        "minimumIntereventGapMinutes": {
+          "description": "Optional. Minimum minutes between the end of one event and the start of the next.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "maximumEmployeeCount": {
+          "type": "integer",
+          "description": "Required. Maximum number of employees that can be assigned to all shifts generated by this template on working days.",
+          "format": "int32"
+        },
+        "earliestStartTime": {
+          "description": "Required. Earliest time in the day that a shift can start. This value is specified with hours and minutes; seconds and nanos are ignored.",
+          "$ref": "TimeOfDay"
         },
         "durationMinutes": {
-          "type": "integer",
-          "description": "Required. Fixed duration in minutes of this event.",
-          "format": "int32"
-        },
-        "maximumMinutesAfterShiftStart": {
-          "description": "Optional. Maximum number of minutes after the beginning of a shift that this event can start.",
+          "description": "Required. Fixed duration of a shift generated by this template.",
           "format": "int32",
           "type": "integer"
         }
       }
     },
-    "ListOperationsResponse": {
-      "id": "ListOperationsResponse",
-      "description": "The response message for Operations.ListOperations.",
+    "DateTime": {
+      "id": "DateTime",
+      "description": "Represents civil time (or occasionally physical time). This type can represent a civil time in one of a few possible ways: * When utc_offset is set and time_zone is unset: a civil time on a calendar day with a particular offset from UTC. * When time_zone is set and utc_offset is unset: a civil time on a calendar day in a particular time zone. * When neither time_zone nor utc_offset is set: a civil time on a calendar day in local time. The date is relative to the Proleptic Gregorian Calendar. If year, month, or day are 0, the DateTime is considered not to have a specific year, month, or day respectively. This type may also be used to represent a physical time if all the date and time fields are set and either case of the `time_offset` oneof is set. Consider using `Timestamp` message for physical time instead. If your use case also would like to store the user's timezone, that can be done in another field. This type is more flexible than some applications may want. Make sure to document and validate your application's limitations.",
       "type": "object",
       "properties": {
-        "nextPageToken": {
-          "type": "string",
-          "description": "The standard List next-page token."
+        "hours": {
+          "description": "Optional. Hours of day in 24 hour format. Should be from 0 to 23, defaults to 0 (midnight). An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
+          "format": "int32",
+          "type": "integer"
         },
-        "unreachable": {
-          "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "minutes": {
+          "description": "Optional. Minutes of hour of day. Must be from 0 to 59, defaults to 0.",
+          "format": "int32",
+          "type": "integer"
         },
-        "operations": {
-          "items": {
-            "$ref": "Operation"
-          },
-          "type": "array",
-          "description": "A list of operations that matches the specified filter in the request."
-        }
-      }
-    },
-    "ListContactCentersResponse": {
-      "type": "object",
-      "properties": {
-        "contactCenters": {
-          "items": {
-            "$ref": "ContactCenter"
-          },
-          "type": "array",
-          "description": "The list of ContactCenter"
+        "timeZone": {
+          "description": "Time zone.",
+          "$ref": "TimeZone"
         },
-        "nextPageToken": {
-          "description": "A token identifying a page of results the server should return.",
+        "seconds": {
+          "description": "Optional. Seconds of minutes of the time. Must normally be from 0 to 59, defaults to 0. An API may allow the value 60 if it allows leap-seconds.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "day": {
+          "description": "Optional. Day of month. Must be from 1 to 31 and valid for the year and month, or 0 if specifying a datetime without a day.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "month": {
+          "description": "Optional. Month of year. Must be from 1 to 12, or 0 if specifying a datetime without a month.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "utcOffset": {
+          "description": "UTC offset. Must be whole seconds, between -18 hours and +18 hours. For example, a UTC offset of -4:00 would be represented as { seconds: -14400 }.",
+          "format": "google-duration",
           "type": "string"
         },
-        "unreachable": {
-          "items": {
-            "type": "string"
-          },
-          "description": "Locations that could not be reached.",
-          "type": "array"
-        }
-      },
-      "id": "ListContactCentersResponse",
-      "description": "Message for response to listing ContactCenters"
-    },
-    "PscSetting": {
-      "id": "PscSetting",
-      "description": "Private service connect settings.",
-      "type": "object",
-      "properties": {
-        "producerProjectIds": {
-          "items": {
-            "type": "string"
-          },
-          "description": "Output only. The CCAIP tenant project ids.",
-          "readOnly": true,
-          "type": "array"
+        "nanos": {
+          "type": "integer",
+          "description": "Optional. Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999, defaults to 0.",
+          "format": "int32"
         },
-        "allowedConsumerProjectIds": {
-          "description": "The list of project ids that are allowed to send traffic to the service attachment. This field should be filled only for the ingress components.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "year": {
+          "type": "integer",
+          "description": "Optional. Year of date. Must be from 1 to 9999, or 0 if specifying a datetime without a year.",
+          "format": "int32"
         }
       }
     },
-    "FeatureConfig": {
+    "Location": {
       "type": "object",
       "properties": {
-        "agentDesktopEnabled": {
-          "description": "Optional. If true - enables the agent desktop feature. Default is false.",
-          "type": "boolean"
+        "locationId": {
+          "description": "The canonical id for this location. For example: `\"us-east1\"`.",
+          "type": "string"
+        },
+        "displayName": {
+          "description": "The friendly name for this location, typically a nearby city name. For example, \"Tokyo\".",
+          "type": "string"
+        },
+        "name": {
+          "type": "string",
+          "description": "Resource name for the location, which may vary between implementations. For example: `\"projects/example-project/locations/us-east1\"`"
+        },
+        "labels": {
+          "description": "Cross-service attributes for the location. For example {\"cloud.googleapis.com/region\": \"us-east1\"}",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "metadata": {
+          "description": "Service-specific metadata. For example the available capacity at the given location.",
+          "type": "object",
+          "additionalProperties": {
+            "description": "Properties of the object. Contains field @type with type URL.",
+            "type": "any"
+          }
         }
       },
-      "id": "FeatureConfig"
+      "id": "Location",
+      "description": "A resource that represents a Google Cloud location."
     },
-    "PlanningHorizon": {
-      "id": "PlanningHorizon",
-      "description": "Specifies the time interval during which the solver should generate shifts. The start time must be before the end time.",
+    "Early": {
+      "id": "Early",
+      "description": "LINT.IfChange First Channel to receive the updates. Meant to dev/test instances",
+      "type": "object",
+      "properties": {}
+    },
+    "Normal": {
+      "id": "Normal",
+      "description": "Instances in this Channel will receive updates after all instances in `Early` were updated + 2 days.",
+      "type": "object",
+      "properties": {}
+    },
+    "TimeOfDay": {
+      "id": "TimeOfDay",
+      "description": "Represents a time of day. The date and time zone are either not significant or are specified elsewhere. An API may choose to allow leap seconds. Related types are google.type.Date and `google.protobuf.Timestamp`.",
       "type": "object",
       "properties": {
-        "startTime": {
-          "description": "Required. Start of the time interval for the given demand (inclusive). These values are read down to the minute; seconds and all smaller units are ignored.",
-          "$ref": "DateTime"
+        "seconds": {
+          "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must be less than or equal to 59. An API may allow the value 60 if it allows leap-seconds.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "nanos": {
+          "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "hours": {
+          "description": "Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "minutes": {
+          "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or equal to 59.",
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "InstanceConfig": {
+      "type": "object",
+      "properties": {
+        "instanceSize": {
+          "type": "string",
+          "description": "The instance size of this the instance configuration.",
+          "enumDescriptions": [
+            "The default value. This value is used if the state is omitted.",
+            "Instance Size STANDARD_SMALL.",
+            "Instance Size STANDARD_MEDIUM.",
+            "Instance Size STANDARD_LARGE.",
+            "Instance Size STANDARD_XLARGE.",
+            "Instance Size STANDARD_2XLARGE.",
+            "Instance Size STANDARD_3XLARGE.",
+            "Instance Size MULTIREGION_SMALL",
+            "Instance Size MULTIREGION_MEDIUM",
+            "Instance Size MULTIREGION_LARGE",
+            "Instance Size MULTIREGION_XLARGE",
+            "Instance Size MULTIREGION_2XLARGE.",
+            "Instance Size MULTIREGION_3XLARGE.",
+            "Instance Size DEV_SMALL",
+            "Instance Size SANDBOX_SMALL",
+            "Instance Size TRIAL_SMALL",
+            "Instance Size TIME_LIMITED_TRIAL_SMALL"
+          ],
+          "enum": [
+            "INSTANCE_SIZE_UNSPECIFIED",
+            "STANDARD_SMALL",
+            "STANDARD_MEDIUM",
+            "STANDARD_LARGE",
+            "STANDARD_XLARGE",
+            "STANDARD_2XLARGE",
+            "STANDARD_3XLARGE",
+            "MULTIREGION_SMALL",
+            "MULTIREGION_MEDIUM",
+            "MULTIREGION_LARGE",
+            "MULTIREGION_XLARGE",
+            "MULTIREGION_2XLARGE",
+            "MULTIREGION_3XLARGE",
+            "DEV_SMALL",
+            "SANDBOX_SMALL",
+            "TRIAL_SMALL",
+            "TIME_LIMITED_TRIAL_SMALL"
+          ]
+        }
+      },
+      "id": "InstanceConfig",
+      "description": "Message storing the instance configuration."
+    },
+    "ContactCenter": {
+      "type": "object",
+      "properties": {
+        "ccaipManagedUsers": {
+          "description": "Optional. Whether to enable users to be created in the CCAIP-instance concurrently to having users in Cloud identity",
+          "type": "boolean"
+        },
+        "samlParams": {
+          "description": "Optional. Params that sets up Google as IdP.",
+          "$ref": "SAMLParams"
+        },
+        "createTime": {
+          "type": "string",
+          "description": "Output only. [Output only] Create time stamp",
+          "readOnly": true,
+          "format": "google-datetime"
+        },
+        "labels": {
+          "description": "Labels as key value pairs",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "description": "name of resource",
+          "type": "string"
+        },
+        "adminUser": {
+          "description": "Optional. Info about the first admin user, such as given name and family name.",
+          "$ref": "AdminUser"
+        },
+        "purgeTime": {
+          "type": "string",
+          "description": "Output only. Timestamp in UTC of when this resource is going to be hard-deleted.",
+          "readOnly": true,
+          "format": "google-datetime"
+        },
+        "kmsKey": {
+          "type": "string",
+          "description": "Immutable. The KMS key name to encrypt the user input (`ContactCenter`)."
+        },
+        "privateAccess": {
+          "description": "Optional. VPC-SC related networking configuration.",
+          "$ref": "PrivateAccess"
+        },
+        "updateTime": {
+          "description": "Output only. [Output only] Update time stamp",
+          "readOnly": true,
+          "format": "google-datetime",
+          "type": "string"
+        },
+        "instanceConfig": {
+          "description": "The configuration of this instance, it is currently immutable once created.",
+          "$ref": "InstanceConfig"
+        },
+        "normal": {
+          "description": "Optional. Normal release channel.",
+          "$ref": "Normal"
+        },
+        "userEmail": {
+          "type": "string",
+          "description": "Optional. Email address of the first admin user."
+        },
+        "featureConfig": {
+          "description": "Optional. Feature configuration to populate the feature flags.",
+          "$ref": "FeatureConfig"
+        },
+        "expireTime": {
+          "type": "string",
+          "description": "Output only. Timestamp in UTC of when this resource is considered expired.",
+          "readOnly": true,
+          "format": "google-datetime"
+        },
+        "privateComponents": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "description": "Output only. TODO(b/283407860) Deprecate this field.",
+          "readOnly": true
+        },
+        "advancedReportingEnabled": {
+          "type": "boolean",
+          "description": "Optional. Whether the advanced reporting feature is enabled."
+        },
+        "early": {
+          "description": "Optional. Early release channel.",
+          "$ref": "Early"
+        },
+        "state": {
+          "description": "Output only. The state of this contact center.",
+          "readOnly": true,
+          "type": "string",
+          "enumDescriptions": [
+            "The default value. This value is used if the state is omitted.",
+            "State DEPLOYING",
+            "State DEPLOYED",
+            "State TERMINATING",
+            "State FAILED",
+            "State TERMINATING_FAILED",
+            "Reused for soft-deleted state because semantically equivalent to `DELETED` as implied by go/aip/164.",
+            "State IN_GRACE_PERIOD",
+            "State in STATE_FAILING_OVER. This State must ONLY be used by Multiregional Instances when a failover was triggered. Customers are not able to update instances in this state.",
+            "State DEGRADED. This State must ONLY be used by Multiregional Instances after a failover was executed successfully. Customers are not able to update instances in this state.",
+            "State REPAIRING. This State must ONLY be used by Multiregional Instances after a fallback was triggered. Customers are not able to update instancs in this state.",
+            "Flagged by an automation as soon to be expired."
+          ],
+          "enum": [
+            "STATE_UNSPECIFIED",
+            "STATE_DEPLOYING",
+            "STATE_DEPLOYED",
+            "STATE_TERMINATING",
+            "STATE_FAILED",
+            "STATE_TERMINATING_FAILED",
+            "STATE_TERMINATED",
+            "STATE_IN_GRACE_PERIOD",
+            "STATE_FAILING_OVER",
+            "STATE_DEGRADED",
+            "STATE_REPAIRING",
+            "STATE_EXPIRING"
+          ]
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Required. A user friendly name for the ContactCenter."
+        },
+        "customerDomainPrefix": {
+          "description": "Required. Immutable. At least 2 and max 16 char long, must conform to [RFC 1035](https://www.ietf.org/rfc/rfc1035.txt).",
+          "type": "string"
+        },
+        "deleteTime": {
+          "type": "string",
+          "description": "Output only. Timestamp in UTC of when this resource was soft-deleted.",
+          "readOnly": true,
+          "format": "google-datetime"
+        },
+        "uris": {
+          "description": "Output only. URIs to access the deployed ContactCenters.",
+          "readOnly": true,
+          "$ref": "URIs"
+        },
+        "critical": {
+          "description": "Optional. Critical release channel.",
+          "$ref": "Critical"
+        },
+        "releaseVersion": {
+          "type": "string",
+          "description": "Output only. UJET release version, unique for each new release.",
+          "readOnly": true
+        }
+      },
+      "id": "ContactCenter",
+      "description": "Message describing ContactCenter object"
+    },
+    "ContactCenterQuota": {
+      "type": "object",
+      "properties": {
+        "contactCenterCountSum": {
+          "deprecated": true,
+          "description": "Deprecated: Use the Quota fields instead. Reflects the count sum of contact centers on a billing account.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "contactCenterCountLimit": {
+          "type": "integer",
+          "description": "Deprecated: Use the Quota fields instead. Reflects the count limit of contact centers on a billing account.",
+          "format": "int32",
+          "deprecated": true
+        },
+        "quotas": {
+          "description": "Quota details per contact center instance type.",
+          "type": "array",
+          "items": {
+            "$ref": "Quota"
+          }
+        }
+      },
+      "id": "ContactCenterQuota",
+      "description": "Represents a quota for contact centers."
+    },
+    "WorkforceDemand": {
+      "type": "object",
+      "properties": {
+        "employeeCount": {
+          "type": "integer",
+          "description": "Optional. Number of employees needed to cover the demand for this interval.",
+          "format": "int32"
         },
         "endTime": {
           "description": "Required. End of the time interval for the given demand (exclusive). These values are read down to the minute; seconds and all smaller units are ignored.",
           "$ref": "DateTime"
+        },
+        "startTime": {
+          "description": "Required. Start of the time interval for the given demand (inclusive). These values are read down to the minute; seconds and all smaller units are ignored.",
+          "$ref": "DateTime"
+        }
+      },
+      "id": "WorkforceDemand",
+      "description": "Specifies the number of employees required to cover the demand in the given time interval. The length of the interval must be strictly positive."
+    },
+    "GenerateShiftsRequest": {
+      "type": "object",
+      "properties": {
+        "employeeInfo": {
+          "type": "array",
+          "description": "Optional. Employee information that should be considered when generating shifts.",
+          "items": {
+            "$ref": "EmployeeInfo"
+          }
+        },
+        "solverConfig": {
+          "description": "Required. Parameters for the solver.",
+          "$ref": "SolverConfig"
+        },
+        "planningHorizon": {
+          "description": "Required. The solver will generate the maximum number of shifts per shift template.",
+          "$ref": "PlanningHorizon"
+        },
+        "workforceDemands": {
+          "description": "Required. All the workforce demands that the generated shifts need to cover. The planning horizon is defined between the earliest start time and the latest end time across all the entries. This field cannot be empty.",
+          "$ref": "WorkforceDemandList"
+        },
+        "shiftTemplates": {
+          "items": {
+            "$ref": "ShiftTemplate"
+          },
+          "description": "Required. Set of shift templates specifying rules for generating shifts. A shift template can be used for generating multiple shifts.",
+          "type": "array"
+        }
+      },
+      "id": "GenerateShiftsRequest",
+      "description": "Request with constraints for generating shifts. The shifts generated must adhere to these constraints."
+    },
+    "OperationMetadata": {
+      "id": "OperationMetadata",
+      "description": "Represents the metadata of the long-running operation.",
+      "type": "object",
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "Output only. Server-defined resource path for the target of the operation.",
+          "readOnly": true
+        },
+        "contactCenter": {
+          "description": "Contact center information for this request",
+          "$ref": "ContactCenter"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "Output only. The time the operation finished running.",
+          "readOnly": true,
+          "format": "google-datetime"
+        },
+        "requestedCancellation": {
+          "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have been cancelled successfully have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
+          "readOnly": true,
+          "type": "boolean"
+        },
+        "createTime": {
+          "description": "Output only. The time the operation was created.",
+          "readOnly": true,
+          "format": "google-datetime",
+          "type": "string"
+        },
+        "statusMessage": {
+          "description": "Output only. Human-readable status of the operation, if any.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "verb": {
+          "type": "string",
+          "description": "Output only. Name of the verb executed by the operation.",
+          "readOnly": true
+        },
+        "apiVersion": {
+          "description": "Output only. API version used to start the operation.",
+          "readOnly": true,
+          "type": "string"
+        }
+      }
+    },
+    "URIs": {
+      "id": "URIs",
+      "description": "Message storing the URIs of the ContactCenter.",
+      "type": "object",
+      "properties": {
+        "chatBotUri": {
+          "description": "Chat Bot Uri of the ContactCenter",
+          "type": "string"
+        },
+        "rootUri": {
+          "description": "Root Uri of the ContactCenter.",
+          "type": "string"
+        },
+        "mediaUri": {
+          "description": "Media Uri of the ContactCenter.",
+          "type": "string"
+        },
+        "virtualAgentStreamingServiceUri": {
+          "description": "Virtual Agent Streaming Service Uri of the ContactCenter.",
+          "type": "string"
+        }
+      }
+    },
+    "WeeklySchedule": {
+      "id": "WeeklySchedule",
+      "description": "Message representing a weekly schedule.",
+      "type": "object",
+      "properties": {
+        "startTime": {
+          "description": "Required. Daily start time of the schedule.",
+          "$ref": "TimeOfDay"
+        },
+        "endTime": {
+          "description": "Optional. Daily end time of the schedule. If `end_time` is before `start_time`, the schedule will be considered as ending on the next day.",
+          "$ref": "TimeOfDay"
+        },
+        "duration": {
+          "description": "Optional. Duration of the schedule.",
+          "format": "google-duration",
+          "type": "string"
+        },
+        "days": {
+          "items": {
+            "type": "string",
+            "enumDescriptions": [
+              "The day of the week is unspecified.",
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+              "Saturday",
+              "Sunday"
+            ],
+            "enum": [
+              "DAY_OF_WEEK_UNSPECIFIED",
+              "MONDAY",
+              "TUESDAY",
+              "WEDNESDAY",
+              "THURSDAY",
+              "FRIDAY",
+              "SATURDAY",
+              "SUNDAY"
+            ]
+          },
+          "description": "Required. Days of the week this schedule applies to.",
+          "type": "array"
+        }
+      }
+    },
+    "Quota": {
+      "type": "object",
+      "properties": {
+        "contactCenterCountSum": {
+          "description": "Reflects the count sum of contact centers on a billing account.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "contactCenterInstanceSize": {
+          "enumDescriptions": [
+            "The default value. This value is used if the state is omitted.",
+            "Instance Size STANDARD_SMALL.",
+            "Instance Size STANDARD_MEDIUM.",
+            "Instance Size STANDARD_LARGE.",
+            "Instance Size STANDARD_XLARGE.",
+            "Instance Size STANDARD_2XLARGE.",
+            "Instance Size STANDARD_3XLARGE.",
+            "Instance Size MULTIREGION_SMALL",
+            "Instance Size MULTIREGION_MEDIUM",
+            "Instance Size MULTIREGION_LARGE",
+            "Instance Size MULTIREGION_XLARGE",
+            "Instance Size MULTIREGION_2XLARGE.",
+            "Instance Size MULTIREGION_3XLARGE.",
+            "Instance Size DEV_SMALL",
+            "Instance Size SANDBOX_SMALL",
+            "Instance Size TRIAL_SMALL",
+            "Instance Size TIME_LIMITED_TRIAL_SMALL"
+          ],
+          "enum": [
+            "INSTANCE_SIZE_UNSPECIFIED",
+            "STANDARD_SMALL",
+            "STANDARD_MEDIUM",
+            "STANDARD_LARGE",
+            "STANDARD_XLARGE",
+            "STANDARD_2XLARGE",
+            "STANDARD_3XLARGE",
+            "MULTIREGION_SMALL",
+            "MULTIREGION_MEDIUM",
+            "MULTIREGION_LARGE",
+            "MULTIREGION_XLARGE",
+            "MULTIREGION_2XLARGE",
+            "MULTIREGION_3XLARGE",
+            "DEV_SMALL",
+            "SANDBOX_SMALL",
+            "TRIAL_SMALL",
+            "TIME_LIMITED_TRIAL_SMALL"
+          ],
+          "type": "string",
+          "description": "Contact center instance type."
+        },
+        "contactCenterCountLimit": {
+          "description": "Reflects the count limit of contact centers on a billing account.",
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "id": "Quota",
+      "description": "Quota details."
+    },
+    "Status": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "description": "The status code, which should be an enum value of google.rpc.Code.",
+          "format": "int32"
+        },
+        "details": {
+          "description": "A list of messages that carry the error details. There is a common set of message types for APIs to use.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "description": "Properties of the object. Contains field @type with type URL.",
+              "type": "any"
+            }
+          }
+        },
+        "message": {
+          "description": "A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.",
+          "type": "string"
+        }
+      },
+      "id": "Status",
+      "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors)."
+    },
+    "DateList": {
+      "type": "object",
+      "properties": {
+        "values": {
+          "type": "array",
+          "description": "Optional. Values in the list.",
+          "items": {
+            "$ref": "Date"
+          }
+        }
+      },
+      "id": "DateList",
+      "description": "List of dates."
+    },
+    "Operation": {
+      "id": "Operation",
+      "description": "This resource represents a long-running operation that is the result of a network API call.",
+      "type": "object",
+      "properties": {
+        "done": {
+          "type": "boolean",
+          "description": "If the value is `false`, it means the operation is still in progress. If `true`, the operation is completed, and either `error` or `response` is available."
+        },
+        "metadata": {
+          "description": "Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "any",
+            "description": "Properties of the object. Contains field @type with type URL."
+          }
+        },
+        "error": {
+          "description": "The error result of the operation in case of failure or cancellation.",
+          "$ref": "Status"
+        },
+        "response": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "any",
+            "description": "Properties of the object. Contains field @type with type URL."
+          },
+          "description": "The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`."
+        },
+        "name": {
+          "type": "string",
+          "description": "The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`."
         }
       }
     },
     "ListLocationsResponse": {
-      "id": "ListLocationsResponse",
-      "description": "The response message for Locations.ListLocations.",
       "type": "object",
       "properties": {
-        "nextPageToken": {
-          "type": "string",
-          "description": "The standard List next-page token."
-        },
         "locations": {
           "items": {
             "$ref": "Location"
           },
-          "type": "array",
-          "description": "A list of locations that matches the specified filter in the request."
+          "description": "A list of locations that matches the specified filter in the request.",
+          "type": "array"
+        },
+        "nextPageToken": {
+          "description": "The standard List next-page token.",
+          "type": "string"
         }
-      }
+      },
+      "id": "ListLocationsResponse",
+      "description": "The response message for Locations.ListLocations."
     },
     "SAMLParams": {
       "id": "SAMLParams",
@@ -329,8 +779,8 @@
       "type": "object",
       "properties": {
         "ssoUri": {
-          "type": "string",
-          "description": "Single sign-on URL"
+          "description": "Single sign-on URL",
+          "type": "string"
         },
         "entityId": {
           "type": "string",
@@ -346,8 +796,8 @@
           "description": "IdP field that maps to the user’s email address"
         },
         "authenticationContexts": {
-          "description": "Additional contexts used for authentication.",
           "type": "array",
+          "description": "Additional contexts used for authentication.",
           "items": {
             "type": "string",
             "enumDescriptions": [
@@ -412,34 +862,34 @@
         }
       }
     },
-    "AdminUser": {
+    "PlanningHorizon": {
+      "id": "PlanningHorizon",
+      "description": "Specifies the time interval during which the solver should generate shifts. The start time must be before the end time.",
       "type": "object",
       "properties": {
-        "givenName": {
-          "description": "Optional. First/given name of the first admin user.",
-          "type": "string"
+        "startTime": {
+          "description": "Required. Start of the time interval for the given demand (inclusive). These values are read down to the minute; seconds and all smaller units are ignored.",
+          "$ref": "DateTime"
         },
-        "familyName": {
-          "description": "Optional. Last/family name of the first admin user.",
-          "type": "string"
+        "endTime": {
+          "description": "Required. End of the time interval for the given demand (exclusive). These values are read down to the minute; seconds and all smaller units are ignored.",
+          "$ref": "DateTime"
         }
-      },
-      "id": "AdminUser",
-      "description": "Message storing info about the first admin user. Next ID: 3"
+      }
     },
     "EmployeeInfo": {
       "type": "object",
       "properties": {
         "id": {
-          "description": "Required. Unique ID of this employee.",
-          "type": "string"
+          "type": "string",
+          "description": "Required. Unique ID of this employee."
         },
         "unwantedEventIntervals": {
+          "type": "array",
+          "description": "Optional. A list of unwanted event intervals for this employee. The start time of the interval must be in the planning horizon.",
           "items": {
             "$ref": "UnwantedEventInterval"
-          },
-          "description": "Optional. A list of unwanted event intervals for this employee. The start time of the interval must be in the planning horizon.",
-          "type": "array"
+          }
         }
       },
       "id": "EmployeeInfo",
@@ -461,24 +911,36 @@
         }
       }
     },
-    "GoogleCloudCommonOperationMetadata": {
+    "AdminUser": {
+      "id": "AdminUser",
+      "description": "Message storing info about the first admin user. Next ID: 3",
       "type": "object",
       "properties": {
-        "endTime": {
-          "description": "Output only. The time the operation finished running.",
-          "readOnly": true,
-          "format": "google-datetime",
+        "givenName": {
+          "description": "Optional. First/given name of the first admin user.",
           "type": "string"
         },
-        "target": {
+        "familyName": {
+          "description": "Optional. Last/family name of the first admin user.",
+          "type": "string"
+        }
+      }
+    },
+    "GoogleCloudCommonOperationMetadata": {
+      "id": "GoogleCloudCommonOperationMetadata",
+      "description": "Represents the metadata of the long-running operation.",
+      "type": "object",
+      "properties": {
+        "createTime": {
           "type": "string",
-          "description": "Output only. Server-defined resource path for the target of the operation.",
-          "readOnly": true
-        },
-        "statusDetail": {
-          "description": "Output only. Human-readable status of the operation, if any.",
+          "description": "Output only. The time the operation was created.",
           "readOnly": true,
-          "type": "string"
+          "format": "google-datetime"
+        },
+        "cancelRequested": {
+          "type": "boolean",
+          "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have been cancelled successfully have google.longrunning.Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
+          "readOnly": true
         },
         "verb": {
           "type": "string",
@@ -490,34 +952,37 @@
           "readOnly": true,
           "type": "string"
         },
-        "cancelRequested": {
-          "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have been cancelled successfully have google.longrunning.Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
-          "readOnly": true,
-          "type": "boolean"
-        },
-        "createTime": {
+        "target": {
           "type": "string",
-          "description": "Output only. The time the operation was created.",
+          "description": "Output only. Server-defined resource path for the target of the operation.",
+          "readOnly": true
+        },
+        "statusDetail": {
+          "type": "string",
+          "description": "Output only. Human-readable status of the operation, if any.",
+          "readOnly": true
+        },
+        "endTime": {
+          "type": "string",
+          "description": "Output only. The time the operation finished running.",
           "readOnly": true,
           "format": "google-datetime"
         }
-      },
-      "id": "GoogleCloudCommonOperationMetadata",
-      "description": "Represents the metadata of the long-running operation."
+      }
     },
     "WorkforceDemandList": {
+      "id": "WorkforceDemandList",
+      "description": "List of workforce demands.",
       "type": "object",
       "properties": {
         "values": {
           "items": {
             "$ref": "WorkforceDemand"
           },
-          "description": "Optional. Values in the list.",
-          "type": "array"
+          "type": "array",
+          "description": "Optional. Values in the list."
         }
-      },
-      "id": "WorkforceDemandList",
-      "description": "List of workforce demands."
+      }
     },
     "TimeZone": {
       "id": "TimeZone",
@@ -534,780 +999,365 @@
         }
       }
     },
-    "WeeklySchedule": {
+    "Component": {
       "type": "object",
       "properties": {
-        "endTime": {
-          "description": "Optional. Daily end time of the schedule. If `end_time` is before `start_time`, the schedule will be considered as ending on the next day.",
-          "$ref": "TimeOfDay"
-        },
-        "startTime": {
-          "description": "Required. Daily start time of the schedule.",
-          "$ref": "TimeOfDay"
-        },
-        "days": {
+        "serviceAttachmentNames": {
+          "description": "Associated service attachments. The service attachment names that will be used for sending private traffic to the CCAIP tenant project. Example service attachment name: \"projects/${TENANT_PROJECT_ID}/regions/${REGION}/serviceAttachments/ingress-default\".",
+          "type": "array",
           "items": {
-            "enumDescriptions": [
-              "The day of the week is unspecified.",
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday",
-              "Saturday",
-              "Sunday"
-            ],
-            "enum": [
-              "DAY_OF_WEEK_UNSPECIFIED",
-              "MONDAY",
-              "TUESDAY",
-              "WEDNESDAY",
-              "THURSDAY",
-              "FRIDAY",
-              "SATURDAY",
-              "SUNDAY"
-            ],
             "type": "string"
-          },
-          "type": "array",
-          "description": "Required. Days of the week this schedule applies to."
-        },
-        "duration": {
-          "type": "string",
-          "description": "Optional. Duration of the schedule.",
-          "format": "google-duration"
-        }
-      },
-      "id": "WeeklySchedule",
-      "description": "Message representing a weekly schedule."
-    },
-    "DateList": {
-      "type": "object",
-      "properties": {
-        "values": {
-          "description": "Optional. Values in the list.",
-          "type": "array",
-          "items": {
-            "$ref": "Date"
-          }
-        }
-      },
-      "id": "DateList",
-      "description": "List of dates."
-    },
-    "Quota": {
-      "id": "Quota",
-      "description": "Quota details.",
-      "type": "object",
-      "properties": {
-        "contactCenterCountSum": {
-          "description": "Reflects the count sum of contact centers on a billing account.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "contactCenterInstanceSize": {
-          "enumDescriptions": [
-            "The default value. This value is used if the state is omitted.",
-            "Instance Size STANDARD_SMALL.",
-            "Instance Size STANDARD_MEDIUM.",
-            "Instance Size STANDARD_LARGE.",
-            "Instance Size STANDARD_XLARGE.",
-            "Instance Size STANDARD_2XLARGE.",
-            "Instance Size STANDARD_3XLARGE.",
-            "Instance Size MULTIREGION_SMALL",
-            "Instance Size MULTIREGION_MEDIUM",
-            "Instance Size MULTIREGION_LARGE",
-            "Instance Size MULTIREGION_XLARGE",
-            "Instance Size MULTIREGION_2XLARGE.",
-            "Instance Size MULTIREGION_3XLARGE.",
-            "Instance Size DEV_SMALL",
-            "Instance Size SANDBOX_SMALL",
-            "Instance Size TRIAL_SMALL",
-            "Instance Size TIME_LIMITED_TRIAL_SMALL"
-          ],
-          "enum": [
-            "INSTANCE_SIZE_UNSPECIFIED",
-            "STANDARD_SMALL",
-            "STANDARD_MEDIUM",
-            "STANDARD_LARGE",
-            "STANDARD_XLARGE",
-            "STANDARD_2XLARGE",
-            "STANDARD_3XLARGE",
-            "MULTIREGION_SMALL",
-            "MULTIREGION_MEDIUM",
-            "MULTIREGION_LARGE",
-            "MULTIREGION_XLARGE",
-            "MULTIREGION_2XLARGE",
-            "MULTIREGION_3XLARGE",
-            "DEV_SMALL",
-            "SANDBOX_SMALL",
-            "TRIAL_SMALL",
-            "TIME_LIMITED_TRIAL_SMALL"
-          ],
-          "description": "Contact center instance type.",
-          "type": "string"
-        },
-        "contactCenterCountLimit": {
-          "type": "integer",
-          "description": "Reflects the count limit of contact centers on a billing account.",
-          "format": "int32"
-        }
-      }
-    },
-    "Status": {
-      "id": "Status",
-      "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).",
-      "type": "object",
-      "properties": {
-        "message": {
-          "description": "A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.",
-          "type": "string"
-        },
-        "details": {
-          "type": "array",
-          "description": "A list of messages that carry the error details. There is a common set of message types for APIs to use.",
-          "items": {
-            "type": "object",
-            "additionalProperties": {
-              "description": "Properties of the object. Contains field @type with type URL.",
-              "type": "any"
-            }
           }
         },
-        "code": {
-          "description": "The status code, which should be an enum value of google.rpc.Code.",
-          "format": "int32",
-          "type": "integer"
-        }
-      }
-    },
-    "Operation": {
-      "id": "Operation",
-      "description": "This resource represents a long-running operation that is the result of a network API call.",
-      "type": "object",
-      "properties": {
         "name": {
-          "description": "The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.",
-          "type": "string"
-        },
-        "response": {
-          "description": "The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.",
-          "type": "object",
-          "additionalProperties": {
-            "description": "Properties of the object. Contains field @type with type URL.",
-            "type": "any"
-          }
-        },
-        "metadata": {
-          "description": "Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "any",
-            "description": "Properties of the object. Contains field @type with type URL."
-          }
-        },
-        "error": {
-          "description": "The error result of the operation in case of failure or cancellation.",
-          "$ref": "Status"
-        },
-        "done": {
-          "type": "boolean",
-          "description": "If the value is `false`, it means the operation is still in progress. If `true`, the operation is completed, and either `error` or `response` is available."
+          "type": "string",
+          "description": "Name of the component."
         }
-      }
+      },
+      "id": "Component",
+      "description": "Defines a logical CCAIP component that e.g. “EMAIL”, \"CRM\". For more information see go/ccaip-private-path-v2. Each logical component is associated with a list of service attachments."
     },
-    "SolverConfig": {
-      "id": "SolverConfig",
-      "description": "Specifies additional parameters for the solver generating shifts.",
+    "Empty": {
+      "id": "Empty",
+      "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
+      "type": "object",
+      "properties": {}
+    },
+    "PrivateAccess": {
       "type": "object",
       "properties": {
-        "maximumProcessingDuration": {
-          "type": "string",
-          "description": "Optional. Maximum time the solver should spend on the problem. If not set, defaults to 1 minute. The choice of a time limit should depend on the size of the problem. To give an example, when solving a 7-day instance with 2 `ShiftTemplates`, each with ~20 possible start times and holding 2 events with ~30 possible start times, and two days off per week, recommended values are: <10s for fast solutions (and likely suboptimal), (10s, 300s) for good quality solutions, and >300s for an exhaustive search. Larger instances may require longer time limits. This value is not a hard limit and it does not account for the communication overhead. The expected latency to solve the problem may slightly exceed this value.",
-          "format": "google-duration"
+        "pscSetting": {
+          "description": "Private service connect settings.",
+          "$ref": "PscSetting"
         },
-        "scheduleType": {
-          "description": "Required. Specifies the type of schedule to generate.",
-          "type": "string",
-          "enumDescriptions": [
-            "Unspecified schedule type. Should not be used.",
-            "Each `EmployeeSchedule` will include exactly one shift.",
-            "`EmployeeSchedule`s will include several shifts to generate a week-long schedule. The start and end time of events in a particular `EmployeeSchedule` will be identical. All the shifts have the same start and end time.",
-            "`EmployeeSchedule`s will include several shifts to generate a week-long schedule. The start and end time of events in a particular `EmployeeSchedule` can vary. All the shifts have the same start and end time. This option may result in longer solve times."
-          ],
-          "enum": [
-            "SCHEDULE_TYPE_UNSPECIFIED",
-            "SINGLE_SHIFT",
-            "WEEKLY_WITH_FIXED_EVENTS",
-            "WEEKLY_WITH_VARIABLE_EVENTS"
-          ]
-        }
-      }
-    },
-    "ShiftTemplate": {
-      "id": "ShiftTemplate",
-      "description": "Template specifying rules for generating shifts. A shift is a unit of work that specifies a start time, end time, and may contain events (e.g. lunch, breaks etc.). Shifts will be assigned to specific dates in the response.",
-      "type": "object",
-      "properties": {
-        "eventTemplates": {
+        "ingressSettings": {
+          "type": "array",
+          "description": "List of ingress components that should not be accessed via the Internet. For more information see go/ccaip-private-path-v2.",
           "items": {
-            "$ref": "EventTemplate"
+            "$ref": "Component"
+          }
+        },
+        "egressSettings": {
+          "type": "array",
+          "description": "List of egress components that should not be accessed via the Internet. For more information see go/ccaip-private-path-v2.",
+          "items": {
+            "$ref": "Component"
+          }
+        }
+      },
+      "id": "PrivateAccess",
+      "description": "Defines ingress and egress private traffic settings for CCAIP instances."
+    },
+    "Date": {
+      "id": "Date",
+      "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values. * A month and day, with a zero year (for example, an anniversary). * A year on its own, with a zero month and a zero day. * A year and month, with a zero day (for example, a credit card expiration date). Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp",
+      "type": "object",
+      "properties": {
+        "month": {
+          "type": "integer",
+          "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.",
+          "format": "int32"
+        },
+        "day": {
+          "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "year": {
+          "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.",
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "Critical": {
+      "type": "object",
+      "properties": {
+        "peakHours": {
+          "items": {
+            "$ref": "WeeklySchedule"
           },
-          "type": "array",
-          "description": "Optional. Rules for generating events for each shift. Exactly one event will be included in each shift for each `EventTemplate` specified."
-        },
-        "minimumIntereventGapMinutes": {
-          "type": "integer",
-          "description": "Optional. Minimum minutes between the end of one event and the start of the next.",
-          "format": "int32"
-        },
-        "maximumEmployeeCount": {
-          "description": "Required. Maximum number of employees that can be assigned to all shifts generated by this template on working days.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "earliestStartTime": {
-          "description": "Required. Earliest time in the day that a shift can start. This value is specified with hours and minutes; seconds and nanos are ignored.",
-          "$ref": "TimeOfDay"
-        },
-        "durationMinutes": {
-          "type": "integer",
-          "description": "Required. Fixed duration of a shift generated by this template.",
-          "format": "int32"
-        },
+          "description": "Required. Hours during which the instance should not be updated.",
+          "type": "array"
+        }
+      },
+      "id": "Critical",
+      "description": "Instances in this Channel will receive updates after all instances in `Normal` were updated. They also will only be updated outside of their peak hours."
+    },
+    "EventTemplate": {
+      "type": "object",
+      "properties": {
         "startTimeIncrementMinutes": {
-          "description": "Optional. The time increment (in minutes) used to generate the set of possible start times between `earliest_start_time` and `latest_start_time`. For example, if the earliest start time is 8:00, the latest start time is 8:30, and the start time increment is 10 minutes, then all possible start times for this shift template are: 8:00, 8:10, 8:20, and 8:30.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "assignableEmployeeIds": {
-          "description": "Optional. A list of specific employee IDs that can be assigned to shifts generated by this template. If this field is present, there will be `EmployeeSchedule`s in the response for which the `EmployeeSchedule.employee_id` field is set to one of the IDs in this list. The number of employee schedules with an assigned employee ID will be between `minimum_employee_count` and `maximum_employee_count`. If this field is empty, between `minimum_employee_count` and `maximum_employee_count` employees can be assigned to shifts generated by this template and the employee schedules won't have an assigned employee ID. Currently, only one assignable employee ID is supported.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+          "type": "integer",
+          "description": "Required. The time increment (in minutes) used to generate the set of possible event start times between `minimum_minutes_after_shift_start` and `maximum_minutes_after_shift_start`. For example, if the minimum minutes after shift start are 30, maximum minutes after shift start are 45, and the start time increment is 5 minutes, the event can take place 30, 35, 40, or 45 minutes after the start of the shift.",
+          "format": "int32"
         },
         "id": {
           "type": "string",
           "description": "Required. Unique ID of this template."
         },
-        "daysOffCountPerWeek": {
-          "description": "Optional. Fixed number of days off per week. An employee has a given day off if they are not assigned to a shift that starts on that day. A week is 7 days and begins on Sunday.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "daysOffDates": {
-          "description": "Optional. Fixed dates when shifts from this template should not be generated.",
-          "$ref": "DateList"
-        },
-        "latestStartTime": {
-          "description": "Required. Latest time in the day that a shift can start. This value is specified with hours and minutes; seconds and nanos are ignored. If this value is less than the `earliest_start_time`, it may imply an overnight shift.",
-          "$ref": "TimeOfDay"
-        },
-        "minimumEmployeeCount": {
-          "description": "Optional. Minimum number of employees that can be assigned to all shifts generated by this template on working days.",
-          "format": "int32",
-          "type": "integer"
-        }
-      }
-    },
-    "DateTime": {
-      "type": "object",
-      "properties": {
-        "month": {
-          "description": "Optional. Month of year. Must be from 1 to 12, or 0 if specifying a datetime without a month.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "utcOffset": {
-          "type": "string",
-          "description": "UTC offset. Must be whole seconds, between -18 hours and +18 hours. For example, a UTC offset of -4:00 would be represented as { seconds: -14400 }.",
-          "format": "google-duration"
-        },
-        "nanos": {
+        "maximumMinutesAfterShiftStart": {
           "type": "integer",
-          "description": "Optional. Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999, defaults to 0.",
+          "description": "Optional. Maximum number of minutes after the beginning of a shift that this event can start.",
           "format": "int32"
         },
-        "year": {
-          "description": "Optional. Year of date. Must be from 1 to 9999, or 0 if specifying a datetime without a year.",
+        "minimumMinutesAfterShiftStart": {
+          "description": "Optional. Minimum number of minutes after the beginning of a shift that this event can start.",
           "format": "int32",
           "type": "integer"
         },
-        "hours": {
+        "durationMinutes": {
           "type": "integer",
-          "description": "Optional. Hours of day in 24 hour format. Should be from 0 to 23, defaults to 0 (midnight). An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
+          "description": "Required. Fixed duration in minutes of this event.",
           "format": "int32"
-        },
-        "minutes": {
-          "type": "integer",
-          "description": "Optional. Minutes of hour of day. Must be from 0 to 59, defaults to 0.",
-          "format": "int32"
-        },
-        "timeZone": {
-          "description": "Time zone.",
-          "$ref": "TimeZone"
-        },
-        "seconds": {
-          "type": "integer",
-          "description": "Optional. Seconds of minutes of the time. Must normally be from 0 to 59, defaults to 0. An API may allow the value 60 if it allows leap-seconds.",
-          "format": "int32"
-        },
-        "day": {
-          "description": "Optional. Day of month. Must be from 1 to 31 and valid for the year and month, or 0 if specifying a datetime without a day.",
-          "format": "int32",
-          "type": "integer"
         }
       },
-      "id": "DateTime",
-      "description": "Represents civil time (or occasionally physical time). This type can represent a civil time in one of a few possible ways: * When utc_offset is set and time_zone is unset: a civil time on a calendar day with a particular offset from UTC. * When time_zone is set and utc_offset is unset: a civil time on a calendar day in a particular time zone. * When neither time_zone nor utc_offset is set: a civil time on a calendar day in local time. The date is relative to the Proleptic Gregorian Calendar. If year, month, or day are 0, the DateTime is considered not to have a specific year, month, or day respectively. This type may also be used to represent a physical time if all the date and time fields are set and either case of the `time_offset` oneof is set. Consider using `Timestamp` message for physical time instead. If your use case also would like to store the user's timezone, that can be done in another field. This type is more flexible than some applications may want. Make sure to document and validate your application's limitations."
+      "id": "EventTemplate",
+      "description": "Template specifying rules for generating a single event that occurs during a shift. An event may represent a meeting, break, lunch, etc."
     },
-    "InstanceConfig": {
-      "type": "object",
-      "properties": {
-        "instanceSize": {
-          "enumDescriptions": [
-            "The default value. This value is used if the state is omitted.",
-            "Instance Size STANDARD_SMALL.",
-            "Instance Size STANDARD_MEDIUM.",
-            "Instance Size STANDARD_LARGE.",
-            "Instance Size STANDARD_XLARGE.",
-            "Instance Size STANDARD_2XLARGE.",
-            "Instance Size STANDARD_3XLARGE.",
-            "Instance Size MULTIREGION_SMALL",
-            "Instance Size MULTIREGION_MEDIUM",
-            "Instance Size MULTIREGION_LARGE",
-            "Instance Size MULTIREGION_XLARGE",
-            "Instance Size MULTIREGION_2XLARGE.",
-            "Instance Size MULTIREGION_3XLARGE.",
-            "Instance Size DEV_SMALL",
-            "Instance Size SANDBOX_SMALL",
-            "Instance Size TRIAL_SMALL",
-            "Instance Size TIME_LIMITED_TRIAL_SMALL"
-          ],
-          "enum": [
-            "INSTANCE_SIZE_UNSPECIFIED",
-            "STANDARD_SMALL",
-            "STANDARD_MEDIUM",
-            "STANDARD_LARGE",
-            "STANDARD_XLARGE",
-            "STANDARD_2XLARGE",
-            "STANDARD_3XLARGE",
-            "MULTIREGION_SMALL",
-            "MULTIREGION_MEDIUM",
-            "MULTIREGION_LARGE",
-            "MULTIREGION_XLARGE",
-            "MULTIREGION_2XLARGE",
-            "MULTIREGION_3XLARGE",
-            "DEV_SMALL",
-            "SANDBOX_SMALL",
-            "TRIAL_SMALL",
-            "TIME_LIMITED_TRIAL_SMALL"
-          ],
-          "type": "string",
-          "description": "The instance size of this the instance configuration."
-        }
-      },
-      "id": "InstanceConfig",
-      "description": "Message storing the instance configuration."
-    },
-    "Location": {
-      "type": "object",
-      "properties": {
-        "locationId": {
-          "type": "string",
-          "description": "The canonical id for this location. For example: `\"us-east1\"`."
-        },
-        "displayName": {
-          "description": "The friendly name for this location, typically a nearby city name. For example, \"Tokyo\".",
-          "type": "string"
-        },
-        "name": {
-          "description": "Resource name for the location, which may vary between implementations. For example: `\"projects/example-project/locations/us-east1\"`",
-          "type": "string"
-        },
-        "labels": {
-          "description": "Cross-service attributes for the location. For example {\"cloud.googleapis.com/region\": \"us-east1\"}",
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "metadata": {
-          "type": "object",
-          "additionalProperties": {
-            "description": "Properties of the object. Contains field @type with type URL.",
-            "type": "any"
-          },
-          "description": "Service-specific metadata. For example the available capacity at the given location."
-        }
-      },
-      "id": "Location",
-      "description": "A resource that represents a Google Cloud location."
-    },
-    "Early": {
+    "CancelOperationRequest": {
       "type": "object",
       "properties": {},
-      "id": "Early",
-      "description": "LINT.IfChange First Channel to receive the updates. Meant to dev/test instances"
+      "id": "CancelOperationRequest",
+      "description": "The request message for Operations.CancelOperation."
     },
-    "Normal": {
-      "id": "Normal",
-      "description": "Instances in this Channel will receive updates after all instances in `Early` were updated + 2 days.",
-      "type": "object",
-      "properties": {}
-    },
-    "TimeOfDay": {
+    "PscSetting": {
+      "id": "PscSetting",
+      "description": "Private service connect settings.",
       "type": "object",
       "properties": {
-        "hours": {
-          "type": "integer",
-          "description": "Hours of a day in 24 hour format. Must be greater than or equal to 0 and typically must be less than or equal to 23. An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
-          "format": "int32"
-        },
-        "seconds": {
-          "type": "integer",
-          "description": "Seconds of a minute. Must be greater than or equal to 0 and typically must be less than or equal to 59. An API may allow the value 60 if it allows leap-seconds.",
-          "format": "int32"
-        },
-        "nanos": {
-          "type": "integer",
-          "description": "Fractions of seconds, in nanoseconds. Must be greater than or equal to 0 and less than or equal to 999,999,999.",
-          "format": "int32"
-        },
-        "minutes": {
-          "type": "integer",
-          "description": "Minutes of an hour. Must be greater than or equal to 0 and less than or equal to 59.",
-          "format": "int32"
-        }
-      },
-      "id": "TimeOfDay",
-      "description": "Represents a time of day. The date and time zone are either not significant or are specified elsewhere. An API may choose to allow leap seconds. Related types are google.type.Date and `google.protobuf.Timestamp`."
-    },
-    "ContactCenter": {
-      "id": "ContactCenter",
-      "description": "Message describing ContactCenter object",
-      "type": "object",
-      "properties": {
-        "labels": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Labels as key value pairs"
-        },
-        "createTime": {
-          "type": "string",
-          "description": "Output only. [Output only] Create time stamp",
-          "readOnly": true,
-          "format": "google-datetime"
-        },
-        "ccaipManagedUsers": {
-          "description": "Optional. Whether to enable users to be created in the CCAIP-instance concurrently to having users in Cloud identity",
-          "type": "boolean"
-        },
-        "samlParams": {
-          "description": "Optional. Params that sets up Google as IdP.",
-          "$ref": "SAMLParams"
-        },
-        "kmsKey": {
-          "type": "string",
-          "description": "Immutable. The KMS key name to encrypt the user input (`ContactCenter`)."
-        },
-        "purgeTime": {
-          "type": "string",
-          "description": "Output only. Timestamp in UTC of when this resource is going to be hard-deleted.",
-          "readOnly": true,
-          "format": "google-datetime"
-        },
-        "name": {
-          "description": "name of resource",
-          "type": "string"
-        },
-        "adminUser": {
-          "description": "Optional. Info about the first admin user, such as given name and family name.",
-          "$ref": "AdminUser"
-        },
-        "instanceConfig": {
-          "description": "The configuration of this instance, it is currently immutable once created.",
-          "$ref": "InstanceConfig"
-        },
-        "normal": {
-          "description": "Optional. Normal release channel.",
-          "$ref": "Normal"
-        },
-        "updateTime": {
-          "description": "Output only. [Output only] Update time stamp",
-          "readOnly": true,
-          "format": "google-datetime",
-          "type": "string"
-        },
-        "privateAccess": {
-          "description": "Optional. VPC-SC related networking configuration.",
-          "$ref": "PrivateAccess"
-        },
-        "featureConfig": {
-          "description": "Optional. Feature configuration to populate the feature flags.",
-          "$ref": "FeatureConfig"
-        },
-        "expireTime": {
-          "description": "Output only. Timestamp in UTC of when this resource is considered expired.",
-          "readOnly": true,
-          "format": "google-datetime",
-          "type": "string"
-        },
-        "privateComponents": {
-          "description": "Output only. TODO(b/283407860) Deprecate this field.",
-          "readOnly": true,
+        "allowedConsumerProjectIds": {
           "type": "array",
+          "description": "The list of project ids that are allowed to send traffic to the service attachment. This field should be filled only for the ingress components.",
           "items": {
             "type": "string"
           }
         },
-        "advancedReportingEnabled": {
-          "description": "Optional. Whether the advanced reporting feature is enabled.",
+        "producerProjectIds": {
+          "items": {
+            "type": "string"
+          },
+          "description": "Output only. The CCAIP tenant project ids.",
+          "readOnly": true,
+          "type": "array"
+        }
+      }
+    },
+    "FeatureConfig": {
+      "type": "object",
+      "properties": {
+        "agentDesktopEnabled": {
+          "description": "Optional. If true - enables the agent desktop feature. Default is false.",
           "type": "boolean"
-        },
-        "userEmail": {
-          "type": "string",
-          "description": "Optional. Email address of the first admin user."
-        },
-        "customerDomainPrefix": {
-          "description": "Required. Immutable. At least 2 and max 16 char long, must conform to [RFC 1035](https://www.ietf.org/rfc/rfc1035.txt).",
-          "type": "string"
-        },
-        "state": {
-          "enumDescriptions": [
-            "The default value. This value is used if the state is omitted.",
-            "State DEPLOYING",
-            "State DEPLOYED",
-            "State TERMINATING",
-            "State FAILED",
-            "State TERMINATING_FAILED",
-            "Reused for soft-deleted state because semantically equivalent to `DELETED` as implied by go/aip/164.",
-            "State IN_GRACE_PERIOD",
-            "State in STATE_FAILING_OVER. This State must ONLY be used by Multiregional Instances when a failover was triggered. Customers are not able to update instances in this state.",
-            "State DEGRADED. This State must ONLY be used by Multiregional Instances after a failover was executed successfully. Customers are not able to update instances in this state.",
-            "State REPAIRING. This State must ONLY be used by Multiregional Instances after a fallback was triggered. Customers are not able to update instancs in this state.",
-            "Flagged by an automation as soon to be expired."
-          ],
-          "enum": [
-            "STATE_UNSPECIFIED",
-            "STATE_DEPLOYING",
-            "STATE_DEPLOYED",
-            "STATE_TERMINATING",
-            "STATE_FAILED",
-            "STATE_TERMINATING_FAILED",
-            "STATE_TERMINATED",
-            "STATE_IN_GRACE_PERIOD",
-            "STATE_FAILING_OVER",
-            "STATE_DEGRADED",
-            "STATE_REPAIRING",
-            "STATE_EXPIRING"
-          ],
-          "type": "string",
-          "description": "Output only. The state of this contact center.",
-          "readOnly": true
-        },
-        "early": {
-          "description": "Optional. Early release channel.",
-          "$ref": "Early"
-        },
-        "displayName": {
-          "type": "string",
-          "description": "Required. A user friendly name for the ContactCenter."
-        },
-        "uris": {
-          "description": "Output only. URIs to access the deployed ContactCenters.",
-          "readOnly": true,
-          "$ref": "URIs"
-        },
-        "deleteTime": {
-          "type": "string",
-          "description": "Output only. Timestamp in UTC of when this resource was soft-deleted.",
-          "readOnly": true,
-          "format": "google-datetime"
-        },
-        "critical": {
-          "description": "Optional. Critical release channel.",
-          "$ref": "Critical"
-        },
-        "releaseVersion": {
-          "description": "Output only. UJET release version, unique for each new release.",
-          "readOnly": true,
-          "type": "string"
         }
-      }
+      },
+      "id": "FeatureConfig"
     },
-    "ContactCenterQuota": {
+    "ListOperationsResponse": {
+      "id": "ListOperationsResponse",
+      "description": "The response message for Operations.ListOperations.",
       "type": "object",
       "properties": {
-        "contactCenterCountSum": {
-          "deprecated": true,
-          "description": "Deprecated: Use the Quota fields instead. Reflects the count sum of contact centers on a billing account.",
-          "format": "int32",
-          "type": "integer"
-        },
-        "contactCenterCountLimit": {
-          "type": "integer",
-          "description": "Deprecated: Use the Quota fields instead. Reflects the count limit of contact centers on a billing account.",
-          "format": "int32",
-          "deprecated": true
-        },
-        "quotas": {
-          "description": "Quota details per contact center instance type.",
+        "operations": {
           "type": "array",
+          "description": "A list of operations that matches the specified filter in the request.",
           "items": {
-            "$ref": "Quota"
+            "$ref": "Operation"
           }
-        }
-      },
-      "id": "ContactCenterQuota",
-      "description": "Represents a quota for contact centers."
-    },
-    "WorkforceDemand": {
-      "id": "WorkforceDemand",
-      "description": "Specifies the number of employees required to cover the demand in the given time interval. The length of the interval must be strictly positive.",
-      "type": "object",
-      "properties": {
-        "endTime": {
-          "description": "Required. End of the time interval for the given demand (exclusive). These values are read down to the minute; seconds and all smaller units are ignored.",
-          "$ref": "DateTime"
         },
-        "startTime": {
-          "description": "Required. Start of the time interval for the given demand (inclusive). These values are read down to the minute; seconds and all smaller units are ignored.",
-          "$ref": "DateTime"
+        "nextPageToken": {
+          "description": "The standard List next-page token.",
+          "type": "string"
         },
-        "employeeCount": {
-          "description": "Optional. Number of employees needed to cover the demand for this interval.",
-          "format": "int32",
-          "type": "integer"
+        "unreachable": {
+          "items": {
+            "type": "string"
+          },
+          "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.",
+          "type": "array"
         }
       }
     },
-    "URIs": {
+    "ListContactCentersResponse": {
       "type": "object",
       "properties": {
-        "mediaUri": {
-          "type": "string",
-          "description": "Media Uri of the ContactCenter."
-        },
-        "virtualAgentStreamingServiceUri": {
-          "type": "string",
-          "description": "Virtual Agent Streaming Service Uri of the ContactCenter."
-        },
-        "rootUri": {
-          "description": "Root Uri of the ContactCenter.",
-          "type": "string"
-        },
-        "chatBotUri": {
-          "description": "Chat Bot Uri of the ContactCenter",
-          "type": "string"
-        }
-      },
-      "id": "URIs",
-      "description": "Message storing the URIs of the ContactCenter."
-    },
-    "GenerateShiftsRequest": {
-      "id": "GenerateShiftsRequest",
-      "description": "Request with constraints for generating shifts. The shifts generated must adhere to these constraints.",
-      "type": "object",
-      "properties": {
-        "employeeInfo": {
+        "contactCenters": {
           "items": {
-            "$ref": "EmployeeInfo"
+            "$ref": "ContactCenter"
           },
-          "type": "array",
-          "description": "Optional. Employee information that should be considered when generating shifts."
-        },
-        "shiftTemplates": {
-          "items": {
-            "$ref": "ShiftTemplate"
-          },
-          "description": "Required. Set of shift templates specifying rules for generating shifts. A shift template can be used for generating multiple shifts.",
+          "description": "The list of ContactCenter",
           "type": "array"
         },
-        "planningHorizon": {
-          "description": "Required. The solver will generate the maximum number of shifts per shift template.",
-          "$ref": "PlanningHorizon"
-        },
-        "workforceDemands": {
-          "description": "Required. All the workforce demands that the generated shifts need to cover. The planning horizon is defined between the earliest start time and the latest end time across all the entries. This field cannot be empty.",
-          "$ref": "WorkforceDemandList"
-        },
-        "solverConfig": {
-          "description": "Required. Parameters for the solver.",
-          "$ref": "SolverConfig"
-        }
-      }
-    },
-    "OperationMetadata": {
-      "type": "object",
-      "properties": {
-        "verb": {
-          "type": "string",
-          "description": "Output only. Name of the verb executed by the operation.",
-          "readOnly": true
-        },
-        "apiVersion": {
-          "description": "Output only. API version used to start the operation.",
-          "readOnly": true,
+        "nextPageToken": {
+          "description": "A token identifying a page of results the server should return.",
           "type": "string"
         },
-        "createTime": {
-          "description": "Output only. The time the operation was created.",
-          "readOnly": true,
-          "format": "google-datetime",
-          "type": "string"
-        },
-        "statusMessage": {
-          "type": "string",
-          "description": "Output only. Human-readable status of the operation, if any.",
-          "readOnly": true
-        },
-        "requestedCancellation": {
-          "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have been cancelled successfully have Operation.error value with a google.rpc.Status.code of 1, corresponding to `Code.CANCELLED`.",
-          "readOnly": true,
-          "type": "boolean"
-        },
-        "endTime": {
-          "description": "Output only. The time the operation finished running.",
-          "readOnly": true,
-          "format": "google-datetime",
-          "type": "string"
-        },
-        "target": {
-          "description": "Output only. Server-defined resource path for the target of the operation.",
-          "readOnly": true,
-          "type": "string"
-        },
-        "contactCenter": {
-          "description": "Contact center information for this request",
-          "$ref": "ContactCenter"
+        "unreachable": {
+          "type": "array",
+          "description": "Locations that could not be reached.",
+          "items": {
+            "type": "string"
+          }
         }
       },
-      "id": "OperationMetadata",
-      "description": "Represents the metadata of the long-running operation."
+      "id": "ListContactCentersResponse",
+      "description": "Message for response to listing ContactCenters"
     }
   },
-  "kind": "discovery#restDescription",
   "revision": "20260611",
+  "kind": "discovery#restDescription",
   "icons": {
     "x16": "http://www.google.com/images/icons/product/search-16.gif",
     "x32": "http://www.google.com/images/icons/product/search-32.gif"
   },
   "protocol": "rest",
-  "ownerName": "Google",
-  "description": "",
-  "fullyEncodeReservedExpansion": true,
   "documentationLink": "https://cloud.google.com/solutions/contact-center-ai-platform",
   "mtlsRootUrl": "https://contactcenteraiplatform.mtls.googleapis.com/",
   "baseUrl": "https://contactcenteraiplatform.googleapis.com/",
+  "description": "",
+  "ownerName": "Google",
+  "fullyEncodeReservedExpansion": true,
+  "auth": {
+    "oauth2": {
+      "scopes": {
+        "https://www.googleapis.com/auth/cloud-platform": {
+          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
+        }
+      }
+    }
+  },
   "id": "contactcenteraiplatform:v1alpha1",
   "resources": {
     "projects": {
       "resources": {
         "locations": {
+          "methods": {
+            "get": {
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "id": "contactcenteraiplatform.projects.locations.get",
+              "response": {
+                "$ref": "Location"
+              },
+              "parameterOrder": [
+                "name"
+              ],
+              "httpMethod": "GET",
+              "parameters": {
+                "name": {
+                  "description": "Resource name for the location.",
+                  "required": true,
+                  "type": "string",
+                  "pattern": "^projects/[^/]+/locations/[^/]+$",
+                  "location": "path"
+                }
+              },
+              "path": "v1alpha1/{+name}",
+              "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}",
+              "description": "Gets information about a location."
+            },
+            "queryContactCenterQuota": {
+              "parameterOrder": [
+                "parent"
+              ],
+              "id": "contactcenteraiplatform.projects.locations.queryContactCenterQuota",
+              "response": {
+                "$ref": "ContactCenterQuota"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}:queryContactCenterQuota",
+              "description": "Queries the contact center quota, an aggregation over all the projects, that belongs to the billing account, which the input project belongs to.",
+              "path": "v1alpha1/{+parent}:queryContactCenterQuota",
+              "httpMethod": "GET",
+              "parameters": {
+                "parent": {
+                  "pattern": "^projects/[^/]+/locations/[^/]+$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string",
+                  "description": "Required. Parent project resource id."
+                }
+              }
+            },
+            "generateShifts": {
+              "parameters": {
+                "parent": {
+                  "location": "path",
+                  "pattern": "^projects/[^/]+/locations/[^/]+$",
+                  "required": true,
+                  "type": "string",
+                  "description": "Required. Name of the parent resource associated with the request. Format: projects/{project}/locations/{location}"
+                }
+              },
+              "httpMethod": "POST",
+              "path": "v1alpha1/{+parent}:generateShifts",
+              "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}:generateShifts",
+              "description": "Generates shifts constrained by various parameters.",
+              "request": {
+                "$ref": "GenerateShiftsRequest"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "response": {
+                "$ref": "Operation"
+              },
+              "id": "contactcenteraiplatform.projects.locations.generateShifts",
+              "parameterOrder": [
+                "parent"
+              ]
+            },
+            "list": {
+              "flatPath": "v1alpha1/projects/{projectsId}/locations",
+              "description": "Lists information about the supported locations for this service. This method lists locations based on the resource scope provided in the ListLocationsRequest.name field: * **Global locations**: If `name` is empty, the method lists the public locations available to all projects. * **Project-specific locations**: If `name` follows the format `projects/{project}`, the method lists locations visible to that specific project. This includes public, private, or other project-specific locations enabled for the project. For gRPC and client library implementations, the resource name is passed as the `name` field. For direct service calls, the resource name is incorporated into the request path based on the specific service implementation and version.",
+              "path": "v1alpha1/{+name}/locations",
+              "httpMethod": "GET",
+              "parameters": {
+                "filter": {
+                  "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
+                  "location": "query",
+                  "type": "string"
+                },
+                "pageSize": {
+                  "description": "The maximum number of results to return. If not set, the service selects a default.",
+                  "location": "query",
+                  "format": "int32",
+                  "type": "integer"
+                },
+                "pageToken": {
+                  "description": "A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "name": {
+                  "location": "path",
+                  "pattern": "^projects/[^/]+$",
+                  "required": true,
+                  "type": "string",
+                  "description": "The resource that owns the locations collection, if applicable."
+                },
+                "extraLocationTypes": {
+                  "description": "Optional. Do not use this field unless explicitly documented otherwise. This is primarily for internal usage.",
+                  "location": "query",
+                  "repeated": true,
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "name"
+              ],
+              "id": "contactcenteraiplatform.projects.locations.list",
+              "response": {
+                "$ref": "ListLocationsResponse"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ]
+            }
+          },
           "resources": {
             "operations": {
               "methods": {
@@ -1315,44 +1365,31 @@
                   "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
                   "description": "Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.",
                   "path": "v1alpha1/{+name}",
+                  "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "required": true,
-                      "type": "string",
-                      "description": "The name of the operation resource.",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
                       "location": "path",
-                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$"
+                      "description": "The name of the operation resource.",
+                      "required": true,
+                      "type": "string"
                     }
                   },
-                  "httpMethod": "GET",
                   "parameterOrder": [
                     "name"
                   ],
+                  "id": "contactcenteraiplatform.projects.locations.operations.get",
                   "response": {
                     "$ref": "Operation"
                   },
-                  "id": "contactcenteraiplatform.projects.locations.operations.get",
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ]
                 },
                 "cancel": {
-                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
-                  "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
-                  "request": {
-                    "$ref": "CancelOperationRequest"
-                  },
-                  "httpMethod": "POST",
-                  "parameters": {
-                    "name": {
-                      "location": "path",
-                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
-                      "description": "The name of the operation resource to be cancelled.",
-                      "required": true,
-                      "type": "string"
-                    }
-                  },
-                  "path": "v1alpha1/{+name}:cancel",
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
                   "id": "contactcenteraiplatform.projects.locations.operations.cancel",
                   "response": {
                     "$ref": "Empty"
@@ -1360,21 +1397,37 @@
                   "parameterOrder": [
                     "name"
                   ],
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ]
+                  "httpMethod": "POST",
+                  "parameters": {
+                    "name": {
+                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
+                      "location": "path",
+                      "description": "The name of the operation resource to be cancelled.",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1alpha1/{+name}:cancel",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
+                  "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
+                  "request": {
+                    "$ref": "CancelOperationRequest"
+                  }
                 },
                 "list": {
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
+                  "parameterOrder": [
+                    "name"
                   ],
                   "id": "contactcenteraiplatform.projects.locations.operations.list",
                   "response": {
                     "$ref": "ListOperationsResponse"
                   },
-                  "parameterOrder": [
-                    "name"
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
                   ],
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/operations",
+                  "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.",
+                  "path": "v1alpha1/{+name}/operations",
                   "httpMethod": "GET",
                   "parameters": {
                     "pageSize": {
@@ -1399,158 +1452,107 @@
                       "type": "string"
                     },
                     "name": {
+                      "pattern": "^projects/[^/]+/locations/[^/]+$",
+                      "location": "path",
                       "description": "The name of the operation's parent resource.",
                       "required": true,
-                      "type": "string",
-                      "location": "path",
-                      "pattern": "^projects/[^/]+/locations/[^/]+$"
+                      "type": "string"
                     }
-                  },
-                  "path": "v1alpha1/{+name}/operations",
-                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/operations",
-                  "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."
+                  }
                 },
                 "delete": {
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "parameterOrder": [
-                    "name"
-                  ],
-                  "id": "contactcenteraiplatform.projects.locations.operations.delete",
-                  "response": {
-                    "$ref": "Empty"
-                  },
-                  "path": "v1alpha1/{+name}",
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
+                  "description": "Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`.",
                   "httpMethod": "DELETE",
                   "parameters": {
                     "name": {
-                      "description": "The name of the operation resource to be deleted.",
                       "required": true,
                       "type": "string",
+                      "description": "The name of the operation resource to be deleted.",
                       "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
                       "location": "path"
                     }
                   },
-                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
-                  "description": "Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`."
+                  "path": "v1alpha1/{+name}",
+                  "id": "contactcenteraiplatform.projects.locations.operations.delete",
+                  "response": {
+                    "$ref": "Empty"
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ]
                 }
               }
             },
             "contactCenters": {
               "methods": {
                 "create": {
-                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/contactCenters",
-                  "description": "Creates a new ContactCenter in a given project and location.",
                   "request": {
                     "$ref": "ContactCenter"
                   },
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/contactCenters",
+                  "description": "Creates a new ContactCenter in a given project and location.",
+                  "path": "v1alpha1/{+parent}/contactCenters",
+                  "httpMethod": "POST",
                   "parameters": {
+                    "requestId": {
+                      "type": "string",
+                      "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                      "location": "query"
+                    },
                     "parent": {
-                      "pattern": "^projects/[^/]+/locations/[^/]+$",
-                      "location": "path",
+                      "description": "Required. Value for parent.",
                       "required": true,
                       "type": "string",
-                      "description": "Required. Value for parent."
+                      "pattern": "^projects/[^/]+/locations/[^/]+$",
+                      "location": "path"
                     },
                     "contactCenterId": {
                       "description": "Required. Id of the requesting object If auto-generating Id server-side, remove this field and contact_center_id from the method_signature of Create RPC",
                       "location": "query",
                       "type": "string"
-                    },
-                    "requestId": {
-                      "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
-                      "location": "query",
-                      "type": "string"
                     }
                   },
-                  "httpMethod": "POST",
-                  "path": "v1alpha1/{+parent}/contactCenters",
-                  "response": {
-                    "$ref": "Operation"
-                  },
-                  "id": "contactcenteraiplatform.projects.locations.contactCenters.create",
                   "parameterOrder": [
                     "parent"
                   ],
+                  "id": "contactcenteraiplatform.projects.locations.contactCenters.create",
+                  "response": {
+                    "$ref": "Operation"
+                  },
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ]
                 },
-                "patch": {
-                  "httpMethod": "PATCH",
+                "get": {
+                  "httpMethod": "GET",
                   "parameters": {
                     "name": {
-                      "location": "path",
                       "pattern": "^projects/[^/]+/locations/[^/]+/contactCenters/[^/]+$",
-                      "description": "name of resource",
+                      "location": "path",
                       "required": true,
-                      "type": "string"
-                    },
-                    "updateMask": {
                       "type": "string",
-                      "description": "Required. Field mask is used to specify the fields to be overwritten in the ContactCenter resource by the update. The fields specified in the update_mask are relative to the resource, not the full request. A field will be overwritten if it is in the mask. If the user does not provide a mask then all fields will be overwritten.",
-                      "location": "query",
-                      "format": "google-fieldmask"
-                    },
-                    "requestId": {
-                      "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
-                      "location": "query",
-                      "type": "string"
+                      "description": "Required. Name of the resource"
                     }
                   },
                   "path": "v1alpha1/{+name}",
                   "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/contactCenters/{contactCentersId}",
-                  "description": "Updates the parameters of a single ContactCenter.",
-                  "request": {
-                    "$ref": "ContactCenter"
-                  },
+                  "description": "Gets details of a single ContactCenter.",
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "id": "contactcenteraiplatform.projects.locations.contactCenters.patch",
+                  "id": "contactcenteraiplatform.projects.locations.contactCenters.get",
                   "response": {
-                    "$ref": "Operation"
+                    "$ref": "ContactCenter"
                   },
                   "parameterOrder": [
                     "name"
                   ]
                 },
                 "list": {
-                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/contactCenters",
-                  "description": "Lists ContactCenters in a given project and location.",
-                  "path": "v1alpha1/{+parent}/contactCenters",
-                  "parameters": {
-                    "parent": {
-                      "location": "path",
-                      "pattern": "^projects/[^/]+/locations/[^/]+$",
-                      "required": true,
-                      "type": "string",
-                      "description": "Required. Parent value for ListContactCentersRequest"
-                    },
-                    "orderBy": {
-                      "description": "Hint for how to order the results",
-                      "location": "query",
-                      "type": "string"
-                    },
-                    "filter": {
-                      "description": "Filtering results",
-                      "location": "query",
-                      "type": "string"
-                    },
-                    "pageSize": {
-                      "description": "Requested page size. Server may return fewer items than requested. If unspecified, server will pick an appropriate default.",
-                      "location": "query",
-                      "format": "int32",
-                      "type": "integer"
-                    },
-                    "pageToken": {
-                      "type": "string",
-                      "description": "A token identifying a page of results the server should return.",
-                      "location": "query"
-                    }
-                  },
-                  "httpMethod": "GET",
                   "parameterOrder": [
                     "parent"
                   ],
@@ -1560,191 +1562,112 @@
                   "id": "contactcenteraiplatform.projects.locations.contactCenters.list",
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
-                  ]
+                  ],
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/contactCenters",
+                  "description": "Lists ContactCenters in a given project and location.",
+                  "path": "v1alpha1/{+parent}/contactCenters",
+                  "parameters": {
+                    "filter": {
+                      "type": "string",
+                      "description": "Filtering results",
+                      "location": "query"
+                    },
+                    "pageSize": {
+                      "type": "integer",
+                      "description": "Requested page size. Server may return fewer items than requested. If unspecified, server will pick an appropriate default.",
+                      "location": "query",
+                      "format": "int32"
+                    },
+                    "pageToken": {
+                      "type": "string",
+                      "description": "A token identifying a page of results the server should return.",
+                      "location": "query"
+                    },
+                    "parent": {
+                      "description": "Required. Parent value for ListContactCentersRequest",
+                      "required": true,
+                      "type": "string",
+                      "pattern": "^projects/[^/]+/locations/[^/]+$",
+                      "location": "path"
+                    },
+                    "orderBy": {
+                      "type": "string",
+                      "description": "Hint for how to order the results",
+                      "location": "query"
+                    }
+                  },
+                  "httpMethod": "GET"
                 },
                 "delete": {
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
                   "parameterOrder": [
                     "name"
                   ],
+                  "id": "contactcenteraiplatform.projects.locations.contactCenters.delete",
                   "response": {
                     "$ref": "Operation"
                   },
-                  "id": "contactcenteraiplatform.projects.locations.contactCenters.delete",
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/contactCenters/{contactCentersId}",
+                  "description": "Deletes a single ContactCenter.",
                   "path": "v1alpha1/{+name}",
+                  "httpMethod": "DELETE",
                   "parameters": {
                     "name": {
                       "description": "Required. Name of the resource",
                       "required": true,
                       "type": "string",
-                      "location": "path",
-                      "pattern": "^projects/[^/]+/locations/[^/]+/contactCenters/[^/]+$"
+                      "pattern": "^projects/[^/]+/locations/[^/]+/contactCenters/[^/]+$",
+                      "location": "path"
                     },
                     "requestId": {
                       "type": "string",
                       "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes after the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
                       "location": "query"
                     }
-                  },
-                  "httpMethod": "DELETE",
-                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/contactCenters/{contactCentersId}",
-                  "description": "Deletes a single ContactCenter."
+                  }
                 },
-                "get": {
-                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/contactCenters/{contactCentersId}",
-                  "description": "Gets details of a single ContactCenter.",
-                  "httpMethod": "GET",
-                  "parameters": {
-                    "name": {
-                      "location": "path",
-                      "pattern": "^projects/[^/]+/locations/[^/]+/contactCenters/[^/]+$",
-                      "description": "Required. Name of the resource",
-                      "required": true,
-                      "type": "string"
-                    }
-                  },
-                  "path": "v1alpha1/{+name}",
-                  "id": "contactcenteraiplatform.projects.locations.contactCenters.get",
+                "patch": {
+                  "id": "contactcenteraiplatform.projects.locations.contactCenters.patch",
                   "response": {
-                    "$ref": "ContactCenter"
+                    "$ref": "Operation"
                   },
                   "parameterOrder": [
                     "name"
                   ],
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
-                  ]
+                  ],
+                  "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}/contactCenters/{contactCentersId}",
+                  "description": "Updates the parameters of a single ContactCenter.",
+                  "request": {
+                    "$ref": "ContactCenter"
+                  },
+                  "httpMethod": "PATCH",
+                  "parameters": {
+                    "updateMask": {
+                      "description": "Required. Field mask is used to specify the fields to be overwritten in the ContactCenter resource by the update. The fields specified in the update_mask are relative to the resource, not the full request. A field will be overwritten if it is in the mask. If the user does not provide a mask then all fields will be overwritten.",
+                      "location": "query",
+                      "format": "google-fieldmask",
+                      "type": "string"
+                    },
+                    "requestId": {
+                      "description": "Optional. An optional request ID to identify requests. Specify a unique request ID so that if you must retry your request, the server will know to ignore the request if it has already been completed. The server will guarantee that for at least 60 minutes since the first request. For example, consider a situation where you make an initial request and the request times out. If you make the request again with the same request ID, the server can check if original operation with the same request ID was received, and if so, will ignore the second request. This prevents clients from accidentally creating duplicate commitments. The request ID must be a valid UUID with the exception that zero UUID is not supported (00000000-0000-0000-0000-000000000000).",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "name": {
+                      "required": true,
+                      "type": "string",
+                      "description": "name of resource",
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/contactCenters/[^/]+$"
+                    }
+                  },
+                  "path": "v1alpha1/{+name}"
                 }
               }
-            }
-          },
-          "methods": {
-            "get": {
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "parameterOrder": [
-                "name"
-              ],
-              "response": {
-                "$ref": "Location"
-              },
-              "id": "contactcenteraiplatform.projects.locations.get",
-              "path": "v1alpha1/{+name}",
-              "parameters": {
-                "name": {
-                  "required": true,
-                  "type": "string",
-                  "description": "Resource name for the location.",
-                  "pattern": "^projects/[^/]+/locations/[^/]+$",
-                  "location": "path"
-                }
-              },
-              "httpMethod": "GET",
-              "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}",
-              "description": "Gets information about a location."
-            },
-            "queryContactCenterQuota": {
-              "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}:queryContactCenterQuota",
-              "description": "Queries the contact center quota, an aggregation over all the projects, that belongs to the billing account, which the input project belongs to.",
-              "httpMethod": "GET",
-              "parameters": {
-                "parent": {
-                  "required": true,
-                  "type": "string",
-                  "description": "Required. Parent project resource id.",
-                  "location": "path",
-                  "pattern": "^projects/[^/]+/locations/[^/]+$"
-                }
-              },
-              "path": "v1alpha1/{+parent}:queryContactCenterQuota",
-              "id": "contactcenteraiplatform.projects.locations.queryContactCenterQuota",
-              "response": {
-                "$ref": "ContactCenterQuota"
-              },
-              "parameterOrder": [
-                "parent"
-              ],
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ]
-            },
-            "generateShifts": {
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "parameterOrder": [
-                "parent"
-              ],
-              "id": "contactcenteraiplatform.projects.locations.generateShifts",
-              "response": {
-                "$ref": "Operation"
-              },
-              "path": "v1alpha1/{+parent}:generateShifts",
-              "httpMethod": "POST",
-              "parameters": {
-                "parent": {
-                  "pattern": "^projects/[^/]+/locations/[^/]+$",
-                  "location": "path",
-                  "description": "Required. Name of the parent resource associated with the request. Format: projects/{project}/locations/{location}",
-                  "required": true,
-                  "type": "string"
-                }
-              },
-              "request": {
-                "$ref": "GenerateShiftsRequest"
-              },
-              "flatPath": "v1alpha1/projects/{projectsId}/locations/{locationsId}:generateShifts",
-              "description": "Generates shifts constrained by various parameters."
-            },
-            "list": {
-              "response": {
-                "$ref": "ListLocationsResponse"
-              },
-              "id": "contactcenteraiplatform.projects.locations.list",
-              "parameterOrder": [
-                "name"
-              ],
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "flatPath": "v1alpha1/projects/{projectsId}/locations",
-              "description": "Lists information about the supported locations for this service. This method lists locations based on the resource scope provided in the ListLocationsRequest.name field: * **Global locations**: If `name` is empty, the method lists the public locations available to all projects. * **Project-specific locations**: If `name` follows the format `projects/{project}`, the method lists locations visible to that specific project. This includes public, private, or other project-specific locations enabled for the project. For gRPC and client library implementations, the resource name is passed as the `name` field. For direct service calls, the resource name is incorporated into the request path based on the specific service implementation and version.",
-              "parameters": {
-                "name": {
-                  "required": true,
-                  "type": "string",
-                  "description": "The resource that owns the locations collection, if applicable.",
-                  "pattern": "^projects/[^/]+$",
-                  "location": "path"
-                },
-                "extraLocationTypes": {
-                  "description": "Optional. Do not use this field unless explicitly documented otherwise. This is primarily for internal usage.",
-                  "location": "query",
-                  "repeated": true,
-                  "type": "string"
-                },
-                "filter": {
-                  "type": "string",
-                  "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
-                  "location": "query"
-                },
-                "pageSize": {
-                  "description": "The maximum number of results to return. If not set, the service selects a default.",
-                  "location": "query",
-                  "format": "int32",
-                  "type": "integer"
-                },
-                "pageToken": {
-                  "type": "string",
-                  "description": "A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.",
-                  "location": "query"
-                }
-              },
-              "httpMethod": "GET",
-              "path": "v1alpha1/{+name}/locations"
             }
           }
         }
@@ -1753,13 +1676,90 @@
   },
   "discoveryVersion": "v1",
   "servicePath": "",
-  "auth": {
-    "oauth2": {
-      "scopes": {
-        "https://www.googleapis.com/auth/cloud-platform": {
-          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
-        }
-      }
+  "basePath": "",
+  "version_module": true,
+  "batchPath": "batch",
+  "ownerDomain": "google.com",
+  "canonicalName": "CCAI Platform",
+  "parameters": {
+    "access_token": {
+      "description": "OAuth access token.",
+      "location": "query",
+      "type": "string"
+    },
+    "upload_protocol": {
+      "type": "string",
+      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").",
+      "location": "query"
+    },
+    "fields": {
+      "description": "Selector specifying which fields to include in a partial response.",
+      "location": "query",
+      "type": "string"
+    },
+    "quotaUser": {
+      "type": "string",
+      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
+      "location": "query"
+    },
+    "key": {
+      "type": "string",
+      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
+      "location": "query"
+    },
+    "alt": {
+      "location": "query",
+      "enum": [
+        "json",
+        "media",
+        "proto"
+      ],
+      "enumDescriptions": [
+        "Responses with Content-Type of application/json",
+        "Media download with context-dependent Content-Type",
+        "Responses with Content-Type of application/x-protobuf"
+      ],
+      "default": "json",
+      "description": "Data format for response.",
+      "type": "string"
+    },
+    "callback": {
+      "type": "string",
+      "description": "JSONP",
+      "location": "query"
+    },
+    "$.xgafv": {
+      "type": "string",
+      "description": "V1 error format.",
+      "enum": [
+        "1",
+        "2"
+      ],
+      "enumDescriptions": [
+        "v1 error format",
+        "v2 error format"
+      ],
+      "location": "query"
+    },
+    "prettyPrint": {
+      "default": "true",
+      "type": "boolean",
+      "description": "Returns response with indentations and line breaks.",
+      "location": "query"
+    },
+    "oauth_token": {
+      "type": "string",
+      "description": "OAuth 2.0 token for the current user.",
+      "location": "query"
+    },
+    "uploadType": {
+      "type": "string",
+      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
+      "location": "query"
     }
-  }
+  },
+  "title": "Contact Center AI Platform API",
+  "rootUrl": "https://contactcenteraiplatform.googleapis.com/",
+  "name": "contactcenteraiplatform",
+  "version": "v1alpha1"
 }
