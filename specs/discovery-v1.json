@@ -1,379 +1,190 @@
 {
   "schemas": {
-    "RestDescription": {
-      "id": "RestDescription",
+    "RestMethod": {
+      "id": "RestMethod",
+      "type": "object",
       "properties": {
-        "kind": {
+        "description": {
           "type": "string",
-          "default": "discovery#restDescription",
-          "description": "The kind for this response."
+          "description": "Description of this method."
         },
-        "protocol": {
+        "parameters": {
+          "description": "Details for all parameters in this method.",
+          "additionalProperties": {
+            "$ref": "JsonSchema",
+            "description": "Details for a single parameter in this method."
+          },
+          "type": "object"
+        },
+        "scopes": {
+          "description": "OAuth 2.0 scopes applicable to this method.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "apiVersion": {
           "type": "string",
-          "default": "rest",
-          "description": "The protocol described by this document."
+          "description": "The API Version of this method, as passed in via the `X-Goog-Api-Version` header or `$apiVersion` query parameter."
         },
-        "discoveryVersion": {
-          "description": "Indicate the version of the Discovery API used to generate this doc.",
-          "default": "v1",
-          "type": "string"
+        "supportsMediaDownload": {
+          "type": "boolean",
+          "description": "Whether this method supports media downloads."
         },
-        "servicePath": {
-          "type": "string",
-          "description": "The base path for all REST requests."
+        "useMediaDownloadService": {
+          "type": "boolean",
+          "description": "Indicates that downloads from this method should use the download service URL (i.e. \"/download\"). Only applies if the method supports media download."
         },
-        "version": {
-          "type": "string",
-          "description": "The version of this API."
-        },
-        "title": {
-          "type": "string",
-          "description": "The title of this API."
-        },
-        "ownerName": {
-          "type": "string",
-          "description": "The name of the owner of this API. See ownerDomain."
-        },
-        "auth": {
+        "request": {
+          "description": "The schema for the request.",
           "properties": {
-            "oauth2": {
-              "properties": {
-                "scopes": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "object",
-                    "properties": {
-                      "description": {
-                        "type": "string",
-                        "description": "Description of scope."
-                      }
-                    },
-                    "description": "The scope value."
-                  },
-                  "description": "Available OAuth 2.0 scopes."
-                }
-              },
-              "type": "object",
-              "description": "OAuth 2.0 authentication information."
+            "$ref": {
+              "type": "string",
+              "description": "Schema ID for the request schema."
+            },
+            "parameterName": {
+              "type": "string",
+              "description": "parameter name."
             }
           },
+          "type": "object"
+        },
+        "supportsMediaUpload": {
+          "type": "boolean",
+          "description": "Whether this method supports media uploads."
+        },
+        "id": {
+          "type": "string",
+          "description": "A unique ID for this method. This property can be used to match methods between different versions of Discovery."
+        },
+        "parameterOrder": {
+          "type": "array",
+          "description": "Ordered list of required parameters, serves as a hint to clients on how to structure their method signatures. The array is ordered such that the \"most-significant\" parameter appears first.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "supportsSubscription": {
+          "type": "boolean",
+          "description": "Whether this method supports subscriptions."
+        },
+        "etagRequired": {
+          "type": "boolean",
+          "description": "Whether this method requires an ETag to be specified. The ETag is sent as an HTTP If-Match or If-None-Match header."
+        },
+        "path": {
+          "type": "string",
+          "description": "The URI path of this REST method. Should be used in conjunction with the basePath property at the api-level."
+        },
+        "deprecated": {
+          "type": "boolean",
+          "description": "Whether this method is deprecated."
+        },
+        "httpMethod": {
+          "type": "string",
+          "description": "HTTP method used by this method."
+        },
+        "mediaUpload": {
+          "description": "Media upload parameters.",
           "type": "object",
-          "description": "Authentication information."
+          "properties": {
+            "accept": {
+              "type": "array",
+              "description": "MIME Media Ranges for acceptable media uploads to this method.",
+              "items": {
+                "type": "string"
+              }
+            },
+            "maxSize": {
+              "type": "string",
+              "description": "Maximum size of a media upload, such as \"1MB\", \"2GB\" or \"3TB\"."
+            },
+            "protocols": {
+              "description": "Supported upload protocols.",
+              "properties": {
+                "resumable": {
+                  "type": "object",
+                  "properties": {
+                    "multipart": {
+                      "type": "boolean",
+                      "description": "True if this endpoint supports uploading multipart media.",
+                      "default": "true"
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "The URI path to be used for upload. Should be used in conjunction with the basePath property at the api-level."
+                    }
+                  },
+                  "description": "Supports the Resumable Media Upload protocol."
+                },
+                "simple": {
+                  "properties": {
+                    "multipart": {
+                      "type": "boolean",
+                      "default": "true",
+                      "description": "True if this endpoint supports upload multipart media."
+                    },
+                    "path": {
+                      "type": "string",
+                      "description": "The URI path to be used for upload. Should be used in conjunction with the basePath property at the api-level."
+                    }
+                  },
+                  "type": "object",
+                  "description": "Supports uploading as a single HTTP request."
+                }
+              },
+              "type": "object"
+            }
+          }
+        },
+        "response": {
+          "description": "The schema for the response.",
+          "properties": {
+            "$ref": {
+              "type": "string",
+              "description": "Schema ID for the response schema."
+            }
+          },
+          "type": "object"
+        },
+        "flatPath": {
+          "type": "string",
+          "description": "The URI path of this REST method in (RFC 6570) format without level 2 features ({+var}). Supplementary to the path property."
+        }
+      }
+    },
+    "RestResource": {
+      "type": "object",
+      "properties": {
+        "methods": {
+          "additionalProperties": {
+            "description": "Description for any methods on this resource.",
+            "$ref": "RestMethod"
+          },
+          "description": "Methods on this resource.",
+          "type": "object"
         },
         "resources": {
-          "description": "The resources in this API.",
+          "description": "Sub-resources on this resource.",
           "additionalProperties": {
-            "description": "An individual resource description. Contains methods and sub-resources related to this resource.",
+            "description": "Description for any sub-resources on this resource.",
             "$ref": "RestResource"
           },
           "type": "object"
         },
-        "name": {
-          "type": "string",
-          "description": "The name of this API."
-        },
-        "description": {
-          "type": "string",
-          "description": "The description of this API."
-        },
-        "ownerDomain": {
-          "type": "string",
-          "description": "The domain of the owner of this API. Together with the ownerName and a packagePath values, this can be used to generate a library for this API which would have a unique fully qualified name."
-        },
-        "parameters": {
-          "additionalProperties": {
-            "description": "Description of a single parameter.",
-            "$ref": "JsonSchema"
-          },
-          "description": "Common parameters that apply across all apis.",
-          "type": "object"
-        },
-        "batchPath": {
-          "type": "string",
-          "description": "The path for REST batch requests."
-        },
-        "basePath": {
-          "type": "string",
-          "description": "[DEPRECATED] The base path for REST requests."
-        },
-        "id": {
-          "type": "string",
-          "description": "The ID of this API."
-        },
-        "revision": {
-          "type": "string",
-          "description": "The version of this API."
-        },
-        "etag": {
-          "type": "string",
-          "readOnly": true,
-          "description": "The ETag for this response."
-        },
-        "features": {
-          "description": "A list of supported features for this API.",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "schemas": {
-          "type": "object",
-          "description": "The schemas for this API.",
-          "additionalProperties": {
-            "description": "An individual schema description.",
-            "$ref": "JsonSchema"
-          }
-        },
-        "labels": {
-          "type": "array",
-          "description": "Labels for the status of this API, such as labs or deprecated.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "documentationLink": {
-          "type": "string",
-          "description": "A link to human readable documentation for the API."
-        },
-        "icons": {
-          "type": "object",
-          "properties": {
-            "x16": {
-              "type": "string",
-              "description": "The URL of the 16x16 icon."
-            },
-            "x32": {
-              "type": "string",
-              "description": "The URL of the 32x32 icon."
-            }
-          },
-          "description": "Links to 16x16 and 32x32 icons representing the API."
-        },
-        "endpoints": {
-          "type": "array",
-          "description": "A list of location-based endpoint objects for this API. Each object contains the endpoint URL, location, description and deprecation status.",
-          "items": {
-            "description": "A single endpoint object",
-            "type": "object",
-            "properties": {
-              "endpointUrl": {
-                "type": "string",
-                "description": "The URL of the endpoint target host"
-              },
-              "location": {
-                "type": "string",
-                "description": "The location of the endpoint"
-              },
-              "description": {
-                "type": "string",
-                "description": "A string describing the host designated by the URL"
-              },
-              "deprecated": {
-                "type": "boolean",
-                "description": "Whether this endpoint is deprecated"
-              }
-            }
-          }
-        },
-        "exponentialBackoffDefault": {
-          "type": "boolean",
-          "description": "Enable exponential backoff for suitable methods in the generated clients."
-        },
-        "methods": {
-          "type": "object",
-          "description": "API-level methods for this API.",
-          "additionalProperties": {
-            "$ref": "RestMethod",
-            "description": "An individual method description."
-          }
-        },
-        "baseUrl": {
-          "type": "string",
-          "description": "[DEPRECATED] The base URL for REST requests."
-        },
-        "rootUrl": {
-          "type": "string",
-          "description": "The root URL under which all API services live."
-        },
-        "canonicalName": {
-          "type": "string",
-          "description": "Indicates how the API name should be capitalized and split into various parts. Useful for generating pretty class names."
-        },
-        "version_module": {
-          "type": "boolean"
-        },
-        "packagePath": {
-          "type": "string",
-          "description": "The package of the owner of this API. See ownerDomain."
-        }
-      },
-      "type": "object"
-    },
-    "JsonSchema": {
-      "type": "object",
-      "properties": {
-        "enumDeprecated": {
-          "type": "array",
-          "description": "The deprecation status for the enums. Each position maps to the corresponding value in the \"enum\" array.",
-          "items": {
-            "type": "boolean"
-          }
-        },
-        "pattern": {
-          "type": "string",
-          "description": "The regular expression this parameter must conform to. Uses Java 6 regex format: http://docs.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html"
-        },
-        "description": {
-          "type": "string",
-          "description": "A description of this object."
-        },
-        "maximum": {
-          "type": "string",
-          "description": "The maximum value of this parameter."
-        },
-        "readOnly": {
-          "type": "boolean",
-          "description": "The value is read-only, generated by the service. The value cannot be modified by the client. If the value is included in a POST, PUT, or PATCH request, it is ignored by the service."
-        },
-        "annotations": {
-          "properties": {
-            "required": {
-              "type": "array",
-              "description": "A list of methods for which this property is required on requests.",
-              "items": {
-                "type": "string"
-              }
-            }
-          },
-          "type": "object",
-          "description": "Additional information about this property."
-        },
-        "additionalProperties": {
-          "$ref": "JsonSchema",
-          "description": "If this is a schema for an object, this property is the schema for any additional properties with dynamic keys on this object."
-        },
         "deprecated": {
           "type": "boolean",
-          "description": "Whether the parameter is deprecated."
-        },
-        "format": {
-          "type": "string",
-          "description": "An additional regular expression or key that helps constrain the value. For more details see: http://tools.ietf.org/html/draft-zyp-json-schema-03#section-5.23"
-        },
-        "location": {
-          "type": "string",
-          "description": "Whether this parameter goes in the query or the path for REST requests."
-        },
-        "id": {
-          "type": "string",
-          "description": "Unique identifier for this schema."
-        },
-        "repeated": {
-          "type": "boolean",
-          "description": "Whether this parameter may appear multiple times."
-        },
-        "variant": {
-          "type": "object",
-          "properties": {
-            "map": {
-              "type": "array",
-              "description": "The map of discriminant value to schema to use for parsing..",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "$ref": {
-                    "type": "string"
-                  },
-                  "type_value": {
-                    "type": "string"
-                  }
-                }
-              }
-            },
-            "discriminant": {
-              "type": "string",
-              "description": "The name of the type discriminant property."
-            }
-          },
-          "description": "In a variant data type, the value of one property is used to determine how to interpret the entire entity. Its value must exist in a map of descriminant values to schema names."
-        },
-        "default": {
-          "type": "string",
-          "description": "The default value of this property (if one exists)."
-        },
-        "items": {
-          "$ref": "JsonSchema",
-          "description": "If this is a schema for an array, this property is the schema for each element in the array."
-        },
-        "$ref": {
-          "type": "string",
-          "description": "A reference to another schema. The value of this property is the \"id\" of another schema."
-        },
-        "properties": {
-          "additionalProperties": {
-            "description": "A single property of this object. The value is itself a JSON Schema object describing this property.",
-            "$ref": "JsonSchema"
-          },
-          "description": "If this is a schema for an object, list the schema for each property of this object.",
-          "type": "object"
-        },
-        "enumDescriptions": {
-          "type": "array",
-          "description": "The descriptions for the enums. Each position maps to the corresponding value in the \"enum\" array.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "required": {
-          "type": "boolean",
-          "description": "Whether the parameter is required."
-        },
-        "enum": {
-          "description": "Values this parameter may take (if it is an enum).",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "minimum": {
-          "type": "string",
-          "description": "The minimum value of this parameter."
-        },
-        "type": {
-          "type": "string",
-          "description": "The value type for this schema. A list of values can be found here: http://tools.ietf.org/html/draft-zyp-json-schema-03#section-5.1"
+          "description": "Whether this resource is deprecated."
         }
       },
-      "id": "JsonSchema"
+      "id": "RestResource"
     },
     "DirectoryList": {
       "properties": {
         "items": {
           "description": "The individual directory entries. One entry per api/version pair.",
           "items": {
-            "type": "object",
             "properties": {
-              "kind": {
-                "type": "string",
-                "default": "discovery#directoryItem",
-                "description": "The kind for this response."
-              },
-              "discoveryLink": {
-                "type": "string",
-                "description": "A link to the discovery document."
-              },
-              "preferred": {
-                "type": "boolean",
-                "description": "True if this version is the preferred version to use."
-              },
-              "description": {
-                "type": "string",
-                "description": "The description of this API."
-              },
-              "name": {
-                "type": "string",
-                "description": "The name of the API."
-              },
               "id": {
                 "type": "string",
                 "description": "The id of this API."
@@ -414,203 +225,392 @@
                   "type": "string"
                 },
                 "type": "array"
+              },
+              "kind": {
+                "type": "string",
+                "default": "discovery#directoryItem",
+                "description": "The kind for this response."
+              },
+              "discoveryLink": {
+                "type": "string",
+                "description": "A link to the discovery document."
+              },
+              "preferred": {
+                "type": "boolean",
+                "description": "True if this version is the preferred version to use."
+              },
+              "description": {
+                "type": "string",
+                "description": "The description of this API."
+              },
+              "name": {
+                "type": "string",
+                "description": "The name of the API."
               }
-            }
+            },
+            "type": "object"
           },
           "type": "array"
         },
         "discoveryVersion": {
-          "default": "v1",
+          "type": "string",
           "description": "Indicate the version of the Discovery API used to generate this doc.",
-          "type": "string"
+          "default": "v1"
         },
         "kind": {
+          "type": "string",
           "default": "discovery#directoryList",
-          "description": "The kind for this response.",
-          "type": "string"
+          "description": "The kind for this response."
         }
       },
       "type": "object",
       "id": "DirectoryList"
     },
-    "RestMethod": {
+    "JsonSchema": {
       "properties": {
-        "response": {
-          "type": "object",
-          "properties": {
-            "$ref": {
-              "type": "string",
-              "description": "Schema ID for the response schema."
-            }
-          },
-          "description": "The schema for the response."
-        },
-        "httpMethod": {
+        "description": {
           "type": "string",
-          "description": "HTTP method used by this method."
+          "description": "A description of this object."
         },
-        "mediaUpload": {
-          "description": "Media upload parameters.",
-          "type": "object",
+        "pattern": {
+          "type": "string",
+          "description": "The regular expression this parameter must conform to. Uses Java 6 regex format: http://docs.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html"
+        },
+        "annotations": {
           "properties": {
-            "accept": {
-              "description": "MIME Media Ranges for acceptable media uploads to this method.",
+            "required": {
+              "type": "array",
+              "description": "A list of methods for which this property is required on requests.",
               "items": {
                 "type": "string"
+              }
+            }
+          },
+          "type": "object",
+          "description": "Additional information about this property."
+        },
+        "maximum": {
+          "type": "string",
+          "description": "The maximum value of this parameter."
+        },
+        "readOnly": {
+          "type": "boolean",
+          "description": "The value is read-only, generated by the service. The value cannot be modified by the client. If the value is included in a POST, PUT, or PATCH request, it is ignored by the service."
+        },
+        "enumDeprecated": {
+          "description": "The deprecation status for the enums. Each position maps to the corresponding value in the \"enum\" array.",
+          "items": {
+            "type": "boolean"
+          },
+          "type": "array"
+        },
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for this schema."
+        },
+        "repeated": {
+          "type": "boolean",
+          "description": "Whether this parameter may appear multiple times."
+        },
+        "variant": {
+          "description": "In a variant data type, the value of one property is used to determine how to interpret the entire entity. Its value must exist in a map of descriminant values to schema names.",
+          "type": "object",
+          "properties": {
+            "map": {
+              "description": "The map of discriminant value to schema to use for parsing..",
+              "items": {
+                "properties": {
+                  "$ref": {
+                    "type": "string"
+                  },
+                  "type_value": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
               },
               "type": "array"
             },
-            "maxSize": {
+            "discriminant": {
               "type": "string",
-              "description": "Maximum size of a media upload, such as \"1MB\", \"2GB\" or \"3TB\"."
-            },
-            "protocols": {
-              "properties": {
-                "simple": {
-                  "description": "Supports uploading as a single HTTP request.",
-                  "type": "object",
-                  "properties": {
-                    "multipart": {
-                      "type": "boolean",
-                      "default": "true",
-                      "description": "True if this endpoint supports upload multipart media."
-                    },
-                    "path": {
-                      "type": "string",
-                      "description": "The URI path to be used for upload. Should be used in conjunction with the basePath property at the api-level."
-                    }
-                  }
-                },
-                "resumable": {
-                  "properties": {
-                    "multipart": {
-                      "default": "true",
-                      "description": "True if this endpoint supports uploading multipart media.",
-                      "type": "boolean"
-                    },
-                    "path": {
-                      "type": "string",
-                      "description": "The URI path to be used for upload. Should be used in conjunction with the basePath property at the api-level."
-                    }
-                  },
-                  "type": "object",
-                  "description": "Supports the Resumable Media Upload protocol."
-                }
-              },
-              "type": "object",
-              "description": "Supported upload protocols."
+              "description": "The name of the type discriminant property."
             }
           }
         },
-        "flatPath": {
+        "format": {
           "type": "string",
-          "description": "The URI path of this REST method in (RFC 6570) format without level 2 features ({+var}). Supplementary to the path property."
+          "description": "An additional regular expression or key that helps constrain the value. For more details see: http://tools.ietf.org/html/draft-zyp-json-schema-03#section-5.23"
         },
-        "request": {
-          "properties": {
-            "$ref": {
-              "type": "string",
-              "description": "Schema ID for the request schema."
-            },
-            "parameterName": {
-              "type": "string",
-              "description": "parameter name."
-            }
-          },
-          "type": "object",
-          "description": "The schema for the request."
-        },
-        "supportsMediaUpload": {
-          "type": "boolean",
-          "description": "Whether this method supports media uploads."
-        },
-        "apiVersion": {
+        "location": {
           "type": "string",
-          "description": "The API Version of this method, as passed in via the `X-Goog-Api-Version` header or `$apiVersion` query parameter."
+          "description": "Whether this parameter goes in the query or the path for REST requests."
         },
-        "supportsMediaDownload": {
+        "deprecated": {
           "type": "boolean",
-          "description": "Whether this method supports media downloads."
+          "description": "Whether the parameter is deprecated."
         },
-        "useMediaDownloadService": {
-          "type": "boolean",
-          "description": "Indicates that downloads from this method should use the download service URL (i.e. \"/download\"). Only applies if the method supports media download."
+        "additionalProperties": {
+          "description": "If this is a schema for an object, this property is the schema for any additional properties with dynamic keys on this object.",
+          "$ref": "JsonSchema"
         },
-        "description": {
+        "enumDescriptions": {
+          "type": "array",
+          "description": "The descriptions for the enums. Each position maps to the corresponding value in the \"enum\" array.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "items": {
+          "$ref": "JsonSchema",
+          "description": "If this is a schema for an array, this property is the schema for each element in the array."
+        },
+        "default": {
           "type": "string",
-          "description": "Description of this method."
+          "description": "The default value of this property (if one exists)."
         },
-        "parameters": {
-          "type": "object",
-          "description": "Details for all parameters in this method.",
+        "$ref": {
+          "type": "string",
+          "description": "A reference to another schema. The value of this property is the \"id\" of another schema."
+        },
+        "properties": {
+          "description": "If this is a schema for an object, list the schema for each property of this object.",
           "additionalProperties": {
-            "description": "Details for a single parameter in this method.",
-            "$ref": "JsonSchema"
-          }
+            "$ref": "JsonSchema",
+            "description": "A single property of this object. The value is itself a JSON Schema object describing this property."
+          },
+          "type": "object"
         },
-        "scopes": {
-          "description": "OAuth 2.0 scopes applicable to this method.",
+        "enum": {
+          "description": "Values this parameter may take (if it is an enum).",
           "items": {
             "type": "string"
           },
           "type": "array"
         },
-        "deprecated": {
-          "type": "boolean",
-          "description": "Whether this method is deprecated."
-        },
-        "supportsSubscription": {
-          "type": "boolean",
-          "description": "Whether this method supports subscriptions."
-        },
-        "etagRequired": {
-          "type": "boolean",
-          "description": "Whether this method requires an ETag to be specified. The ETag is sent as an HTTP If-Match or If-None-Match header."
-        },
-        "path": {
+        "minimum": {
           "type": "string",
-          "description": "The URI path of this REST method. Should be used in conjunction with the basePath property at the api-level."
+          "description": "The minimum value of this parameter."
         },
-        "id": {
+        "type": {
           "type": "string",
-          "description": "A unique ID for this method. This property can be used to match methods between different versions of Discovery."
+          "description": "The value type for this schema. A list of values can be found here: http://tools.ietf.org/html/draft-zyp-json-schema-03#section-5.1"
         },
-        "parameterOrder": {
+        "required": {
+          "type": "boolean",
+          "description": "Whether the parameter is required."
+        }
+      },
+      "type": "object",
+      "id": "JsonSchema"
+    },
+    "RestDescription": {
+      "properties": {
+        "endpoints": {
+          "description": "A list of location-based endpoint objects for this API. Each object contains the endpoint URL, location, description and deprecation status.",
+          "items": {
+            "description": "A single endpoint object",
+            "properties": {
+              "description": {
+                "type": "string",
+                "description": "A string describing the host designated by the URL"
+              },
+              "deprecated": {
+                "type": "boolean",
+                "description": "Whether this endpoint is deprecated"
+              },
+              "endpointUrl": {
+                "type": "string",
+                "description": "The URL of the endpoint target host"
+              },
+              "location": {
+                "type": "string",
+                "description": "The location of the endpoint"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "exponentialBackoffDefault": {
+          "type": "boolean",
+          "description": "Enable exponential backoff for suitable methods in the generated clients."
+        },
+        "baseUrl": {
+          "type": "string",
+          "description": "[DEPRECATED] The base URL for REST requests."
+        },
+        "rootUrl": {
+          "type": "string",
+          "description": "The root URL under which all API services live."
+        },
+        "methods": {
+          "additionalProperties": {
+            "description": "An individual method description.",
+            "$ref": "RestMethod"
+          },
+          "description": "API-level methods for this API.",
+          "type": "object"
+        },
+        "canonicalName": {
+          "type": "string",
+          "description": "Indicates how the API name should be capitalized and split into various parts. Useful for generating pretty class names."
+        },
+        "version_module": {
+          "type": "boolean"
+        },
+        "packagePath": {
+          "type": "string",
+          "description": "The package of the owner of this API. See ownerDomain."
+        },
+        "features": {
           "type": "array",
-          "description": "Ordered list of required parameters, serves as a hint to clients on how to structure their method signatures. The array is ordered such that the \"most-significant\" parameter appears first.",
+          "description": "A list of supported features for this API.",
           "items": {
             "type": "string"
           }
-        }
-      },
-      "type": "object",
-      "id": "RestMethod"
-    },
-    "RestResource": {
-      "properties": {
-        "resources": {
+        },
+        "etag": {
+          "readOnly": true,
+          "type": "string",
+          "description": "The ETag for this response."
+        },
+        "schemas": {
           "additionalProperties": {
-            "$ref": "RestResource",
-            "description": "Description for any sub-resources on this resource."
+            "description": "An individual schema description.",
+            "$ref": "JsonSchema"
           },
-          "description": "Sub-resources on this resource.",
+          "description": "The schemas for this API.",
           "type": "object"
         },
-        "deprecated": {
-          "type": "boolean",
-          "description": "Whether this resource is deprecated."
+        "documentationLink": {
+          "type": "string",
+          "description": "A link to human readable documentation for the API."
         },
-        "methods": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "RestMethod",
-            "description": "Description for any methods on this resource."
+        "icons": {
+          "description": "Links to 16x16 and 32x32 icons representing the API.",
+          "properties": {
+            "x32": {
+              "type": "string",
+              "description": "The URL of the 32x32 icon."
+            },
+            "x16": {
+              "type": "string",
+              "description": "The URL of the 16x16 icon."
+            }
           },
-          "description": "Methods on this resource."
+          "type": "object"
+        },
+        "labels": {
+          "type": "array",
+          "description": "Labels for the status of this API, such as labs or deprecated.",
+          "items": {
+            "type": "string"
+          }
+        },
+        "ownerName": {
+          "type": "string",
+          "description": "The name of the owner of this API. See ownerDomain."
+        },
+        "resources": {
+          "description": "The resources in this API.",
+          "additionalProperties": {
+            "description": "An individual resource description. Contains methods and sub-resources related to this resource.",
+            "$ref": "RestResource"
+          },
+          "type": "object"
+        },
+        "auth": {
+          "properties": {
+            "oauth2": {
+              "type": "object",
+              "properties": {
+                "scopes": {
+                  "additionalProperties": {
+                    "description": "The scope value.",
+                    "properties": {
+                      "description": {
+                        "type": "string",
+                        "description": "Description of scope."
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "description": "Available OAuth 2.0 scopes.",
+                  "type": "object"
+                }
+              },
+              "description": "OAuth 2.0 authentication information."
+            }
+          },
+          "type": "object",
+          "description": "Authentication information."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of this API."
+        },
+        "description": {
+          "type": "string",
+          "description": "The description of this API."
+        },
+        "ownerDomain": {
+          "type": "string",
+          "description": "The domain of the owner of this API. Together with the ownerName and a packagePath values, this can be used to generate a library for this API which would have a unique fully qualified name."
+        },
+        "parameters": {
+          "description": "Common parameters that apply across all apis.",
+          "additionalProperties": {
+            "description": "Description of a single parameter.",
+            "$ref": "JsonSchema"
+          },
+          "type": "object"
+        },
+        "batchPath": {
+          "type": "string",
+          "description": "The path for REST batch requests."
+        },
+        "basePath": {
+          "type": "string",
+          "description": "[DEPRECATED] The base path for REST requests."
+        },
+        "id": {
+          "type": "string",
+          "description": "The ID of this API."
+        },
+        "revision": {
+          "type": "string",
+          "description": "The version of this API."
+        },
+        "kind": {
+          "type": "string",
+          "default": "discovery#restDescription",
+          "description": "The kind for this response."
+        },
+        "protocol": {
+          "type": "string",
+          "default": "rest",
+          "description": "The protocol described by this document."
+        },
+        "discoveryVersion": {
+          "description": "Indicate the version of the Discovery API used to generate this doc.",
+          "default": "v1",
+          "type": "string"
+        },
+        "servicePath": {
+          "type": "string",
+          "description": "The base path for all REST requests."
+        },
+        "version": {
+          "type": "string",
+          "description": "The version of this API."
+        },
+        "title": {
+          "type": "string",
+          "description": "The title of this API."
         }
       },
       "type": "object",
-      "id": "RestResource"
+      "id": "RestDescription"
     }
   },
   "protocol": "rest",
@@ -623,32 +623,34 @@
   },
   "documentationLink": "https://developers.google.com/discovery/",
   "title": "API Discovery Service",
-  "discoveryVersion": "v1",
   "servicePath": "discovery/v1/",
+  "discoveryVersion": "v1",
   "name": "discovery",
+  "description": "Provides information about other Google APIs, such as what APIs are available, the resource, and method details for each API.",
+  "ownerDomain": "google.com",
   "parameters": {
     "alt": {
-      "default": "json",
-      "type": "string",
-      "enumDescriptions": [
-        "Responses with Content-Type of application/json"
-      ],
+      "location": "query",
       "description": "Data format for the response.",
       "enum": [
         "json"
       ],
-      "location": "query"
+      "type": "string",
+      "enumDescriptions": [
+        "Responses with Content-Type of application/json"
+      ],
+      "default": "json"
     },
     "prettyPrint": {
+      "type": "boolean",
       "description": "Returns response with indentations and line breaks.",
       "default": "true",
-      "location": "query",
-      "type": "boolean"
+      "location": "query"
     },
     "fields": {
+      "type": "string",
       "location": "query",
-      "description": "Selector specifying which fields to include in a partial response.",
-      "type": "string"
+      "description": "Selector specifying which fields to include in a partial response."
     },
     "oauth_token": {
       "type": "string",
@@ -661,50 +663,25 @@
       "type": "string"
     },
     "key": {
-      "type": "string",
+      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
       "location": "query",
-      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token."
+      "type": "string"
     },
     "userIp": {
-      "description": "Deprecated. Please use quotaUser instead.",
       "location": "query",
+      "description": "Deprecated. Please use quotaUser instead.",
       "type": "string"
     }
   },
-  "ownerDomain": "google.com",
-  "description": "Provides information about other Google APIs, such as what APIs are available, the resource, and method details for each API.",
   "ownerName": "Google",
   "resources": {
     "apis": {
       "methods": {
-        "getRest": {
-          "response": {
-            "$ref": "RestDescription"
-          },
-          "path": "apis/{api}/{version}/rest",
-          "id": "discovery.apis.getRest",
-          "description": "Retrieve the description of a particular version of an api.",
-          "parameters": {
-            "api": {
-              "type": "string",
-              "required": true,
-              "location": "path",
-              "description": "The name of the API."
-            },
-            "version": {
-              "description": "The version of the API.",
-              "location": "path",
-              "type": "string",
-              "required": true
-            }
-          },
-          "parameterOrder": [
-            "api",
-            "version"
-          ],
-          "httpMethod": "GET"
-        },
         "list": {
+          "path": "apis",
+          "response": {
+            "$ref": "DirectoryList"
+          },
           "httpMethod": "GET",
           "id": "discovery.apis.list",
           "description": "Retrieve the list of APIs supported at this endpoint.",
@@ -715,16 +692,39 @@
               "type": "string"
             },
             "preferred": {
+              "type": "boolean",
               "description": "Return only the preferred version of an API.",
               "default": "false",
-              "location": "query",
-              "type": "boolean"
+              "location": "query"
+            }
+          }
+        },
+        "getRest": {
+          "path": "apis/{api}/{version}/rest",
+          "response": {
+            "$ref": "RestDescription"
+          },
+          "parameterOrder": [
+            "api",
+            "version"
+          ],
+          "id": "discovery.apis.getRest",
+          "description": "Retrieve the description of a particular version of an api.",
+          "parameters": {
+            "api": {
+              "type": "string",
+              "required": true,
+              "description": "The name of the API.",
+              "location": "path"
+            },
+            "version": {
+              "type": "string",
+              "required": true,
+              "location": "path",
+              "description": "The version of the API."
             }
           },
-          "response": {
-            "$ref": "DirectoryList"
-          },
-          "path": "apis"
+          "httpMethod": "GET"
         }
       }
     }
@@ -732,7 +732,7 @@
   "basePath": "/discovery/v1/",
   "id": "discovery:v1",
   "revision": "20200806",
+  "batchPath": "batch/discovery/v1",
   "baseUrl": "https://www.googleapis.com/discovery/v1/",
-  "rootUrl": "https://www.googleapis.com/",
-  "batchPath": "batch/discovery/v1"
+  "rootUrl": "https://www.googleapis.com/"
 }
