@@ -1,26 +1,182 @@
 {
-  "revision": "20260709",
+  "mtlsRootUrl": "https://biglake.mtls.googleapis.com/",
+  "ownerName": "Google",
+  "fullyEncodeReservedExpansion": true,
   "schemas": {
+    "AuditConfig": {
+      "description": "Specifies the audit configuration for a service. The configuration determines which permission types are logged, and what identities, if any, are exempted from logging. An AuditConfig must have one or more AuditLogConfigs. If there are AuditConfigs for both `allServices` and a specific service, the union of the two AuditConfigs is used for that service: the log_types specified in each AuditConfig are enabled, and the exempted_members in each AuditLogConfig are exempted. Example Policy with multiple AuditConfigs: { \"audit_configs\": [ { \"service\": \"allServices\", \"audit_log_configs\": [ { \"log_type\": \"DATA_READ\", \"exempted_members\": [ \"user:jose@example.com\" ] }, { \"log_type\": \"DATA_WRITE\" }, { \"log_type\": \"ADMIN_READ\" } ] }, { \"service\": \"sampleservice.googleapis.com\", \"audit_log_configs\": [ { \"log_type\": \"DATA_READ\" }, { \"log_type\": \"DATA_WRITE\", \"exempted_members\": [ \"user:aliya@example.com\" ] } ] } ] } For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ logging. It also exempts `jose@example.com` from DATA_READ logging, and `aliya@example.com` from DATA_WRITE logging.",
+      "id": "AuditConfig",
+      "type": "object",
+      "properties": {
+        "service": {
+          "description": "Specifies a service that will be enabled for audit logging. For example, `storage.googleapis.com`, `cloudsql.googleapis.com`. `allServices` is a special value that covers all services.",
+          "type": "string"
+        },
+        "auditLogConfigs": {
+          "description": "The configuration for logging of each type of permission.",
+          "type": "array",
+          "items": {
+            "$ref": "AuditLogConfig"
+          }
+        }
+      }
+    },
+    "TestIamPermissionsResponse": {
+      "id": "TestIamPermissionsResponse",
+      "type": "object",
+      "properties": {
+        "permissions": {
+          "description": "A subset of `TestPermissionsRequest.permissions` that the caller is allowed.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Response message for `TestIamPermissions` method."
+    },
     "ListTablesResponse": {
       "description": "Response message for the ListTables method.",
+      "id": "ListTablesResponse",
       "type": "object",
       "properties": {
         "tables": {
+          "description": "The tables from the specified database.",
+          "type": "array",
           "items": {
             "$ref": "Table"
-          },
-          "description": "The tables from the specified database.",
-          "type": "array"
+          }
         },
         "nextPageToken": {
           "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
           "type": "string"
         }
+      }
+    },
+    "ListDatabasesResponse": {
+      "description": "Response message for the ListDatabases method.",
+      "id": "ListDatabasesResponse",
+      "type": "object",
+      "properties": {
+        "databases": {
+          "type": "array",
+          "items": {
+            "$ref": "Database"
+          },
+          "description": "The databases from the specified catalog."
+        },
+        "nextPageToken": {
+          "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+          "type": "string"
+        }
+      }
+    },
+    "HiveTableOptions": {
+      "id": "HiveTableOptions",
+      "type": "object",
+      "properties": {
+        "tableType": {
+          "description": "Hive table type. For example, MANAGED_TABLE, EXTERNAL_TABLE.",
+          "type": "string"
+        },
+        "storageDescriptor": {
+          "description": "Stores physical storage information of the data.",
+          "$ref": "StorageDescriptor"
+        },
+        "parameters": {
+          "description": "Stores user supplied Hive table parameters.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
       },
-      "id": "ListTablesResponse"
+      "description": "Options of a Hive table."
+    },
+    "HiveDatabaseOptions": {
+      "id": "HiveDatabaseOptions",
+      "type": "object",
+      "properties": {
+        "locationUri": {
+          "description": "Cloud Storage folder URI where the database data is stored, starting with \"gs://\".",
+          "type": "string"
+        },
+        "parameters": {
+          "description": "Stores user supplied Hive database parameters.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Options of a Hive database."
+    },
+    "AuditLogConfig": {
+      "description": "Provides the configuration for logging a type of permissions. Example: { \"audit_log_configs\": [ { \"log_type\": \"DATA_READ\", \"exempted_members\": [ \"user:jose@example.com\" ] }, { \"log_type\": \"DATA_WRITE\" } ] } This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting jose@example.com from DATA_READ logging.",
+      "id": "AuditLogConfig",
+      "type": "object",
+      "properties": {
+        "logType": {
+          "type": "string",
+          "enumDescriptions": [
+            "Default case. Should never be this.",
+            "Admin reads. Example: CloudIAM getIamPolicy",
+            "Data writes. Example: CloudSQL Users create",
+            "Data reads. Example: CloudSQL Users list"
+          ],
+          "enum": [
+            "LOG_TYPE_UNSPECIFIED",
+            "ADMIN_READ",
+            "DATA_WRITE",
+            "DATA_READ"
+          ],
+          "description": "The log type that this config enables."
+        },
+        "exemptedMembers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Specifies the identities that do not cause logging for this type of permission. Follows the same format of Binding.members."
+        }
+      }
+    },
+    "RenameTableRequest": {
+      "id": "RenameTableRequest",
+      "type": "object",
+      "properties": {
+        "newName": {
+          "description": "Required. The new `name` for the specified table, must be in the same database. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}/tables/{table_id}",
+          "type": "string"
+        }
+      },
+      "description": "Request message for the RenameTable method in MetastoreService"
+    },
+    "Expr": {
+      "description": "Represents a textual expression in the Common Expression Language (CEL) syntax. CEL is a C-like expression language. The syntax and semantics of CEL are documented at https://github.com/google/cel-spec. Example (Comparison): title: \"Summary size limit\" description: \"Determines if a summary is less than 100 chars\" expression: \"document.summary.size() < 100\" Example (Equality): title: \"Requestor is owner\" description: \"Determines if requestor is the document owner\" expression: \"document.owner == request.auth.claims.email\" Example (Logic): title: \"Public documents\" description: \"Determine whether the document should be publicly visible\" expression: \"document.type != 'private' && document.type != 'internal'\" Example (Data Manipulation): title: \"Notification string\" description: \"Create a notification string with a timestamp.\" expression: \"'New message received at ' + string(document.create_time)\" The exact variables and functions that may be referenced within an expression are determined by the service that evaluates it. See the service documentation for additional information.",
+      "id": "Expr",
+      "type": "object",
+      "properties": {
+        "expression": {
+          "description": "Textual representation of an expression in Common Expression Language syntax.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Optional. Description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI.",
+          "type": "string"
+        },
+        "title": {
+          "description": "Optional. Title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression.",
+          "type": "string"
+        },
+        "location": {
+          "description": "Optional. String indicating the location of the expression for error reporting, e.g. a file name and a position in the file.",
+          "type": "string"
+        }
+      }
     },
     "TestIamPermissionsRequest": {
-      "description": "Request message for `TestIamPermissions` method.",
+      "id": "TestIamPermissionsRequest",
       "type": "object",
       "properties": {
         "permissions": {
@@ -31,153 +187,104 @@
           }
         }
       },
-      "id": "TestIamPermissionsRequest"
+      "description": "Request message for `TestIamPermissions` method."
     },
-    "HiveDatabaseOptions": {
-      "description": "Options of a Hive database.",
+    "Catalog": {
+      "description": "Catalog is the container of databases.",
+      "id": "Catalog",
       "type": "object",
       "properties": {
-        "parameters": {
-          "type": "object",
-          "description": "Stores user supplied Hive database parameters.",
-          "additionalProperties": {
-            "type": "string"
-          }
-        },
-        "locationUri": {
+        "expireTime": {
+          "description": "Output only. The time when this catalog is considered expired. Only set after the catalog is deleted.",
+          "readOnly": true,
           "type": "string",
-          "description": "Cloud Storage folder URI where the database data is stored, starting with \"gs://\"."
-        }
-      },
-      "id": "HiveDatabaseOptions"
-    },
-    "ListDatabasesResponse": {
-      "id": "ListDatabasesResponse",
-      "properties": {
-        "databases": {
-          "type": "array",
-          "description": "The databases from the specified catalog.",
-          "items": {
-            "$ref": "Database"
-          }
+          "format": "google-datetime"
         },
-        "nextPageToken": {
+        "name": {
+          "description": "Output only. The resource name. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}",
+          "readOnly": true,
+          "type": "string"
+        },
+        "createTime": {
+          "description": "Output only. The creation time of the catalog.",
+          "readOnly": true,
           "type": "string",
-          "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages."
-        }
-      },
-      "type": "object",
-      "description": "Response message for the ListDatabases method."
-    },
-    "HiveTableOptions": {
-      "id": "HiveTableOptions",
-      "properties": {
-        "parameters": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Stores user supplied Hive table parameters.",
-          "type": "object"
+          "format": "google-datetime"
         },
-        "storageDescriptor": {
-          "description": "Stores physical storage information of the data.",
-          "$ref": "StorageDescriptor"
-        },
-        "tableType": {
+        "updateTime": {
           "type": "string",
-          "description": "Hive table type. For example, MANAGED_TABLE, EXTERNAL_TABLE."
+          "format": "google-datetime",
+          "description": "Output only. The last modification time of the catalog.",
+          "readOnly": true
+        },
+        "deleteTime": {
+          "type": "string",
+          "format": "google-datetime",
+          "description": "Output only. The deletion time of the catalog. Only set after the catalog is deleted.",
+          "readOnly": true
         }
-      },
-      "type": "object",
-      "description": "Options of a Hive table."
+      }
     },
     "Binding": {
+      "description": "Associates `members`, or principals, with a `role`.",
       "id": "Binding",
+      "type": "object",
       "properties": {
-        "role": {
-          "type": "string",
-          "description": "Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`. For an overview of the IAM roles and permissions, see the [IAM documentation](https://cloud.google.com/iam/docs/roles-overview). For a list of the available pre-defined roles, see [here](https://cloud.google.com/iam/docs/understanding-roles)."
-        },
         "members": {
           "type": "array",
-          "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workforce identity pool. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/group/{group_id}`: All workforce identities in a group. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All workforce identities with a specific attribute value. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/*`: All identities in a workforce identity pool. * `principal://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workload identity pool. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/group/{group_id}`: A workload identity pool group. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All identities in a workload identity pool with a certain attribute. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/*`: All identities in a workload identity pool. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `deleted:principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: Deleted single identity in a workforce identity pool. For example, `deleted:principal://iam.googleapis.com/locations/global/workforcePools/my-pool-id/subject/my-subject-attribute-value`.",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Specifies the principals requesting access for a Google Cloud resource. `members` can have the following values: * `allUsers`: A special identifier that represents anyone who is on the internet; with or without a Google account. * `allAuthenticatedUsers`: A special identifier that represents anyone who is authenticated with a Google account or a service account. Does not include identities that come from external identity providers (IdPs) through identity federation. * `user:{emailid}`: An email address that represents a specific Google account. For example, `alice@example.com` . * `serviceAccount:{emailid}`: An email address that represents a Google service account. For example, `my-other-app@appspot.gserviceaccount.com`. * `serviceAccount:{projectid}.svc.id.goog[{namespace}/{kubernetes-sa}]`: An identifier for a [Kubernetes service account](https://cloud.google.com/kubernetes-engine/docs/how-to/kubernetes-service-accounts). For example, `my-project.svc.id.goog[my-namespace/my-kubernetes-sa]`. * `group:{emailid}`: An email address that represents a Google group. For example, `admins@example.com`. * `domain:{domain}`: The G Suite domain (primary) that represents all the users of that domain. For example, `google.com` or `example.com`. * `principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workforce identity pool. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/group/{group_id}`: All workforce identities in a group. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All workforce identities with a specific attribute value. * `principalSet://iam.googleapis.com/locations/global/workforcePools/{pool_id}/*`: All identities in a workforce identity pool. * `principal://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/subject/{subject_attribute_value}`: A single identity in a workload identity pool. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/group/{group_id}`: A workload identity pool group. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/attribute.{attribute_name}/{attribute_value}`: All identities in a workload identity pool with a certain attribute. * `principalSet://iam.googleapis.com/projects/{project_number}/locations/global/workloadIdentityPools/{pool_id}/*`: All identities in a workload identity pool. * `deleted:user:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a user that has been recently deleted. For example, `alice@example.com?uid=123456789012345678901`. If the user is recovered, this value reverts to `user:{emailid}` and the recovered user retains the role in the binding. * `deleted:serviceAccount:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a service account that has been recently deleted. For example, `my-other-app@appspot.gserviceaccount.com?uid=123456789012345678901`. If the service account is undeleted, this value reverts to `serviceAccount:{emailid}` and the undeleted service account retains the role in the binding. * `deleted:group:{emailid}?uid={uniqueid}`: An email address (plus unique identifier) representing a Google group that has been recently deleted. For example, `admins@example.com?uid=123456789012345678901`. If the group is recovered, this value reverts to `group:{emailid}` and the recovered group retains the role in the binding. * `deleted:principal://iam.googleapis.com/locations/global/workforcePools/{pool_id}/subject/{subject_attribute_value}`: Deleted single identity in a workforce identity pool. For example, `deleted:principal://iam.googleapis.com/locations/global/workforcePools/my-pool-id/subject/my-subject-attribute-value`."
         },
         "condition": {
           "description": "The condition that is associated with this binding. If the condition evaluates to `true`, then this binding applies to the current request. If the condition evaluates to `false`, then this binding does not apply to the current request. However, a different role binding might grant the same role to one or more of the principals in this binding. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).",
           "$ref": "Expr"
-        }
-      },
-      "type": "object",
-      "description": "Associates `members`, or principals, with a `role`."
-    },
-    "TestIamPermissionsResponse": {
-      "type": "object",
-      "description": "Response message for `TestIamPermissions` method.",
-      "id": "TestIamPermissionsResponse",
-      "properties": {
-        "permissions": {
-          "type": "array",
-          "description": "A subset of `TestPermissionsRequest.permissions` that the caller is allowed.",
-          "items": {
-            "type": "string"
-          }
+        },
+        "role": {
+          "description": "Role that is assigned to the list of `members`, or principals. For example, `roles/viewer`, `roles/editor`, or `roles/owner`. For an overview of the IAM roles and permissions, see the [IAM documentation](https://cloud.google.com/iam/docs/roles-overview). For a list of the available pre-defined roles, see [here](https://cloud.google.com/iam/docs/understanding-roles).",
+          "type": "string"
         }
       }
     },
-    "Policy": {
-      "id": "Policy",
-      "properties": {
-        "bindings": {
-          "items": {
-            "$ref": "Binding"
-          },
-          "description": "Associates a list of `members`, or principals, with a `role`. Optionally, may specify a `condition` that determines how and when the `bindings` are applied. Each of the `bindings` must contain at least one principal. The `bindings` in a `Policy` can refer to up to 1,500 principals; up to 250 of these principals can be Google groups. Each occurrence of a principal counts towards these limits. For example, if the `bindings` grant 50 different roles to `user:alice@example.com`, and not to any other principal, then you can add another 1,450 principals to the `bindings` in the `Policy`.",
-          "type": "array"
-        },
-        "auditConfigs": {
-          "items": {
-            "$ref": "AuditConfig"
-          },
-          "description": "Specifies cloud audit logging configuration for this policy.",
-          "type": "array"
-        },
-        "etag": {
-          "type": "string",
-          "description": "`etag` is used for optimistic concurrency control as a way to help prevent simultaneous updates of a policy from overwriting each other. It is strongly suggested that systems make use of the `etag` in the read-modify-write cycle to perform policy updates in order to avoid race conditions: An `etag` is returned in the response to `getIamPolicy`, and systems are expected to put that etag in the request to `setIamPolicy` to ensure that their change will be applied to the same version of the policy. **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost.",
-          "format": "byte"
-        },
-        "version": {
-          "description": "Specifies the format of the policy. Valid values are `0`, `1`, and `3`. Requests that specify an invalid value are rejected. Any operation that affects conditional role bindings must specify version `3`. This requirement applies to the following operations: * Getting a policy that includes a conditional role binding * Adding a conditional role binding to a policy * Changing a conditional role binding in a policy * Removing any role binding, with or without a condition, from a policy that includes conditions **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost. If a policy does not include any conditions, operations on that policy may specify any valid version or leave the field unset. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).",
-          "type": "integer",
-          "format": "int32"
-        }
-      },
+    "StorageDescriptor": {
+      "description": "Stores physical storage information of the data.",
+      "id": "StorageDescriptor",
       "type": "object",
-      "description": "An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** ``` { \"bindings\": [ { \"role\": \"roles/resourcemanager.organizationAdmin\", \"members\": [ \"user:mike@example.com\", \"group:admins@example.com\", \"domain:google.com\", \"serviceAccount:my-project-id@appspot.gserviceaccount.com\" ] }, { \"role\": \"roles/resourcemanager.organizationViewer\", \"members\": [ \"user:eve@example.com\" ], \"condition\": { \"title\": \"expirable access\", \"description\": \"Does not grant access after Sep 2020\", \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\", } } ], \"etag\": \"BwWWja0YfJA=\", \"version\": 3 } ``` **YAML example:** ``` bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3 ``` For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/)."
-    },
-    "ListCatalogsResponse": {
-      "id": "ListCatalogsResponse",
       "properties": {
-        "catalogs": {
-          "description": "The catalogs from the specified project.",
-          "type": "array",
-          "items": {
-            "$ref": "Catalog"
-          }
+        "locationUri": {
+          "description": "Cloud Storage folder URI where the table data is stored, starting with \"gs://\".",
+          "type": "string"
         },
-        "nextPageToken": {
-          "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+        "serdeInfo": {
+          "description": "Serializer and deserializer information.",
+          "$ref": "SerDeInfo"
+        },
+        "inputFormat": {
+          "description": "The fully qualified Java class name of the input format.",
+          "type": "string"
+        },
+        "outputFormat": {
+          "description": "The fully qualified Java class name of the output format.",
+          "type": "string"
+        }
+      }
+    },
+    "SerDeInfo": {
+      "id": "SerDeInfo",
+      "type": "object",
+      "properties": {
+        "serializationLib": {
+          "description": "The fully qualified Java class name of the serialization library.",
           "type": "string"
         }
       },
-      "type": "object",
-      "description": "Response message for the ListCatalogs method."
+      "description": "Serializer and deserializer information."
     },
     "Table": {
+      "description": "Represents a table.",
       "id": "Table",
+      "type": "object",
       "properties": {
         "deleteTime": {
           "description": "Output only. The deletion time of the table. Only set after the table is deleted.",
@@ -185,17 +292,36 @@
           "type": "string",
           "format": "google-datetime"
         },
+        "etag": {
+          "description": "The checksum of a table object computed by the server based on the value of other fields. It may be sent on update requests to ensure the client has an up-to-date value before proceeding. It is only checked for update table operations.",
+          "type": "string"
+        },
+        "hiveOptions": {
+          "description": "Options of a Hive table.",
+          "$ref": "HiveTableOptions"
+        },
+        "expireTime": {
+          "description": "Output only. The time when this table is considered expired. Only set after the table is deleted.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        },
         "type": {
           "description": "The table type.",
+          "type": "string",
           "enumDescriptions": [
             "The type is not specified.",
             "Represents a table compatible with Hive Metastore tables."
           ],
-          "type": "string",
           "enum": [
             "TYPE_UNSPECIFIED",
             "HIVE"
           ]
+        },
+        "name": {
+          "description": "Output only. The resource name. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}/tables/{table_id}",
+          "readOnly": true,
+          "type": "string"
         },
         "createTime": {
           "description": "Output only. The creation time of the table.",
@@ -203,146 +329,67 @@
           "type": "string",
           "format": "google-datetime"
         },
-        "hiveOptions": {
-          "description": "Options of a Hive table.",
-          "$ref": "HiveTableOptions"
-        },
-        "name": {
-          "description": "Output only. The resource name. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}/tables/{table_id}",
-          "readOnly": true,
-          "type": "string"
-        },
-        "expireTime": {
-          "format": "google-datetime",
-          "type": "string",
-          "description": "Output only. The time when this table is considered expired. Only set after the table is deleted.",
-          "readOnly": true
-        },
-        "etag": {
-          "type": "string",
-          "description": "The checksum of a table object computed by the server based on the value of other fields. It may be sent on update requests to ensure the client has an up-to-date value before proceeding. It is only checked for update table operations."
-        },
         "updateTime": {
-          "format": "google-datetime",
-          "type": "string",
           "description": "Output only. The last modification time of the table.",
-          "readOnly": true
-        }
-      },
-      "type": "object",
-      "description": "Represents a table."
-    },
-    "AuditConfig": {
-      "description": "Specifies the audit configuration for a service. The configuration determines which permission types are logged, and what identities, if any, are exempted from logging. An AuditConfig must have one or more AuditLogConfigs. If there are AuditConfigs for both `allServices` and a specific service, the union of the two AuditConfigs is used for that service: the log_types specified in each AuditConfig are enabled, and the exempted_members in each AuditLogConfig are exempted. Example Policy with multiple AuditConfigs: { \"audit_configs\": [ { \"service\": \"allServices\", \"audit_log_configs\": [ { \"log_type\": \"DATA_READ\", \"exempted_members\": [ \"user:jose@example.com\" ] }, { \"log_type\": \"DATA_WRITE\" }, { \"log_type\": \"ADMIN_READ\" } ] }, { \"service\": \"sampleservice.googleapis.com\", \"audit_log_configs\": [ { \"log_type\": \"DATA_READ\" }, { \"log_type\": \"DATA_WRITE\", \"exempted_members\": [ \"user:aliya@example.com\" ] } ] } ] } For sampleservice, this policy enables DATA_READ, DATA_WRITE and ADMIN_READ logging. It also exempts `jose@example.com` from DATA_READ logging, and `aliya@example.com` from DATA_WRITE logging.",
-      "type": "object",
-      "properties": {
-        "service": {
-          "description": "Specifies a service that will be enabled for audit logging. For example, `storage.googleapis.com`, `cloudsql.googleapis.com`. `allServices` is a special value that covers all services.",
-          "type": "string"
-        },
-        "auditLogConfigs": {
-          "items": {
-            "$ref": "AuditLogConfig"
-          },
-          "description": "The configuration for logging of each type of permission.",
-          "type": "array"
-        }
-      },
-      "id": "AuditConfig"
-    },
-    "Expr": {
-      "id": "Expr",
-      "properties": {
-        "location": {
-          "description": "Optional. String indicating the location of the expression for error reporting, e.g. a file name and a position in the file.",
-          "type": "string"
-        },
-        "description": {
-          "type": "string",
-          "description": "Optional. Description of the expression. This is a longer text which describes the expression, e.g. when hovered over it in a UI."
-        },
-        "expression": {
-          "description": "Textual representation of an expression in Common Expression Language syntax.",
-          "type": "string"
-        },
-        "title": {
-          "type": "string",
-          "description": "Optional. Title for the expression, i.e. a short string describing its purpose. This can be used e.g. in UIs which allow to enter the expression."
-        }
-      },
-      "type": "object",
-      "description": "Represents a textual expression in the Common Expression Language (CEL) syntax. CEL is a C-like expression language. The syntax and semantics of CEL are documented at https://github.com/google/cel-spec. Example (Comparison): title: \"Summary size limit\" description: \"Determines if a summary is less than 100 chars\" expression: \"document.summary.size() < 100\" Example (Equality): title: \"Requestor is owner\" description: \"Determines if requestor is the document owner\" expression: \"document.owner == request.auth.claims.email\" Example (Logic): title: \"Public documents\" description: \"Determine whether the document should be publicly visible\" expression: \"document.type != 'private' && document.type != 'internal'\" Example (Data Manipulation): title: \"Notification string\" description: \"Create a notification string with a timestamp.\" expression: \"'New message received at ' + string(document.create_time)\" The exact variables and functions that may be referenced within an expression are determined by the service that evaluates it. See the service documentation for additional information."
-    },
-    "Catalog": {
-      "properties": {
-        "deleteTime": {
-          "type": "string",
-          "description": "Output only. The deletion time of the catalog. Only set after the catalog is deleted.",
           "readOnly": true,
+          "type": "string",
           "format": "google-datetime"
-        },
-        "createTime": {
-          "format": "google-datetime",
-          "type": "string",
-          "description": "Output only. The creation time of the catalog.",
-          "readOnly": true
-        },
-        "name": {
-          "description": "Output only. The resource name. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}",
-          "readOnly": true,
-          "type": "string"
-        },
-        "expireTime": {
-          "format": "google-datetime",
-          "type": "string",
-          "description": "Output only. The time when this catalog is considered expired. Only set after the catalog is deleted.",
-          "readOnly": true
-        },
-        "updateTime": {
-          "format": "google-datetime",
-          "type": "string",
-          "description": "Output only. The last modification time of the catalog.",
-          "readOnly": true
         }
-      },
-      "id": "Catalog",
-      "description": "Catalog is the container of databases.",
-      "type": "object"
+      }
     },
-    "AuditLogConfig": {
+    "Policy": {
+      "description": "An Identity and Access Management (IAM) policy, which specifies access controls for Google Cloud resources. A `Policy` is a collection of `bindings`. A `binding` binds one or more `members`, or principals, to a single `role`. Principals can be user accounts, service accounts, Google groups, and domains (such as G Suite). A `role` is a named list of permissions; each `role` can be an IAM predefined role or a user-created custom role. For some types of Google Cloud resources, a `binding` can also specify a `condition`, which is a logical expression that allows access to a resource only if the expression evaluates to `true`. A condition can add constraints based on attributes of the request, the resource, or both. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies). **JSON example:** ``` { \"bindings\": [ { \"role\": \"roles/resourcemanager.organizationAdmin\", \"members\": [ \"user:mike@example.com\", \"group:admins@example.com\", \"domain:google.com\", \"serviceAccount:my-project-id@appspot.gserviceaccount.com\" ] }, { \"role\": \"roles/resourcemanager.organizationViewer\", \"members\": [ \"user:eve@example.com\" ], \"condition\": { \"title\": \"expirable access\", \"description\": \"Does not grant access after Sep 2020\", \"expression\": \"request.time < timestamp('2020-10-01T00:00:00.000Z')\", } } ], \"etag\": \"BwWWja0YfJA=\", \"version\": 3 } ``` **YAML example:** ``` bindings: - members: - user:mike@example.com - group:admins@example.com - domain:google.com - serviceAccount:my-project-id@appspot.gserviceaccount.com role: roles/resourcemanager.organizationAdmin - members: - user:eve@example.com role: roles/resourcemanager.organizationViewer condition: title: expirable access description: Does not grant access after Sep 2020 expression: request.time < timestamp('2020-10-01T00:00:00.000Z') etag: BwWWja0YfJA= version: 3 ``` For a description of IAM and its features, see the [IAM documentation](https://cloud.google.com/iam/docs/).",
+      "id": "Policy",
       "type": "object",
-      "description": "Provides the configuration for logging a type of permissions. Example: { \"audit_log_configs\": [ { \"log_type\": \"DATA_READ\", \"exempted_members\": [ \"user:jose@example.com\" ] }, { \"log_type\": \"DATA_WRITE\" } ] } This enables 'DATA_READ' and 'DATA_WRITE' logging, while exempting jose@example.com from DATA_READ logging.",
-      "id": "AuditLogConfig",
       "properties": {
-        "logType": {
-          "type": "string",
-          "enum": [
-            "LOG_TYPE_UNSPECIFIED",
-            "ADMIN_READ",
-            "DATA_WRITE",
-            "DATA_READ"
-          ],
-          "description": "The log type that this config enables.",
-          "enumDescriptions": [
-            "Default case. Should never be this.",
-            "Admin reads. Example: CloudIAM getIamPolicy",
-            "Data writes. Example: CloudSQL Users create",
-            "Data reads. Example: CloudSQL Users list"
-          ]
+        "version": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Specifies the format of the policy. Valid values are `0`, `1`, and `3`. Requests that specify an invalid value are rejected. Any operation that affects conditional role bindings must specify version `3`. This requirement applies to the following operations: * Getting a policy that includes a conditional role binding * Adding a conditional role binding to a policy * Changing a conditional role binding in a policy * Removing any role binding, with or without a condition, from a policy that includes conditions **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost. If a policy does not include any conditions, operations on that policy may specify any valid version or leave the field unset. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies)."
         },
-        "exemptedMembers": {
-          "description": "Specifies the identities that do not cause logging for this type of permission. Follows the same format of Binding.members.",
+        "bindings": {
+          "description": "Associates a list of `members`, or principals, with a `role`. Optionally, may specify a `condition` that determines how and when the `bindings` are applied. Each of the `bindings` must contain at least one principal. The `bindings` in a `Policy` can refer to up to 1,500 principals; up to 250 of these principals can be Google groups. Each occurrence of a principal counts towards these limits. For example, if the `bindings` grant 50 different roles to `user:alice@example.com`, and not to any other principal, then you can add another 1,450 principals to the `bindings` in the `Policy`.",
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "Binding"
+          }
+        },
+        "auditConfigs": {
+          "description": "Specifies cloud audit logging configuration for this policy.",
+          "type": "array",
+          "items": {
+            "$ref": "AuditConfig"
+          }
+        },
+        "etag": {
+          "description": "`etag` is used for optimistic concurrency control as a way to help prevent simultaneous updates of a policy from overwriting each other. It is strongly suggested that systems make use of the `etag` in the read-modify-write cycle to perform policy updates in order to avoid race conditions: An `etag` is returned in the response to `getIamPolicy`, and systems are expected to put that etag in the request to `setIamPolicy` to ensure that their change will be applied to the same version of the policy. **Important:** If you use IAM Conditions, you must include the `etag` field whenever you call `setIamPolicy`. If you omit this field, then IAM allows you to overwrite a version `3` policy with a version `1` policy, and all of the conditions in the version `3` policy are lost.",
+          "type": "string",
+          "format": "byte"
+        }
+      }
+    },
+    "ListCatalogsResponse": {
+      "description": "Response message for the ListCatalogs method.",
+      "id": "ListCatalogsResponse",
+      "type": "object",
+      "properties": {
+        "nextPageToken": {
+          "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+          "type": "string"
+        },
+        "catalogs": {
+          "description": "The catalogs from the specified project.",
+          "type": "array",
+          "items": {
+            "$ref": "Catalog"
           }
         }
       }
     },
     "SetIamPolicyRequest": {
-      "type": "object",
       "description": "Request message for `SetIamPolicy` method.",
       "id": "SetIamPolicyRequest",
+      "type": "object",
       "properties": {
         "policy": {
           "description": "REQUIRED: The complete policy to be applied to the `resource`. The size of the policy is limited to a few 10s of KB. An empty policy is a valid policy but certain Google Cloud services (such as Projects) might reject them.",
@@ -355,41 +402,23 @@
         }
       }
     },
-    "RenameTableRequest": {
-      "id": "RenameTableRequest",
-      "properties": {
-        "newName": {
-          "description": "Required. The new `name` for the specified table, must be in the same database. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}/tables/{table_id}",
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "description": "Request message for the RenameTable method in MetastoreService"
-    },
     "Database": {
-      "description": "Database is the container of tables.",
+      "id": "Database",
       "type": "object",
       "properties": {
-        "type": {
-          "description": "The database type.",
-          "enumDescriptions": [
-            "The type is not specified.",
-            "Represents a database storing tables compatible with Hive Metastore tables."
-          ],
-          "type": "string",
-          "enum": [
-            "TYPE_UNSPECIFIED",
-            "HIVE"
-          ]
-        },
-        "deleteTime": {
-          "type": "string",
-          "description": "Output only. The deletion time of the database. Only set after the database is deleted.",
+        "name": {
+          "description": "Output only. The resource name. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}",
           "readOnly": true,
-          "format": "google-datetime"
+          "type": "string"
         },
         "createTime": {
+          "type": "string",
+          "format": "google-datetime",
           "description": "Output only. The creation time of the database.",
+          "readOnly": true
+        },
+        "updateTime": {
+          "description": "Output only. The last modification time of the database.",
           "readOnly": true,
           "type": "string",
           "format": "google-datetime"
@@ -398,261 +427,618 @@
           "description": "Options of a Hive database.",
           "$ref": "HiveDatabaseOptions"
         },
-        "name": {
-          "type": "string",
-          "description": "Output only. The resource name. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}",
-          "readOnly": true
-        },
         "expireTime": {
           "type": "string",
+          "format": "google-datetime",
           "description": "Output only. The time when this database is considered expired. Only set after the database is deleted.",
-          "readOnly": true,
-          "format": "google-datetime"
+          "readOnly": true
         },
-        "updateTime": {
-          "description": "Output only. The last modification time of the database.",
-          "readOnly": true,
+        "type": {
+          "enumDescriptions": [
+            "The type is not specified.",
+            "Represents a database storing tables compatible with Hive Metastore tables."
+          ],
+          "enum": [
+            "TYPE_UNSPECIFIED",
+            "HIVE"
+          ],
           "type": "string",
-          "format": "google-datetime"
+          "description": "The database type."
+        },
+        "deleteTime": {
+          "type": "string",
+          "format": "google-datetime",
+          "description": "Output only. The deletion time of the database. Only set after the database is deleted.",
+          "readOnly": true
         }
       },
-      "id": "Database"
-    },
-    "StorageDescriptor": {
-      "id": "StorageDescriptor",
-      "properties": {
-        "locationUri": {
-          "type": "string",
-          "description": "Cloud Storage folder URI where the table data is stored, starting with \"gs://\"."
-        },
-        "inputFormat": {
-          "description": "The fully qualified Java class name of the input format.",
-          "type": "string"
-        },
-        "outputFormat": {
-          "type": "string",
-          "description": "The fully qualified Java class name of the output format."
-        },
-        "serdeInfo": {
-          "description": "Serializer and deserializer information.",
-          "$ref": "SerDeInfo"
-        }
-      },
-      "type": "object",
-      "description": "Stores physical storage information of the data."
-    },
-    "SerDeInfo": {
-      "id": "SerDeInfo",
-      "properties": {
-        "serializationLib": {
-          "description": "The fully qualified Java class name of the serialization library.",
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "description": "Serializer and deserializer information."
+      "description": "Database is the container of tables."
     }
   },
-  "mtlsRootUrl": "https://biglake.mtls.googleapis.com/",
+  "id": "biglake:v1",
+  "description": "The Lakehouse API (formerly BigLake API) provides access to a serverless, fully managed, and highly available metastore that provides a single source of truth for your data lakehouse. It lets multiple engines—including Apache Spark, Google Managed Spark, Apache Flink, Trino and BigQuery—share tables and metadata for key open formats (Apache Iceberg, Apache Hive), and query the same copy of data. Plus, through the Lakehouse runtime catalog federation seamlessly unite your lakehouse ecosystem, letting Iceberg compatible engines on Google Cloud (BigQuery, Google Managed Spark) discover and analyze enterprise data across Snowflake, Databricks, and AWS Glue.",
+  "revision": "20260709",
+  "canonicalName": "BigLake Service",
+  "ownerDomain": "google.com",
+  "rootUrl": "https://biglake.googleapis.com/",
+  "title": "Lakehouse API",
+  "protocol": "rest",
+  "name": "biglake",
+  "baseUrl": "https://biglake.googleapis.com/",
   "resources": {
     "projects": {
       "resources": {
-        "catalogs": {
-          "methods": {
-            "getIamPolicy": {
-              "scopes": [
-                "https://www.googleapis.com/auth/bigquery",
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "response": {
-                "$ref": "Policy"
-              },
-              "httpMethod": "GET",
-              "description": "Gets the IAM policy for the specified Catalog.",
-              "path": "v1/{+resource}:getIamPolicy",
-              "parameters": {
-                "options.requestedPolicyVersion": {
-                  "location": "query",
-                  "type": "integer",
-                  "description": "Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).",
-                  "format": "int32"
-                },
-                "resource": {
-                  "description": "REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
-                  "type": "string",
-                  "pattern": "^projects/[^/]+/catalogs/[^/]+$",
-                  "location": "path",
-                  "required": true
-                }
-              },
-              "id": "biglake.projects.catalogs.getIamPolicy",
-              "parameterOrder": [
-                "resource"
-              ],
-              "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}:getIamPolicy"
-            },
-            "testIamPermissions": {
-              "response": {
-                "$ref": "TestIamPermissionsResponse"
-              },
-              "scopes": [
-                "https://www.googleapis.com/auth/bigquery",
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "request": {
-                "$ref": "TestIamPermissionsRequest"
-              },
-              "description": "Tests the IAM permissions for the specified catalog.",
-              "httpMethod": "POST",
-              "parameterOrder": [
-                "resource"
-              ],
-              "id": "biglake.projects.catalogs.testIamPermissions",
-              "path": "v1/{+resource}:testIamPermissions",
-              "parameters": {
-                "resource": {
-                  "description": "REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
-                  "type": "string",
-                  "pattern": "^projects/[^/]+/catalogs/[^/]+$",
-                  "location": "path",
-                  "required": true
-                }
-              },
-              "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}:testIamPermissions"
-            },
-            "setIamPolicy": {
-              "httpMethod": "POST",
-              "request": {
-                "$ref": "SetIamPolicyRequest"
-              },
-              "description": "Sets the IAM policy for the specified catalog.",
-              "scopes": [
-                "https://www.googleapis.com/auth/bigquery",
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "response": {
-                "$ref": "Policy"
-              },
-              "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}:setIamPolicy",
-              "path": "v1/{+resource}:setIamPolicy",
-              "parameters": {
-                "resource": {
-                  "description": "REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
-                  "type": "string",
-                  "pattern": "^projects/[^/]+/catalogs/[^/]+$",
-                  "location": "path",
-                  "required": true
-                }
-              },
-              "id": "biglake.projects.catalogs.setIamPolicy",
-              "parameterOrder": [
-                "resource"
-              ]
-            }
-          },
+        "locations": {
           "resources": {
-            "namespaces": {
-              "methods": {
-                "getIamPolicy": {
-                  "httpMethod": "GET",
-                  "description": "Gets the IAM policy for the specified Catalog.",
-                  "response": {
-                    "$ref": "Policy"
-                  },
-                  "scopes": [
-                    "https://www.googleapis.com/auth/bigquery",
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}/namespaces/{namespacesId}:getIamPolicy",
-                  "id": "biglake.projects.catalogs.namespaces.getIamPolicy",
-                  "path": "v1/{+resource}:getIamPolicy",
-                  "parameters": {
-                    "resource": {
-                      "type": "string",
-                      "description": "REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
-                      "location": "path",
-                      "required": true,
-                      "pattern": "^projects/[^/]+/catalogs/[^/]+/namespaces/[^/]+$"
+            "catalogs": {
+              "resources": {
+                "databases": {
+                  "methods": {
+                    "delete": {
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}",
+                      "id": "biglake.projects.locations.catalogs.databases.delete",
+                      "parameters": {
+                        "name": {
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+$",
+                          "type": "string",
+                          "description": "Required. The name of the database to delete. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}",
+                          "required": true
+                        }
+                      },
+                      "description": "Deletes an existing database specified by the database ID.",
+                      "response": {
+                        "$ref": "Database"
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "path": "v1/{+name}",
+                      "scopes": [
+                        "https://www.googleapis.com/auth/bigquery",
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "httpMethod": "DELETE"
                     },
-                    "options.requestedPolicyVersion": {
-                      "format": "int32",
-                      "location": "query",
-                      "type": "integer",
-                      "description": "Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies)."
+                    "get": {
+                      "scopes": [
+                        "https://www.googleapis.com/auth/bigquery",
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "path": "v1/{+name}",
+                      "httpMethod": "GET",
+                      "id": "biglake.projects.locations.catalogs.databases.get",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}",
+                      "description": "Gets the database specified by the resource name.",
+                      "parameters": {
+                        "name": {
+                          "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+$",
+                          "location": "path",
+                          "type": "string",
+                          "required": true,
+                          "description": "Required. The name of the database to retrieve. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}"
+                        }
+                      },
+                      "response": {
+                        "$ref": "Database"
+                      },
+                      "parameterOrder": [
+                        "name"
+                      ]
+                    },
+                    "create": {
+                      "request": {
+                        "$ref": "Database"
+                      },
+                      "response": {
+                        "$ref": "Database"
+                      },
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "id": "biglake.projects.locations.catalogs.databases.create",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases",
+                      "description": "Creates a new database.",
+                      "parameters": {
+                        "parent": {
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+$",
+                          "type": "string",
+                          "description": "Required. The parent resource where this database will be created. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}",
+                          "required": true
+                        },
+                        "databaseId": {
+                          "description": "Required. The ID to use for the database, which will become the final component of the database's resource name.",
+                          "location": "query",
+                          "type": "string"
+                        }
+                      },
+                      "scopes": [
+                        "https://www.googleapis.com/auth/bigquery",
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "path": "v1/{+parent}/databases",
+                      "httpMethod": "POST"
+                    },
+                    "patch": {
+                      "httpMethod": "PATCH",
+                      "path": "v1/{+name}",
+                      "scopes": [
+                        "https://www.googleapis.com/auth/bigquery",
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "parameterOrder": [
+                        "name"
+                      ],
+                      "request": {
+                        "$ref": "Database"
+                      },
+                      "response": {
+                        "$ref": "Database"
+                      },
+                      "parameters": {
+                        "name": {
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+$",
+                          "type": "string",
+                          "description": "Output only. The resource name. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}",
+                          "required": true
+                        },
+                        "updateMask": {
+                          "location": "query",
+                          "type": "string",
+                          "format": "google-fieldmask",
+                          "description": "The list of fields to update. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask If not set, defaults to all of the fields that are allowed to update."
+                        }
+                      },
+                      "description": "Updates an existing database specified by the database ID.",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}",
+                      "id": "biglake.projects.locations.catalogs.databases.patch"
+                    },
+                    "list": {
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "response": {
+                        "$ref": "ListDatabasesResponse"
+                      },
+                      "description": "List all databases in a specified catalog.",
+                      "parameters": {
+                        "pageToken": {
+                          "location": "query",
+                          "type": "string",
+                          "description": "A page token, received from a previous `ListDatabases` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListDatabases` must match the call that provided the page token."
+                        },
+                        "parent": {
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+$",
+                          "description": "Required. The parent, which owns this collection of databases. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}",
+                          "required": true,
+                          "type": "string"
+                        },
+                        "pageSize": {
+                          "description": "The maximum number of databases to return. The service may return fewer than this value. If unspecified, at most 50 databases will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                          "location": "query",
+                          "type": "integer",
+                          "format": "int32"
+                        }
+                      },
+                      "id": "biglake.projects.locations.catalogs.databases.list",
+                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases",
+                      "httpMethod": "GET",
+                      "scopes": [
+                        "https://www.googleapis.com/auth/bigquery",
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "path": "v1/{+parent}/databases"
                     }
                   },
+                  "resources": {
+                    "tables": {
+                      "methods": {
+                        "list": {
+                          "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}/tables",
+                          "id": "biglake.projects.locations.catalogs.databases.tables.list",
+                          "parameters": {
+                            "pageToken": {
+                              "description": "A page token, received from a previous `ListTables` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListTables` must match the call that provided the page token.",
+                              "location": "query",
+                              "type": "string"
+                            },
+                            "view": {
+                              "description": "The view for the returned tables.",
+                              "type": "string",
+                              "enumDescriptions": [
+                                "Default value. The API will default to the BASIC view.",
+                                "Include only table names. This is the default value.",
+                                "Include everything."
+                              ],
+                              "enum": [
+                                "TABLE_VIEW_UNSPECIFIED",
+                                "BASIC",
+                                "FULL"
+                              ],
+                              "location": "query"
+                            },
+                            "pageSize": {
+                              "description": "The maximum number of tables to return. The service may return fewer than this value. If unspecified, at most 50 tables will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                              "location": "query",
+                              "type": "integer",
+                              "format": "int32"
+                            },
+                            "parent": {
+                              "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+$",
+                              "location": "path",
+                              "type": "string",
+                              "required": true,
+                              "description": "Required. The parent, which owns this collection of tables. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}"
+                            }
+                          },
+                          "description": "List all tables in a specified database.",
+                          "response": {
+                            "$ref": "ListTablesResponse"
+                          },
+                          "parameterOrder": [
+                            "parent"
+                          ],
+                          "path": "v1/{+parent}/tables",
+                          "scopes": [
+                            "https://www.googleapis.com/auth/bigquery",
+                            "https://www.googleapis.com/auth/cloud-platform"
+                          ],
+                          "httpMethod": "GET"
+                        },
+                        "get": {
+                          "parameterOrder": [
+                            "name"
+                          ],
+                          "response": {
+                            "$ref": "Table"
+                          },
+                          "parameters": {
+                            "name": {
+                              "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+/tables/[^/]+$",
+                              "location": "path",
+                              "type": "string",
+                              "required": true,
+                              "description": "Required. The name of the table to retrieve. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}/tables/{table_id}"
+                            }
+                          },
+                          "description": "Gets the table specified by the resource name.",
+                          "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}/tables/{tablesId}",
+                          "id": "biglake.projects.locations.catalogs.databases.tables.get",
+                          "httpMethod": "GET",
+                          "path": "v1/{+name}",
+                          "scopes": [
+                            "https://www.googleapis.com/auth/bigquery",
+                            "https://www.googleapis.com/auth/cloud-platform"
+                          ]
+                        },
+                        "create": {
+                          "request": {
+                            "$ref": "Table"
+                          },
+                          "response": {
+                            "$ref": "Table"
+                          },
+                          "parameterOrder": [
+                            "parent"
+                          ],
+                          "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}/tables",
+                          "id": "biglake.projects.locations.catalogs.databases.tables.create",
+                          "parameters": {
+                            "tableId": {
+                              "description": "Required. The ID to use for the table, which will become the final component of the table's resource name.",
+                              "location": "query",
+                              "type": "string"
+                            },
+                            "parent": {
+                              "required": true,
+                              "description": "Required. The parent resource where this table will be created. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}",
+                              "type": "string",
+                              "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+$",
+                              "location": "path"
+                            }
+                          },
+                          "description": "Creates a new table.",
+                          "path": "v1/{+parent}/tables",
+                          "scopes": [
+                            "https://www.googleapis.com/auth/bigquery",
+                            "https://www.googleapis.com/auth/cloud-platform"
+                          ],
+                          "httpMethod": "POST"
+                        },
+                        "patch": {
+                          "scopes": [
+                            "https://www.googleapis.com/auth/bigquery",
+                            "https://www.googleapis.com/auth/cloud-platform"
+                          ],
+                          "path": "v1/{+name}",
+                          "httpMethod": "PATCH",
+                          "id": "biglake.projects.locations.catalogs.databases.tables.patch",
+                          "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}/tables/{tablesId}",
+                          "description": "Updates an existing table specified by the table ID.",
+                          "parameters": {
+                            "name": {
+                              "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+/tables/[^/]+$",
+                              "location": "path",
+                              "required": true,
+                              "description": "Output only. The resource name. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}/tables/{table_id}",
+                              "type": "string"
+                            },
+                            "updateMask": {
+                              "description": "The list of fields to update. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask If not set, defaults to all of the fields that are allowed to update.",
+                              "location": "query",
+                              "type": "string",
+                              "format": "google-fieldmask"
+                            }
+                          },
+                          "request": {
+                            "$ref": "Table"
+                          },
+                          "response": {
+                            "$ref": "Table"
+                          },
+                          "parameterOrder": [
+                            "name"
+                          ]
+                        },
+                        "delete": {
+                          "httpMethod": "DELETE",
+                          "scopes": [
+                            "https://www.googleapis.com/auth/bigquery",
+                            "https://www.googleapis.com/auth/cloud-platform"
+                          ],
+                          "path": "v1/{+name}",
+                          "parameterOrder": [
+                            "name"
+                          ],
+                          "response": {
+                            "$ref": "Table"
+                          },
+                          "description": "Deletes an existing table specified by the table ID.",
+                          "parameters": {
+                            "name": {
+                              "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+/tables/[^/]+$",
+                              "location": "path",
+                              "type": "string",
+                              "required": true,
+                              "description": "Required. The name of the table to delete. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}/tables/{table_id}"
+                            }
+                          },
+                          "id": "biglake.projects.locations.catalogs.databases.tables.delete",
+                          "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}/tables/{tablesId}"
+                        },
+                        "rename": {
+                          "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}/tables/{tablesId}:rename",
+                          "id": "biglake.projects.locations.catalogs.databases.tables.rename",
+                          "parameters": {
+                            "name": {
+                              "description": "Required. The table's `name` field is used to identify the table to rename. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}/tables/{table_id}",
+                              "required": true,
+                              "type": "string",
+                              "location": "path",
+                              "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+/tables/[^/]+$"
+                            }
+                          },
+                          "description": "Renames an existing table specified by the table ID.",
+                          "request": {
+                            "$ref": "RenameTableRequest"
+                          },
+                          "response": {
+                            "$ref": "Table"
+                          },
+                          "parameterOrder": [
+                            "name"
+                          ],
+                          "path": "v1/{+name}:rename",
+                          "scopes": [
+                            "https://www.googleapis.com/auth/bigquery",
+                            "https://www.googleapis.com/auth/cloud-platform"
+                          ],
+                          "httpMethod": "POST"
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "methods": {
+                "create": {
+                  "httpMethod": "POST",
+                  "scopes": [
+                    "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "path": "v1/{+parent}/catalogs",
                   "parameterOrder": [
-                    "resource"
-                  ]
-                },
-                "testIamPermissions": {
-                  "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}/namespaces/{namespacesId}:testIamPermissions",
-                  "id": "biglake.projects.catalogs.namespaces.testIamPermissions",
-                  "path": "v1/{+resource}:testIamPermissions",
+                    "parent"
+                  ],
+                  "request": {
+                    "$ref": "Catalog"
+                  },
+                  "response": {
+                    "$ref": "Catalog"
+                  },
+                  "description": "Creates a new catalog.",
                   "parameters": {
-                    "resource": {
-                      "type": "string",
-                      "description": "REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
+                    "parent": {
                       "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+$",
+                      "description": "Required. The parent resource where this catalog will be created. Format: projects/{project_id_or_number}/locations/{location_id}",
                       "required": true,
-                      "pattern": "^projects/[^/]+/catalogs/[^/]+/namespaces/[^/]+$"
+                      "type": "string"
+                    },
+                    "catalogId": {
+                      "description": "Required. The ID to use for the catalog, which will become the final component of the catalog's resource name.",
+                      "location": "query",
+                      "type": "string"
                     }
                   },
-                  "parameterOrder": [
-                    "resource"
-                  ],
-                  "httpMethod": "POST",
-                  "request": {
-                    "$ref": "TestIamPermissionsRequest"
-                  },
-                  "description": "Tests the IAM permissions for the specified namespace.",
-                  "response": {
-                    "$ref": "TestIamPermissionsResponse"
-                  },
-                  "scopes": [
-                    "https://www.googleapis.com/auth/bigquery",
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ]
+                  "id": "biglake.projects.locations.catalogs.create",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs"
                 },
-                "setIamPolicy": {
+                "delete": {
+                  "httpMethod": "DELETE",
                   "scopes": [
                     "https://www.googleapis.com/auth/bigquery",
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
+                  "path": "v1/{+name}",
+                  "parameterOrder": [
+                    "name"
+                  ],
                   "response": {
-                    "$ref": "Policy"
+                    "$ref": "Catalog"
                   },
-                  "httpMethod": "POST",
-                  "request": {
-                    "$ref": "SetIamPolicyRequest"
-                  },
-                  "description": "Sets the IAM policy for the specified catalog.",
-                  "path": "v1/{+resource}:setIamPolicy",
+                  "description": "Deletes an existing catalog specified by the catalog ID.",
                   "parameters": {
-                    "resource": {
-                      "description": "REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
-                      "type": "string",
-                      "pattern": "^projects/[^/]+/catalogs/[^/]+/namespaces/[^/]+$",
+                    "name": {
                       "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+$",
+                      "description": "Required. The name of the catalog to delete. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "id": "biglake.projects.locations.catalogs.delete",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}"
+                },
+                "get": {
+                  "scopes": [
+                    "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "path": "v1/{+name}",
+                  "httpMethod": "GET",
+                  "id": "biglake.projects.locations.catalogs.get",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}",
+                  "description": "Gets the catalog specified by the resource name.",
+                  "parameters": {
+                    "name": {
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+$",
+                      "type": "string",
+                      "description": "Required. The name of the catalog to retrieve. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}",
                       "required": true
                     }
                   },
-                  "id": "biglake.projects.catalogs.namespaces.setIamPolicy",
+                  "response": {
+                    "$ref": "Catalog"
+                  },
                   "parameterOrder": [
-                    "resource"
+                    "name"
+                  ]
+                },
+                "list": {
+                  "httpMethod": "GET",
+                  "scopes": [
+                    "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}/namespaces/{namespacesId}:setIamPolicy"
+                  "path": "v1/{+parent}/catalogs",
+                  "description": "List all catalogs in a specified project.",
+                  "parameters": {
+                    "pageSize": {
+                      "description": "The maximum number of catalogs to return. The service may return fewer than this value. If unspecified, at most 50 catalogs will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                      "location": "query",
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "parent": {
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/locations/[^/]+$",
+                      "description": "Required. The parent, which owns this collection of catalogs. Format: projects/{project_id_or_number}/locations/{location_id}",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "pageToken": {
+                      "description": "A page token, received from a previous `ListCatalogs` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListCatalogs` must match the call that provided the page token.",
+                      "location": "query",
+                      "type": "string"
+                    }
+                  },
+                  "id": "biglake.projects.locations.catalogs.list",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs",
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "response": {
+                    "$ref": "ListCatalogsResponse"
+                  }
                 }
-              },
+              }
+            }
+          }
+        },
+        "catalogs": {
+          "resources": {
+            "namespaces": {
               "resources": {
                 "tables": {
                   "methods": {
-                    "testIamPermissions": {
-                      "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}/namespaces/{namespacesId}/tables/{tablesId}:testIamPermissions",
+                    "setIamPolicy": {
                       "parameterOrder": [
                         "resource"
                       ],
-                      "path": "v1/{+resource}:testIamPermissions",
+                      "request": {
+                        "$ref": "SetIamPolicyRequest"
+                      },
+                      "response": {
+                        "$ref": "Policy"
+                      },
+                      "description": "Sets the IAM policy for the specified catalog.",
+                      "parameters": {
+                        "resource": {
+                          "description": "REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
+                          "required": true,
+                          "type": "string",
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/catalogs/[^/]+/namespaces/[^/]+/tables/[^/]+$"
+                        }
+                      },
+                      "id": "biglake.projects.catalogs.namespaces.tables.setIamPolicy",
+                      "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}/namespaces/{namespacesId}/tables/{tablesId}:setIamPolicy",
+                      "httpMethod": "POST",
+                      "scopes": [
+                        "https://www.googleapis.com/auth/bigquery",
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "path": "v1/{+resource}:setIamPolicy"
+                    },
+                    "getIamPolicy": {
+                      "httpMethod": "GET",
+                      "path": "v1/{+resource}:getIamPolicy",
+                      "scopes": [
+                        "https://www.googleapis.com/auth/bigquery",
+                        "https://www.googleapis.com/auth/cloud-platform"
+                      ],
+                      "parameterOrder": [
+                        "resource"
+                      ],
+                      "response": {
+                        "$ref": "Policy"
+                      },
+                      "parameters": {
+                        "options.requestedPolicyVersion": {
+                          "description": "Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).",
+                          "location": "query",
+                          "type": "integer",
+                          "format": "int32"
+                        },
+                        "resource": {
+                          "location": "path",
+                          "pattern": "^projects/[^/]+/catalogs/[^/]+/namespaces/[^/]+/tables/[^/]+$",
+                          "type": "string",
+                          "description": "REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
+                          "required": true
+                        }
+                      },
+                      "description": "Gets the IAM policy for the specified Catalog.",
+                      "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}/namespaces/{namespacesId}/tables/{tablesId}:getIamPolicy",
+                      "id": "biglake.projects.catalogs.namespaces.tables.getIamPolicy"
+                    },
+                    "testIamPermissions": {
                       "parameters": {
                         "resource": {
                           "pattern": "^projects/[^/]+/catalogs/[^/]+/namespaces/[^/]+/tables/[^/]+$",
@@ -662,601 +1048,298 @@
                           "type": "string"
                         }
                       },
+                      "description": "Tests the IAM permissions for the specified table.",
+                      "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}/namespaces/{namespacesId}/tables/{tablesId}:testIamPermissions",
                       "id": "biglake.projects.catalogs.namespaces.tables.testIamPermissions",
+                      "parameterOrder": [
+                        "resource"
+                      ],
                       "request": {
                         "$ref": "TestIamPermissionsRequest"
                       },
-                      "description": "Tests the IAM permissions for the specified table.",
-                      "httpMethod": "POST",
-                      "scopes": [
-                        "https://www.googleapis.com/auth/bigquery",
-                        "https://www.googleapis.com/auth/cloud-platform"
-                      ],
                       "response": {
                         "$ref": "TestIamPermissionsResponse"
-                      }
-                    },
-                    "setIamPolicy": {
-                      "request": {
-                        "$ref": "SetIamPolicyRequest"
                       },
-                      "description": "Sets the IAM policy for the specified catalog.",
                       "httpMethod": "POST",
-                      "scopes": [
-                        "https://www.googleapis.com/auth/bigquery",
-                        "https://www.googleapis.com/auth/cloud-platform"
-                      ],
-                      "response": {
-                        "$ref": "Policy"
-                      },
-                      "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}/namespaces/{namespacesId}/tables/{tablesId}:setIamPolicy",
-                      "parameterOrder": [
-                        "resource"
-                      ],
-                      "path": "v1/{+resource}:setIamPolicy",
-                      "parameters": {
-                        "resource": {
-                          "pattern": "^projects/[^/]+/catalogs/[^/]+/namespaces/[^/]+/tables/[^/]+$",
-                          "location": "path",
-                          "required": true,
-                          "description": "REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
-                          "type": "string"
-                        }
-                      },
-                      "id": "biglake.projects.catalogs.namespaces.tables.setIamPolicy"
-                    },
-                    "getIamPolicy": {
-                      "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}/namespaces/{namespacesId}/tables/{tablesId}:getIamPolicy",
-                      "id": "biglake.projects.catalogs.namespaces.tables.getIamPolicy",
-                      "path": "v1/{+resource}:getIamPolicy",
-                      "parameters": {
-                        "options.requestedPolicyVersion": {
-                          "description": "Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).",
-                          "location": "query",
-                          "type": "integer",
-                          "format": "int32"
-                        },
-                        "resource": {
-                          "pattern": "^projects/[^/]+/catalogs/[^/]+/namespaces/[^/]+/tables/[^/]+$",
-                          "location": "path",
-                          "required": true,
-                          "description": "REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
-                          "type": "string"
-                        }
-                      },
-                      "parameterOrder": [
-                        "resource"
-                      ],
-                      "httpMethod": "GET",
-                      "description": "Gets the IAM policy for the specified Catalog.",
-                      "response": {
-                        "$ref": "Policy"
-                      },
+                      "path": "v1/{+resource}:testIamPermissions",
                       "scopes": [
                         "https://www.googleapis.com/auth/bigquery",
                         "https://www.googleapis.com/auth/cloud-platform"
                       ]
-                    }
-                  }
-                }
-              }
-            }
-          }
-        },
-        "locations": {
-          "resources": {
-            "catalogs": {
-              "methods": {
-                "create": {
-                  "scopes": [
-                    "https://www.googleapis.com/auth/bigquery",
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "response": {
-                    "$ref": "Catalog"
-                  },
-                  "request": {
-                    "$ref": "Catalog"
-                  },
-                  "description": "Creates a new catalog.",
-                  "httpMethod": "POST",
-                  "parameterOrder": [
-                    "parent"
-                  ],
-                  "path": "v1/{+parent}/catalogs",
-                  "parameters": {
-                    "catalogId": {
-                      "description": "Required. The ID to use for the catalog, which will become the final component of the catalog's resource name.",
-                      "location": "query",
-                      "type": "string"
-                    },
-                    "parent": {
-                      "description": "Required. The parent resource where this catalog will be created. Format: projects/{project_id_or_number}/locations/{location_id}",
-                      "type": "string",
-                      "pattern": "^projects/[^/]+/locations/[^/]+$",
-                      "location": "path",
-                      "required": true
-                    }
-                  },
-                  "id": "biglake.projects.locations.catalogs.create",
-                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs"
-                },
-                "get": {
-                  "httpMethod": "GET",
-                  "description": "Gets the catalog specified by the resource name.",
-                  "scopes": [
-                    "https://www.googleapis.com/auth/bigquery",
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "response": {
-                    "$ref": "Catalog"
-                  },
-                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}",
-                  "path": "v1/{+name}",
-                  "parameters": {
-                    "name": {
-                      "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+$",
-                      "location": "path",
-                      "required": true,
-                      "description": "Required. The name of the catalog to retrieve. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}",
-                      "type": "string"
-                    }
-                  },
-                  "id": "biglake.projects.locations.catalogs.get",
-                  "parameterOrder": [
-                    "name"
-                  ]
-                },
-                "delete": {
-                  "scopes": [
-                    "https://www.googleapis.com/auth/bigquery",
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "response": {
-                    "$ref": "Catalog"
-                  },
-                  "httpMethod": "DELETE",
-                  "description": "Deletes an existing catalog specified by the catalog ID.",
-                  "path": "v1/{+name}",
-                  "parameters": {
-                    "name": {
-                      "location": "path",
-                      "required": true,
-                      "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+$",
-                      "type": "string",
-                      "description": "Required. The name of the catalog to delete. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}"
-                    }
-                  },
-                  "id": "biglake.projects.locations.catalogs.delete",
-                  "parameterOrder": [
-                    "name"
-                  ],
-                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}"
-                },
-                "list": {
-                  "description": "List all catalogs in a specified project.",
-                  "httpMethod": "GET",
-                  "response": {
-                    "$ref": "ListCatalogsResponse"
-                  },
-                  "scopes": [
-                    "https://www.googleapis.com/auth/bigquery",
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs",
-                  "parameterOrder": [
-                    "parent"
-                  ],
-                  "id": "biglake.projects.locations.catalogs.list",
-                  "path": "v1/{+parent}/catalogs",
-                  "parameters": {
-                    "pageToken": {
-                      "description": "A page token, received from a previous `ListCatalogs` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListCatalogs` must match the call that provided the page token.",
-                      "location": "query",
-                      "type": "string"
-                    },
-                    "pageSize": {
-                      "description": "The maximum number of catalogs to return. The service may return fewer than this value. If unspecified, at most 50 catalogs will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
-                      "location": "query",
-                      "type": "integer",
-                      "format": "int32"
-                    },
-                    "parent": {
-                      "description": "Required. The parent, which owns this collection of catalogs. Format: projects/{project_id_or_number}/locations/{location_id}",
-                      "type": "string",
-                      "pattern": "^projects/[^/]+/locations/[^/]+$",
-                      "location": "path",
-                      "required": true
                     }
                   }
                 }
               },
-              "resources": {
-                "databases": {
-                  "methods": {
-                    "list": {
-                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases",
-                      "parameterOrder": [
-                        "parent"
-                      ],
-                      "path": "v1/{+parent}/databases",
-                      "parameters": {
-                        "pageSize": {
-                          "description": "The maximum number of databases to return. The service may return fewer than this value. If unspecified, at most 50 databases will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
-                          "location": "query",
-                          "type": "integer",
-                          "format": "int32"
-                        },
-                        "parent": {
-                          "location": "path",
-                          "required": true,
-                          "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+$",
-                          "type": "string",
-                          "description": "Required. The parent, which owns this collection of databases. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}"
-                        },
-                        "pageToken": {
-                          "location": "query",
-                          "type": "string",
-                          "description": "A page token, received from a previous `ListDatabases` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListDatabases` must match the call that provided the page token."
-                        }
-                      },
-                      "id": "biglake.projects.locations.catalogs.databases.list",
-                      "description": "List all databases in a specified catalog.",
-                      "httpMethod": "GET",
-                      "scopes": [
-                        "https://www.googleapis.com/auth/bigquery",
-                        "https://www.googleapis.com/auth/cloud-platform"
-                      ],
-                      "response": {
-                        "$ref": "ListDatabasesResponse"
-                      }
-                    },
-                    "patch": {
-                      "httpMethod": "PATCH",
-                      "request": {
-                        "$ref": "Database"
-                      },
-                      "description": "Updates an existing database specified by the database ID.",
-                      "scopes": [
-                        "https://www.googleapis.com/auth/bigquery",
-                        "https://www.googleapis.com/auth/cloud-platform"
-                      ],
-                      "response": {
-                        "$ref": "Database"
-                      },
-                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}",
-                      "path": "v1/{+name}",
-                      "parameters": {
-                        "name": {
-                          "description": "Output only. The resource name. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}",
-                          "type": "string",
-                          "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+$",
-                          "location": "path",
-                          "required": true
-                        },
-                        "updateMask": {
-                          "description": "The list of fields to update. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask If not set, defaults to all of the fields that are allowed to update.",
-                          "location": "query",
-                          "type": "string",
-                          "format": "google-fieldmask"
-                        }
-                      },
-                      "id": "biglake.projects.locations.catalogs.databases.patch",
-                      "parameterOrder": [
-                        "name"
-                      ]
-                    },
-                    "delete": {
-                      "parameterOrder": [
-                        "name"
-                      ],
-                      "id": "biglake.projects.locations.catalogs.databases.delete",
-                      "path": "v1/{+name}",
-                      "parameters": {
-                        "name": {
-                          "location": "path",
-                          "required": true,
-                          "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+$",
-                          "type": "string",
-                          "description": "Required. The name of the database to delete. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}"
-                        }
-                      },
-                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}",
-                      "response": {
-                        "$ref": "Database"
-                      },
-                      "scopes": [
-                        "https://www.googleapis.com/auth/bigquery",
-                        "https://www.googleapis.com/auth/cloud-platform"
-                      ],
-                      "description": "Deletes an existing database specified by the database ID.",
-                      "httpMethod": "DELETE"
-                    },
-                    "create": {
-                      "parameterOrder": [
-                        "parent"
-                      ],
-                      "id": "biglake.projects.locations.catalogs.databases.create",
-                      "path": "v1/{+parent}/databases",
-                      "parameters": {
-                        "parent": {
-                          "location": "path",
-                          "required": true,
-                          "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+$",
-                          "type": "string",
-                          "description": "Required. The parent resource where this database will be created. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}"
-                        },
-                        "databaseId": {
-                          "description": "Required. The ID to use for the database, which will become the final component of the database's resource name.",
-                          "location": "query",
-                          "type": "string"
-                        }
-                      },
-                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases",
-                      "response": {
-                        "$ref": "Database"
-                      },
-                      "scopes": [
-                        "https://www.googleapis.com/auth/bigquery",
-                        "https://www.googleapis.com/auth/cloud-platform"
-                      ],
-                      "request": {
-                        "$ref": "Database"
-                      },
-                      "description": "Creates a new database.",
-                      "httpMethod": "POST"
-                    },
-                    "get": {
-                      "httpMethod": "GET",
-                      "description": "Gets the database specified by the resource name.",
-                      "response": {
-                        "$ref": "Database"
-                      },
-                      "scopes": [
-                        "https://www.googleapis.com/auth/bigquery",
-                        "https://www.googleapis.com/auth/cloud-platform"
-                      ],
-                      "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}",
-                      "id": "biglake.projects.locations.catalogs.databases.get",
-                      "path": "v1/{+name}",
-                      "parameters": {
-                        "name": {
-                          "location": "path",
-                          "required": true,
-                          "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+$",
-                          "type": "string",
-                          "description": "Required. The name of the database to retrieve. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}"
-                        }
-                      },
-                      "parameterOrder": [
-                        "name"
-                      ]
+              "methods": {
+                "setIamPolicy": {
+                  "httpMethod": "POST",
+                  "path": "v1/{+resource}:setIamPolicy",
+                  "scopes": [
+                    "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "parameterOrder": [
+                    "resource"
+                  ],
+                  "request": {
+                    "$ref": "SetIamPolicyRequest"
+                  },
+                  "response": {
+                    "$ref": "Policy"
+                  },
+                  "parameters": {
+                    "resource": {
+                      "required": true,
+                      "description": "REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
+                      "type": "string",
+                      "pattern": "^projects/[^/]+/catalogs/[^/]+/namespaces/[^/]+$",
+                      "location": "path"
                     }
                   },
-                  "resources": {
-                    "tables": {
-                      "methods": {
-                        "list": {
-                          "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}/tables",
-                          "parameterOrder": [
-                            "parent"
-                          ],
-                          "id": "biglake.projects.locations.catalogs.databases.tables.list",
-                          "path": "v1/{+parent}/tables",
-                          "parameters": {
-                            "parent": {
-                              "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+$",
-                              "location": "path",
-                              "required": true,
-                              "description": "Required. The parent, which owns this collection of tables. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}",
-                              "type": "string"
-                            },
-                            "pageSize": {
-                              "format": "int32",
-                              "location": "query",
-                              "type": "integer",
-                              "description": "The maximum number of tables to return. The service may return fewer than this value. If unspecified, at most 50 tables will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000."
-                            },
-                            "view": {
-                              "description": "The view for the returned tables.",
-                              "enumDescriptions": [
-                                "Default value. The API will default to the BASIC view.",
-                                "Include only table names. This is the default value.",
-                                "Include everything."
-                              ],
-                              "type": "string",
-                              "enum": [
-                                "TABLE_VIEW_UNSPECIFIED",
-                                "BASIC",
-                                "FULL"
-                              ],
-                              "location": "query"
-                            },
-                            "pageToken": {
-                              "description": "A page token, received from a previous `ListTables` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListTables` must match the call that provided the page token.",
-                              "location": "query",
-                              "type": "string"
-                            }
-                          },
-                          "description": "List all tables in a specified database.",
-                          "httpMethod": "GET",
-                          "response": {
-                            "$ref": "ListTablesResponse"
-                          },
-                          "scopes": [
-                            "https://www.googleapis.com/auth/bigquery",
-                            "https://www.googleapis.com/auth/cloud-platform"
-                          ]
-                        },
-                        "rename": {
-                          "response": {
-                            "$ref": "Table"
-                          },
-                          "scopes": [
-                            "https://www.googleapis.com/auth/bigquery",
-                            "https://www.googleapis.com/auth/cloud-platform"
-                          ],
-                          "httpMethod": "POST",
-                          "request": {
-                            "$ref": "RenameTableRequest"
-                          },
-                          "description": "Renames an existing table specified by the table ID.",
-                          "id": "biglake.projects.locations.catalogs.databases.tables.rename",
-                          "path": "v1/{+name}:rename",
-                          "parameters": {
-                            "name": {
-                              "type": "string",
-                              "description": "Required. The table's `name` field is used to identify the table to rename. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}/tables/{table_id}",
-                              "location": "path",
-                              "required": true,
-                              "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+/tables/[^/]+$"
-                            }
-                          },
-                          "parameterOrder": [
-                            "name"
-                          ],
-                          "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}/tables/{tablesId}:rename"
-                        },
-                        "delete": {
-                          "description": "Deletes an existing table specified by the table ID.",
-                          "httpMethod": "DELETE",
-                          "scopes": [
-                            "https://www.googleapis.com/auth/bigquery",
-                            "https://www.googleapis.com/auth/cloud-platform"
-                          ],
-                          "response": {
-                            "$ref": "Table"
-                          },
-                          "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}/tables/{tablesId}",
-                          "parameterOrder": [
-                            "name"
-                          ],
-                          "path": "v1/{+name}",
-                          "parameters": {
-                            "name": {
-                              "location": "path",
-                              "required": true,
-                              "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+/tables/[^/]+$",
-                              "type": "string",
-                              "description": "Required. The name of the table to delete. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}/tables/{table_id}"
-                            }
-                          },
-                          "id": "biglake.projects.locations.catalogs.databases.tables.delete"
-                        },
-                        "patch": {
-                          "httpMethod": "PATCH",
-                          "request": {
-                            "$ref": "Table"
-                          },
-                          "description": "Updates an existing table specified by the table ID.",
-                          "scopes": [
-                            "https://www.googleapis.com/auth/bigquery",
-                            "https://www.googleapis.com/auth/cloud-platform"
-                          ],
-                          "response": {
-                            "$ref": "Table"
-                          },
-                          "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}/tables/{tablesId}",
-                          "path": "v1/{+name}",
-                          "parameters": {
-                            "name": {
-                              "location": "path",
-                              "required": true,
-                              "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+/tables/[^/]+$",
-                              "type": "string",
-                              "description": "Output only. The resource name. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}/tables/{table_id}"
-                            },
-                            "updateMask": {
-                              "description": "The list of fields to update. For the `FieldMask` definition, see https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#fieldmask If not set, defaults to all of the fields that are allowed to update.",
-                              "location": "query",
-                              "type": "string",
-                              "format": "google-fieldmask"
-                            }
-                          },
-                          "id": "biglake.projects.locations.catalogs.databases.tables.patch",
-                          "parameterOrder": [
-                            "name"
-                          ]
-                        },
-                        "create": {
-                          "request": {
-                            "$ref": "Table"
-                          },
-                          "description": "Creates a new table.",
-                          "httpMethod": "POST",
-                          "scopes": [
-                            "https://www.googleapis.com/auth/bigquery",
-                            "https://www.googleapis.com/auth/cloud-platform"
-                          ],
-                          "response": {
-                            "$ref": "Table"
-                          },
-                          "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}/tables",
-                          "parameterOrder": [
-                            "parent"
-                          ],
-                          "path": "v1/{+parent}/tables",
-                          "parameters": {
-                            "parent": {
-                              "location": "path",
-                              "required": true,
-                              "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+$",
-                              "type": "string",
-                              "description": "Required. The parent resource where this table will be created. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}"
-                            },
-                            "tableId": {
-                              "description": "Required. The ID to use for the table, which will become the final component of the table's resource name.",
-                              "location": "query",
-                              "type": "string"
-                            }
-                          },
-                          "id": "biglake.projects.locations.catalogs.databases.tables.create"
-                        },
-                        "get": {
-                          "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/catalogs/{catalogsId}/databases/{databasesId}/tables/{tablesId}",
-                          "parameterOrder": [
-                            "name"
-                          ],
-                          "path": "v1/{+name}",
-                          "parameters": {
-                            "name": {
-                              "pattern": "^projects/[^/]+/locations/[^/]+/catalogs/[^/]+/databases/[^/]+/tables/[^/]+$",
-                              "location": "path",
-                              "required": true,
-                              "description": "Required. The name of the table to retrieve. Format: projects/{project_id_or_number}/locations/{location_id}/catalogs/{catalog_id}/databases/{database_id}/tables/{table_id}",
-                              "type": "string"
-                            }
-                          },
-                          "id": "biglake.projects.locations.catalogs.databases.tables.get",
-                          "description": "Gets the table specified by the resource name.",
-                          "httpMethod": "GET",
-                          "scopes": [
-                            "https://www.googleapis.com/auth/bigquery",
-                            "https://www.googleapis.com/auth/cloud-platform"
-                          ],
-                          "response": {
-                            "$ref": "Table"
-                          }
-                        }
-                      }
+                  "description": "Sets the IAM policy for the specified catalog.",
+                  "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}/namespaces/{namespacesId}:setIamPolicy",
+                  "id": "biglake.projects.catalogs.namespaces.setIamPolicy"
+                },
+                "getIamPolicy": {
+                  "response": {
+                    "$ref": "Policy"
+                  },
+                  "parameterOrder": [
+                    "resource"
+                  ],
+                  "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}/namespaces/{namespacesId}:getIamPolicy",
+                  "id": "biglake.projects.catalogs.namespaces.getIamPolicy",
+                  "parameters": {
+                    "options.requestedPolicyVersion": {
+                      "description": "Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies).",
+                      "location": "query",
+                      "type": "integer",
+                      "format": "int32"
+                    },
+                    "resource": {
+                      "type": "string",
+                      "description": "REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
+                      "required": true,
+                      "location": "path",
+                      "pattern": "^projects/[^/]+/catalogs/[^/]+/namespaces/[^/]+$"
                     }
-                  }
+                  },
+                  "description": "Gets the IAM policy for the specified Catalog.",
+                  "path": "v1/{+resource}:getIamPolicy",
+                  "scopes": [
+                    "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "httpMethod": "GET"
+                },
+                "testIamPermissions": {
+                  "description": "Tests the IAM permissions for the specified namespace.",
+                  "parameters": {
+                    "resource": {
+                      "pattern": "^projects/[^/]+/catalogs/[^/]+/namespaces/[^/]+$",
+                      "location": "path",
+                      "type": "string",
+                      "required": true,
+                      "description": "REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field."
+                    }
+                  },
+                  "id": "biglake.projects.catalogs.namespaces.testIamPermissions",
+                  "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}/namespaces/{namespacesId}:testIamPermissions",
+                  "parameterOrder": [
+                    "resource"
+                  ],
+                  "request": {
+                    "$ref": "TestIamPermissionsRequest"
+                  },
+                  "response": {
+                    "$ref": "TestIamPermissionsResponse"
+                  },
+                  "httpMethod": "POST",
+                  "scopes": [
+                    "https://www.googleapis.com/auth/bigquery",
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "path": "v1/{+resource}:testIamPermissions"
                 }
               }
+            }
+          },
+          "methods": {
+            "setIamPolicy": {
+              "request": {
+                "$ref": "SetIamPolicyRequest"
+              },
+              "response": {
+                "$ref": "Policy"
+              },
+              "parameterOrder": [
+                "resource"
+              ],
+              "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}:setIamPolicy",
+              "id": "biglake.projects.catalogs.setIamPolicy",
+              "parameters": {
+                "resource": {
+                  "required": true,
+                  "description": "REQUIRED: The resource for which the policy is being specified. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
+                  "type": "string",
+                  "pattern": "^projects/[^/]+/catalogs/[^/]+$",
+                  "location": "path"
+                }
+              },
+              "description": "Sets the IAM policy for the specified catalog.",
+              "path": "v1/{+resource}:setIamPolicy",
+              "scopes": [
+                "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "httpMethod": "POST"
+            },
+            "getIamPolicy": {
+              "parameters": {
+                "resource": {
+                  "location": "path",
+                  "pattern": "^projects/[^/]+/catalogs/[^/]+$",
+                  "type": "string",
+                  "description": "REQUIRED: The resource for which the policy is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
+                  "required": true
+                },
+                "options.requestedPolicyVersion": {
+                  "location": "query",
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Optional. The maximum policy version that will be used to format the policy. Valid values are 0, 1, and 3. Requests specifying an invalid value will be rejected. Requests for policies with any conditional role bindings must specify version 3. Policies with no conditional role bindings may specify any valid value or leave the field unset. The policy in the response might use the policy version that you specified, or it might use a lower policy version. For example, if you specify version 3, but the policy has no conditional role bindings, the response uses version 1. To learn which resources support conditions in their IAM policies, see the [IAM documentation](https://cloud.google.com/iam/help/conditions/resource-policies)."
+                }
+              },
+              "description": "Gets the IAM policy for the specified Catalog.",
+              "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}:getIamPolicy",
+              "id": "biglake.projects.catalogs.getIamPolicy",
+              "parameterOrder": [
+                "resource"
+              ],
+              "response": {
+                "$ref": "Policy"
+              },
+              "httpMethod": "GET",
+              "path": "v1/{+resource}:getIamPolicy",
+              "scopes": [
+                "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/cloud-platform"
+              ]
+            },
+            "testIamPermissions": {
+              "id": "biglake.projects.catalogs.testIamPermissions",
+              "flatPath": "v1/projects/{projectsId}/catalogs/{catalogsId}:testIamPermissions",
+              "description": "Tests the IAM permissions for the specified catalog.",
+              "parameters": {
+                "resource": {
+                  "type": "string",
+                  "required": true,
+                  "description": "REQUIRED: The resource for which the policy detail is being requested. See [Resource names](https://cloud.google.com/apis/design/resource_names) for the appropriate value for this field.",
+                  "pattern": "^projects/[^/]+/catalogs/[^/]+$",
+                  "location": "path"
+                }
+              },
+              "request": {
+                "$ref": "TestIamPermissionsRequest"
+              },
+              "response": {
+                "$ref": "TestIamPermissionsResponse"
+              },
+              "parameterOrder": [
+                "resource"
+              ],
+              "scopes": [
+                "https://www.googleapis.com/auth/bigquery",
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "path": "v1/{+resource}:testIamPermissions",
+              "httpMethod": "POST"
             }
           }
         }
       }
     }
   },
+  "basePath": "",
+  "parameters": {
+    "fields": {
+      "description": "Selector specifying which fields to include in a partial response.",
+      "type": "string",
+      "location": "query"
+    },
+    "quotaUser": {
+      "type": "string",
+      "location": "query",
+      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters."
+    },
+    "access_token": {
+      "description": "OAuth access token.",
+      "type": "string",
+      "location": "query"
+    },
+    "uploadType": {
+      "type": "string",
+      "location": "query",
+      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\")."
+    },
+    "oauth_token": {
+      "type": "string",
+      "location": "query",
+      "description": "OAuth 2.0 token for the current user."
+    },
+    "upload_protocol": {
+      "type": "string",
+      "location": "query",
+      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\")."
+    },
+    "callback": {
+      "description": "JSONP",
+      "type": "string",
+      "location": "query"
+    },
+    "prettyPrint": {
+      "default": "true",
+      "description": "Returns response with indentations and line breaks.",
+      "type": "boolean",
+      "location": "query"
+    },
+    "alt": {
+      "enum": [
+        "json",
+        "media",
+        "proto"
+      ],
+      "enumDescriptions": [
+        "Responses with Content-Type of application/json",
+        "Media download with context-dependent Content-Type",
+        "Responses with Content-Type of application/x-protobuf"
+      ],
+      "type": "string",
+      "description": "Data format for response.",
+      "location": "query",
+      "default": "json"
+    },
+    "key": {
+      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
+      "type": "string",
+      "location": "query"
+    },
+    "$.xgafv": {
+      "location": "query",
+      "description": "V1 error format.",
+      "type": "string",
+      "enum": [
+        "1",
+        "2"
+      ],
+      "enumDescriptions": [
+        "v1 error format",
+        "v2 error format"
+      ]
+    }
+  },
+  "kind": "discovery#restDescription",
   "documentationLink": "https://cloud.google.com/products/lakehouse",
-  "servicePath": "",
-  "fullyEncodeReservedExpansion": true,
-  "baseUrl": "https://biglake.googleapis.com/",
-  "version": "v1",
-  "title": "Lakehouse API",
-  "name": "biglake",
-  "version_module": true,
   "auth": {
     "oauth2": {
       "scopes": {
@@ -1273,92 +1356,9 @@
     "x16": "http://www.google.com/images/icons/product/search-16.gif",
     "x32": "http://www.google.com/images/icons/product/search-32.gif"
   },
-  "basePath": "",
-  "canonicalName": "BigLake Service",
-  "id": "biglake:v1",
-  "parameters": {
-    "prettyPrint": {
-      "default": "true",
-      "type": "boolean",
-      "location": "query",
-      "description": "Returns response with indentations and line breaks."
-    },
-    "oauth_token": {
-      "type": "string",
-      "location": "query",
-      "description": "OAuth 2.0 token for the current user."
-    },
-    "quotaUser": {
-      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
-      "type": "string",
-      "location": "query"
-    },
-    "alt": {
-      "type": "string",
-      "enum": [
-        "json",
-        "media",
-        "proto"
-      ],
-      "description": "Data format for response.",
-      "enumDescriptions": [
-        "Responses with Content-Type of application/json",
-        "Media download with context-dependent Content-Type",
-        "Responses with Content-Type of application/x-protobuf"
-      ],
-      "location": "query",
-      "default": "json"
-    },
-    "uploadType": {
-      "type": "string",
-      "location": "query",
-      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\")."
-    },
-    "access_token": {
-      "description": "OAuth access token.",
-      "type": "string",
-      "location": "query"
-    },
-    "fields": {
-      "type": "string",
-      "location": "query",
-      "description": "Selector specifying which fields to include in a partial response."
-    },
-    "key": {
-      "type": "string",
-      "location": "query",
-      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token."
-    },
-    "$.xgafv": {
-      "description": "V1 error format.",
-      "enumDescriptions": [
-        "v1 error format",
-        "v2 error format"
-      ],
-      "type": "string",
-      "enum": [
-        "1",
-        "2"
-      ],
-      "location": "query"
-    },
-    "callback": {
-      "type": "string",
-      "location": "query",
-      "description": "JSONP"
-    },
-    "upload_protocol": {
-      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").",
-      "type": "string",
-      "location": "query"
-    }
-  },
-  "ownerName": "Google",
   "discoveryVersion": "v1",
-  "ownerDomain": "google.com",
-  "description": "The Lakehouse API (formerly BigLake API) provides access to a serverless, fully managed, and highly available metastore that provides a single source of truth for your data lakehouse. It lets multiple engines—including Apache Spark, Google Managed Spark, Apache Flink, Trino and BigQuery—share tables and metadata for key open formats (Apache Iceberg, Apache Hive), and query the same copy of data. Plus, through the Lakehouse runtime catalog federation seamlessly unite your lakehouse ecosystem, letting Iceberg compatible engines on Google Cloud (BigQuery, Google Managed Spark) discover and analyze enterprise data across Snowflake, Databricks, and AWS Glue.",
+  "version": "v1",
+  "servicePath": "",
   "batchPath": "batch",
-  "protocol": "rest",
-  "rootUrl": "https://biglake.googleapis.com/",
-  "kind": "discovery#restDescription"
+  "version_module": true
 }
