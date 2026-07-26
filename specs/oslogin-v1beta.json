@@ -1,37 +1,60 @@
 {
-  "kind": "discovery#restDescription",
+  "revision": "20260719",
+  "fullyEncodeReservedExpansion": true,
+  "documentationLink": "https://cloud.google.com/compute/docs/oslogin/",
+  "baseUrl": "https://oslogin.googleapis.com/",
+  "auth": {
+    "oauth2": {
+      "scopes": {
+        "https://www.googleapis.com/auth/compute": {
+          "description": "View and manage your Google Compute Engine resources"
+        },
+        "https://www.googleapis.com/auth/compute.readonly": {
+          "description": "View your Google Compute Engine resources"
+        },
+        "https://www.googleapis.com/auth/cloud-platform": {
+          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
+        },
+        "https://www.googleapis.com/auth/cloud-platform.read-only": {
+          "description": "View your data across Google Cloud services and see the email address of your Google Account"
+        }
+      }
+    }
+  },
+  "mtlsRootUrl": "https://oslogin.mtls.googleapis.com/",
+  "discoveryVersion": "v1",
   "resources": {
     "projects": {
       "resources": {
         "locations": {
           "methods": {
             "signSshPublicKey": {
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "response": {
-                "$ref": "GoogleCloudOsloginControlplaneRegionalV1betaSignSshPublicKeyResponse"
-              },
               "id": "oslogin.projects.locations.signSshPublicKey",
               "httpMethod": "POST",
               "parameterOrder": [
                 "parent"
               ],
+              "response": {
+                "$ref": "GoogleCloudOsloginControlplaneRegionalV1betaSignSshPublicKeyResponse"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "path": "v1beta/{+parent}:signSshPublicKey",
+              "parameters": {
+                "parent": {
+                  "type": "string",
+                  "description": "Required. The parent for the signing request. Format: projects/{project}/locations/{location}",
+                  "location": "path",
+                  "required": true,
+                  "pattern": "^projects/[^/]+/locations/[^/]+$"
+                }
+              },
               "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}:signSshPublicKey",
               "request": {
                 "$ref": "GoogleCloudOsloginControlplaneRegionalV1betaSignSshPublicKeyRequest"
               },
-              "description": "Signs an SSH public key for a user to authenticate to a virtual machine on Google Compute Engine.",
-              "parameters": {
-                "parent": {
-                  "location": "path",
-                  "description": "Required. The parent for the signing request. Format: projects/{project}/locations/{location}",
-                  "type": "string",
-                  "pattern": "^projects/[^/]+/locations/[^/]+$",
-                  "required": true
-                }
-              },
-              "path": "v1beta/{+parent}:signSshPublicKey"
+              "description": "Signs an SSH public key for a user to authenticate to a virtual machine on Google Compute Engine."
             }
           }
         }
@@ -39,6 +62,61 @@
     },
     "users": {
       "methods": {
+        "importSshPublicKey": {
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/compute"
+          ],
+          "id": "oslogin.users.importSshPublicKey",
+          "httpMethod": "POST",
+          "parameterOrder": [
+            "parent"
+          ],
+          "response": {
+            "$ref": "ImportSshPublicKeyResponse"
+          },
+          "flatPath": "v1beta/users/{usersId}:importSshPublicKey",
+          "request": {
+            "$ref": "SshPublicKey"
+          },
+          "description": "Adds an SSH public key and returns the profile information. Default POSIX account information is set when no username and UID exist as part of the login profile.",
+          "path": "v1beta/{+parent}:importSshPublicKey",
+          "parameters": {
+            "parent": {
+              "pattern": "^users/[^/]+$",
+              "required": true,
+              "location": "path",
+              "type": "string",
+              "description": "The unique ID for the user in format `users/{user}`."
+            },
+            "regions": {
+              "type": "string",
+              "description": "Optional. The regions to which to assert that the key was written. If unspecified, defaults to all regions. Regions are listed at https://cloud.google.com/about/locations#region.",
+              "repeated": true,
+              "location": "query"
+            },
+            "projectId": {
+              "type": "string",
+              "description": "The project ID of the Google Cloud Platform project.",
+              "location": "query"
+            },
+            "view": {
+              "enumDescriptions": [
+                "The default login profile view. The API defaults to the BASIC view.",
+                "Includes POSIX and SSH key information.",
+                "Include security key information for the user."
+              ],
+              "location": "query",
+              "type": "string",
+              "enum": [
+                "LOGIN_PROFILE_VIEW_UNSPECIFIED",
+                "BASIC",
+                "SECURITY_KEY"
+              ],
+              "description": "The view configures whether to retrieve security keys information."
+            }
+          }
+        },
         "getLoginProfile": {
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform",
@@ -46,16 +124,17 @@
             "https://www.googleapis.com/auth/compute",
             "https://www.googleapis.com/auth/compute.readonly"
           ],
-          "response": {
-            "$ref": "LoginProfile"
-          },
           "id": "oslogin.users.getLoginProfile",
           "httpMethod": "GET",
           "parameterOrder": [
             "name"
           ],
+          "response": {
+            "$ref": "LoginProfile"
+          },
           "flatPath": "v1beta/users/{usersId}/loginProfile",
           "description": "Retrieves the profile information used for logging in to a virtual machine on Google Compute Engine.",
+          "path": "v1beta/{+name}/loginProfile",
           "parameters": {
             "name": {
               "description": "Required. The unique ID for the user in format `users/{user}`.",
@@ -66,16 +145,15 @@
             },
             "projectId": {
               "location": "query",
-              "description": "Required. The project ID of the Google Cloud Platform project.",
-              "type": "string"
+              "type": "string",
+              "description": "Required. The project ID of the Google Cloud Platform project."
             },
             "systemId": {
-              "type": "string",
               "description": "Optional. A system ID for filtering the results of the request.",
+              "type": "string",
               "location": "query"
             },
             "view": {
-              "location": "query",
               "type": "string",
               "enum": [
                 "LOGIN_PROFILE_VIEW_UNSPECIFIED",
@@ -83,87 +161,38 @@
                 "SECURITY_KEY"
               ],
               "description": "The view configures whether to retrieve security keys information.",
+              "location": "query",
               "enumDescriptions": [
                 "The default login profile view. The API defaults to the BASIC view.",
                 "Includes POSIX and SSH key information.",
                 "Include security key information for the user."
               ]
             }
-          },
-          "path": "v1beta/{+name}/loginProfile"
-        },
-        "importSshPublicKey": {
-          "id": "oslogin.users.importSshPublicKey",
-          "httpMethod": "POST",
-          "parameterOrder": [
-            "parent"
-          ],
-          "response": {
-            "$ref": "ImportSshPublicKeyResponse"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform",
-            "https://www.googleapis.com/auth/compute"
-          ],
-          "path": "v1beta/{+parent}:importSshPublicKey",
-          "parameters": {
-            "view": {
-              "location": "query",
-              "type": "string",
-              "enum": [
-                "LOGIN_PROFILE_VIEW_UNSPECIFIED",
-                "BASIC",
-                "SECURITY_KEY"
-              ],
-              "description": "The view configures whether to retrieve security keys information.",
-              "enumDescriptions": [
-                "The default login profile view. The API defaults to the BASIC view.",
-                "Includes POSIX and SSH key information.",
-                "Include security key information for the user."
-              ]
-            },
-            "projectId": {
-              "location": "query",
-              "description": "The project ID of the Google Cloud Platform project.",
-              "type": "string"
-            },
-            "parent": {
-              "required": true,
-              "pattern": "^users/[^/]+$",
-              "description": "The unique ID for the user in format `users/{user}`.",
-              "type": "string",
-              "location": "path"
-            },
-            "regions": {
-              "type": "string",
-              "description": "Optional. The regions to which to assert that the key was written. If unspecified, defaults to all regions. Regions are listed at https://cloud.google.com/about/locations#region.",
-              "repeated": true,
-              "location": "query"
-            }
-          },
-          "flatPath": "v1beta/users/{usersId}:importSshPublicKey",
-          "request": {
-            "$ref": "SshPublicKey"
-          },
-          "description": "Adds an SSH public key and returns the profile information. Default POSIX account information is set when no username and UID exist as part of the login profile."
+          }
         }
       },
       "resources": {
         "projects": {
           "methods": {
             "provisionPosixAccount": {
-              "response": {
-                "$ref": "PosixAccount"
-              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/compute"
+              ],
               "id": "oslogin.users.projects.provisionPosixAccount",
               "httpMethod": "POST",
               "parameterOrder": [
                 "name"
               ],
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/compute"
-              ],
+              "response": {
+                "$ref": "PosixAccount"
+              },
+              "flatPath": "v1beta/users/{usersId}/projects/{projectsId}",
+              "request": {
+                "$ref": "ProvisionPosixAccountRequest"
+              },
+              "description": "Create a POSIX account if it doesn't exist.",
+              "path": "v1beta/{+name}",
               "parameters": {
                 "name": {
                   "type": "string",
@@ -172,45 +201,54 @@
                   "required": true,
                   "pattern": "^users/[^/]+/projects/[^/]+$"
                 }
-              },
-              "path": "v1beta/{+name}",
-              "flatPath": "v1beta/users/{usersId}/projects/{projectsId}",
-              "request": {
-                "$ref": "ProvisionPosixAccountRequest"
-              },
-              "description": "Create a POSIX account if it doesn't exist."
+              }
             },
             "delete": {
-              "flatPath": "v1beta/users/{usersId}/projects/{projectsId}",
-              "description": "Deletes a POSIX account.",
-              "path": "v1beta/{+name}",
               "parameters": {
                 "name": {
-                  "pattern": "^users/[^/]+/projects/[^/]+$",
                   "required": true,
-                  "location": "path",
+                  "pattern": "^users/[^/]+/projects/[^/]+$",
+                  "description": "Required. A reference to the POSIX account to update. POSIX accounts are identified by the project ID they are associated with. A reference to the POSIX account is in format `users/{user}/projects/{project}`.",
                   "type": "string",
-                  "description": "Required. A reference to the POSIX account to update. POSIX accounts are identified by the project ID they are associated with. A reference to the POSIX account is in format `users/{user}/projects/{project}`."
+                  "location": "path"
                 }
               },
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/compute"
-              ],
+              "path": "v1beta/{+name}",
+              "flatPath": "v1beta/users/{usersId}/projects/{projectsId}",
+              "description": "Deletes a POSIX account.",
+              "response": {
+                "$ref": "Empty"
+              },
               "id": "oslogin.users.projects.delete",
               "httpMethod": "DELETE",
               "parameterOrder": [
                 "name"
               ],
-              "response": {
-                "$ref": "Empty"
-              }
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/compute"
+              ]
             }
           },
           "resources": {
             "zones": {
               "methods": {
                 "signSshPublicKey": {
+                  "parameters": {
+                    "parent": {
+                      "type": "string",
+                      "description": "Required. The parent project and region for the signing request.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^users/[^/]+/projects/[^/]+/zones/[^/]+$"
+                    }
+                  },
+                  "path": "v1beta/{+parent}:signSshPublicKey",
+                  "flatPath": "v1beta/users/{usersId}/projects/{projectsId}/zones/{zonesId}:signSshPublicKey",
+                  "request": {
+                    "$ref": "SignSshPublicKeyRequest"
+                  },
+                  "description": "Signs an SSH public key for a user to authenticate to an instance.",
                   "response": {
                     "$ref": "SignSshPublicKeyResponse"
                   },
@@ -222,28 +260,32 @@
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform",
                     "https://www.googleapis.com/auth/compute"
-                  ],
-                  "parameters": {
-                    "parent": {
-                      "required": true,
-                      "pattern": "^users/[^/]+/projects/[^/]+/zones/[^/]+$",
-                      "description": "Required. The parent project and region for the signing request.",
-                      "type": "string",
-                      "location": "path"
-                    }
-                  },
-                  "path": "v1beta/{+parent}:signSshPublicKey",
-                  "flatPath": "v1beta/users/{usersId}/projects/{projectsId}/zones/{zonesId}:signSshPublicKey",
-                  "request": {
-                    "$ref": "SignSshPublicKeyRequest"
-                  },
-                  "description": "Signs an SSH public key for a user to authenticate to an instance."
+                  ]
                 }
               }
             },
             "locations": {
               "methods": {
                 "signSshPublicKey": {
+                  "flatPath": "v1beta/users/{usersId}/projects/{projectsId}/locations/{locationsId}:signSshPublicKey",
+                  "request": {
+                    "$ref": "SignSshPublicKeyRequest"
+                  },
+                  "description": "Signs an SSH public key for a user to authenticate to an instance.",
+                  "path": "v1beta/{+parent}:signSshPublicKey",
+                  "parameters": {
+                    "parent": {
+                      "type": "string",
+                      "description": "Required. The parent project and region for the signing request.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^users/[^/]+/projects/[^/]+/locations/[^/]+$"
+                    }
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform",
+                    "https://www.googleapis.com/auth/compute"
+                  ],
                   "id": "oslogin.users.projects.locations.signSshPublicKey",
                   "httpMethod": "POST",
                   "parameterOrder": [
@@ -251,26 +293,7 @@
                   ],
                   "response": {
                     "$ref": "SignSshPublicKeyResponse"
-                  },
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform",
-                    "https://www.googleapis.com/auth/compute"
-                  ],
-                  "path": "v1beta/{+parent}:signSshPublicKey",
-                  "parameters": {
-                    "parent": {
-                      "pattern": "^users/[^/]+/projects/[^/]+/locations/[^/]+$",
-                      "required": true,
-                      "location": "path",
-                      "description": "Required. The parent project and region for the signing request.",
-                      "type": "string"
-                    }
-                  },
-                  "flatPath": "v1beta/users/{usersId}/projects/{projectsId}/locations/{locationsId}:signSshPublicKey",
-                  "request": {
-                    "$ref": "SignSshPublicKeyRequest"
-                  },
-                  "description": "Signs an SSH public key for a user to authenticate to an instance."
+                  }
                 }
               }
             }
@@ -278,68 +301,22 @@
         },
         "sshPublicKeys": {
           "methods": {
-            "delete": {
-              "id": "oslogin.users.sshPublicKeys.delete",
-              "httpMethod": "DELETE",
-              "parameterOrder": [
-                "name"
-              ],
-              "response": {
-                "$ref": "Empty"
-              },
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/compute"
-              ],
-              "path": "v1beta/{+name}",
-              "parameters": {
-                "name": {
-                  "required": true,
-                  "pattern": "^users/[^/]+/sshPublicKeys/[^/]+$",
-                  "type": "string",
-                  "description": "Required. The fingerprint of the public key to update. Public keys are identified by their SHA-256 fingerprint. The fingerprint of the public key is in format `users/{user}/sshPublicKeys/{fingerprint}`.",
-                  "location": "path"
-                }
-              },
-              "flatPath": "v1beta/users/{usersId}/sshPublicKeys/{sshPublicKeysId}",
-              "description": "Deletes an SSH public key."
-            },
-            "patch": {
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/compute"
-              ],
-              "response": {
-                "$ref": "SshPublicKey"
-              },
-              "id": "oslogin.users.sshPublicKeys.patch",
-              "httpMethod": "PATCH",
-              "parameterOrder": [
-                "name"
-              ],
-              "flatPath": "v1beta/users/{usersId}/sshPublicKeys/{sshPublicKeysId}",
+            "create": {
+              "flatPath": "v1beta/users/{usersId}/sshPublicKeys",
               "request": {
                 "$ref": "SshPublicKey"
               },
-              "description": "Updates an SSH public key and returns the profile information. This method supports patch semantics.",
+              "description": "Create an SSH public key",
               "parameters": {
-                "name": {
-                  "required": true,
-                  "pattern": "^users/[^/]+/sshPublicKeys/[^/]+$",
+                "parent": {
+                  "location": "path",
                   "type": "string",
-                  "description": "Required. The fingerprint of the public key to update. Public keys are identified by their SHA-256 fingerprint. The fingerprint of the public key is in format `users/{user}/sshPublicKeys/{fingerprint}`.",
-                  "location": "path"
-                },
-                "updateMask": {
-                  "type": "string",
-                  "description": "Mask to control which fields get updated. Updates all if not present.",
-                  "format": "google-fieldmask",
-                  "location": "query"
+                  "description": "Required. The unique ID for the user in format `users/{user}`.",
+                  "pattern": "^users/[^/]+$",
+                  "required": true
                 }
               },
-              "path": "v1beta/{+name}"
-            },
-            "create": {
+              "path": "v1beta/{+parent}/sshPublicKeys",
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/compute"
@@ -351,36 +328,24 @@
               "httpMethod": "POST",
               "parameterOrder": [
                 "parent"
-              ],
-              "flatPath": "v1beta/users/{usersId}/sshPublicKeys",
-              "request": {
-                "$ref": "SshPublicKey"
-              },
-              "description": "Create an SSH public key",
-              "parameters": {
-                "parent": {
-                  "description": "Required. The unique ID for the user in format `users/{user}`.",
-                  "type": "string",
-                  "location": "path",
-                  "required": true,
-                  "pattern": "^users/[^/]+$"
-                }
-              },
-              "path": "v1beta/{+parent}/sshPublicKeys"
+              ]
             },
             "get": {
-              "response": {
-                "$ref": "SshPublicKey"
-              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/compute"
+              ],
               "id": "oslogin.users.sshPublicKeys.get",
               "httpMethod": "GET",
               "parameterOrder": [
                 "name"
               ],
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/compute"
-              ],
+              "response": {
+                "$ref": "SshPublicKey"
+              },
+              "flatPath": "v1beta/users/{usersId}/sshPublicKeys/{sshPublicKeysId}",
+              "description": "Retrieves an SSH public key.",
+              "path": "v1beta/{+name}",
               "parameters": {
                 "name": {
                   "location": "path",
@@ -389,51 +354,96 @@
                   "pattern": "^users/[^/]+/sshPublicKeys/[^/]+$",
                   "required": true
                 }
+              }
+            },
+            "delete": {
+              "flatPath": "v1beta/users/{usersId}/sshPublicKeys/{sshPublicKeysId}",
+              "description": "Deletes an SSH public key.",
+              "parameters": {
+                "name": {
+                  "pattern": "^users/[^/]+/sshPublicKeys/[^/]+$",
+                  "required": true,
+                  "location": "path",
+                  "type": "string",
+                  "description": "Required. The fingerprint of the public key to update. Public keys are identified by their SHA-256 fingerprint. The fingerprint of the public key is in format `users/{user}/sshPublicKeys/{fingerprint}`."
+                }
               },
               "path": "v1beta/{+name}",
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/compute"
+              ],
+              "response": {
+                "$ref": "Empty"
+              },
+              "id": "oslogin.users.sshPublicKeys.delete",
+              "httpMethod": "DELETE",
+              "parameterOrder": [
+                "name"
+              ]
+            },
+            "patch": {
               "flatPath": "v1beta/users/{usersId}/sshPublicKeys/{sshPublicKeysId}",
-              "description": "Retrieves an SSH public key."
+              "request": {
+                "$ref": "SshPublicKey"
+              },
+              "description": "Updates an SSH public key and returns the profile information. This method supports patch semantics.",
+              "path": "v1beta/{+name}",
+              "parameters": {
+                "name": {
+                  "location": "path",
+                  "type": "string",
+                  "description": "Required. The fingerprint of the public key to update. Public keys are identified by their SHA-256 fingerprint. The fingerprint of the public key is in format `users/{user}/sshPublicKeys/{fingerprint}`.",
+                  "pattern": "^users/[^/]+/sshPublicKeys/[^/]+$",
+                  "required": true
+                },
+                "updateMask": {
+                  "format": "google-fieldmask",
+                  "location": "query",
+                  "type": "string",
+                  "description": "Mask to control which fields get updated. Updates all if not present."
+                }
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/compute"
+              ],
+              "id": "oslogin.users.sshPublicKeys.patch",
+              "httpMethod": "PATCH",
+              "parameterOrder": [
+                "name"
+              ],
+              "response": {
+                "$ref": "SshPublicKey"
+              }
             }
           }
         }
       }
     }
   },
-  "discoveryVersion": "v1",
-  "mtlsRootUrl": "https://oslogin.mtls.googleapis.com/",
+  "kind": "discovery#restDescription",
+  "title": "Cloud OS Login API",
+  "version_module": true,
   "parameters": {
-    "access_token": {
+    "uploadType": {
       "location": "query",
-      "type": "string",
-      "description": "OAuth access token."
-    },
-    "$.xgafv": {
-      "location": "query",
-      "type": "string",
-      "enum": [
-        "1",
-        "2"
-      ],
-      "description": "V1 error format.",
-      "enumDescriptions": [
-        "v1 error format",
-        "v2 error format"
-      ]
-    },
-    "callback": {
-      "location": "query",
-      "description": "JSONP",
+      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
       "type": "string"
     },
-    "prettyPrint": {
-      "description": "Returns response with indentations and line breaks.",
-      "default": "true",
-      "type": "boolean",
-      "location": "query"
-    },
-    "quotaUser": {
-      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
+    "upload_protocol": {
+      "location": "query",
       "type": "string",
+      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\")."
+    },
+    "fields": {
+      "location": "query",
+      "type": "string",
+      "description": "Selector specifying which fields to include in a partial response."
+    },
+    "key": {
+      "type": "string",
+      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
       "location": "query"
     },
     "oauth_token": {
@@ -442,91 +452,82 @@
       "location": "query"
     },
     "alt": {
-      "enumDescriptions": [
-        "Responses with Content-Type of application/json",
-        "Media download with context-dependent Content-Type",
-        "Responses with Content-Type of application/x-protobuf"
-      ],
-      "default": "json",
-      "location": "query",
+      "description": "Data format for response.",
       "type": "string",
       "enum": [
         "json",
         "media",
         "proto"
       ],
-      "description": "Data format for response."
-    },
-    "upload_protocol": {
-      "type": "string",
-      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").",
-      "location": "query"
-    },
-    "uploadType": {
-      "type": "string",
-      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
-      "location": "query"
-    },
-    "fields": {
-      "type": "string",
-      "description": "Selector specifying which fields to include in a partial response.",
-      "location": "query"
-    },
-    "key": {
       "location": "query",
-      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
-      "type": "string"
+      "default": "json",
+      "enumDescriptions": [
+        "Responses with Content-Type of application/json",
+        "Media download with context-dependent Content-Type",
+        "Responses with Content-Type of application/x-protobuf"
+      ]
+    },
+    "$.xgafv": {
+      "location": "query",
+      "description": "V1 error format.",
+      "type": "string",
+      "enum": [
+        "1",
+        "2"
+      ],
+      "enumDescriptions": [
+        "v1 error format",
+        "v2 error format"
+      ]
+    },
+    "access_token": {
+      "location": "query",
+      "type": "string",
+      "description": "OAuth access token."
+    },
+    "prettyPrint": {
+      "type": "boolean",
+      "description": "Returns response with indentations and line breaks.",
+      "default": "true",
+      "location": "query"
+    },
+    "quotaUser": {
+      "type": "string",
+      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
+      "location": "query"
+    },
+    "callback": {
+      "description": "JSONP",
+      "type": "string",
+      "location": "query"
     }
   },
-  "version_module": true,
-  "title": "Cloud OS Login API",
-  "baseUrl": "https://oslogin.googleapis.com/",
-  "documentationLink": "https://cloud.google.com/compute/docs/oslogin/",
-  "fullyEncodeReservedExpansion": true,
-  "revision": "20260719",
-  "auth": {
-    "oauth2": {
-      "scopes": {
-        "https://www.googleapis.com/auth/compute.readonly": {
-          "description": "View your Google Compute Engine resources"
-        },
-        "https://www.googleapis.com/auth/compute": {
-          "description": "View and manage your Google Compute Engine resources"
-        },
-        "https://www.googleapis.com/auth/cloud-platform": {
-          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
-        },
-        "https://www.googleapis.com/auth/cloud-platform.read-only": {
-          "description": "View your data across Google Cloud services and see the email address of your Google Account"
-        }
-      }
-    }
-  },
-  "protocol": "rest",
-  "id": "oslogin:v1beta",
-  "batchPath": "batch",
-  "servicePath": "",
-  "icons": {
-    "x32": "http://www.google.com/images/icons/product/search-32.gif",
-    "x16": "http://www.google.com/images/icons/product/search-16.gif"
-  },
-  "name": "oslogin",
-  "basePath": "",
-  "ownerName": "Google",
-  "description": "You can use OS Login to manage access to your VM instances using IAM roles.",
-  "version": "v1beta",
-  "ownerDomain": "google.com",
   "schemas": {
-    "WebAuthn": {
-      "id": "WebAuthn",
+    "SshPublicKey": {
+      "id": "SshPublicKey",
       "properties": {
-        "rpId": {
+        "key": {
+          "description": "Required. Public key text in SSH format, defined by [RFC4253](https://www.ietf.org/rfc/rfc4253.txt) section 6.6.",
+          "type": "string"
+        },
+        "name": {
           "type": "string",
-          "description": "Relying party ID for Web Authentication."
+          "description": "Output only. The canonical resource name.",
+          "readOnly": true
+        },
+        "fingerprint": {
+          "description": "Output only. The SHA-256 fingerprint of the SSH public key.",
+          "type": "string",
+          "readOnly": true
+        },
+        "expirationTimeUsec": {
+          "format": "int64",
+          "type": "string",
+          "description": "An expiration time in microseconds since epoch."
         }
       },
-      "type": "object",
-      "description": "Security key information specific to the Web Authentication protocol."
+      "description": "The SSH public key information associated with a Google account.",
+      "type": "object"
     },
     "UniversalTwoFactor": {
       "id": "UniversalTwoFactor",
@@ -539,107 +540,43 @@
       "description": "Security key information specific to the U2F protocol.",
       "type": "object"
     },
-    "SshPublicKey": {
-      "description": "The SSH public key information associated with a Google account.",
-      "type": "object",
-      "id": "SshPublicKey",
+    "WebAuthn": {
+      "id": "WebAuthn",
       "properties": {
-        "key": {
-          "description": "Required. Public key text in SSH format, defined by [RFC4253](https://www.ietf.org/rfc/rfc4253.txt) section 6.6.",
-          "type": "string"
-        },
-        "name": {
-          "readOnly": true,
-          "description": "Output only. The canonical resource name.",
-          "type": "string"
-        },
-        "fingerprint": {
+        "rpId": {
           "type": "string",
-          "description": "Output only. The SHA-256 fingerprint of the SSH public key.",
-          "readOnly": true
-        },
-        "expirationTimeUsec": {
-          "format": "int64",
-          "type": "string",
-          "description": "An expiration time in microseconds since epoch."
-        }
-      }
-    },
-    "SignSshPublicKeyResponse": {
-      "type": "object",
-      "id": "SignSshPublicKeyResponse",
-      "properties": {
-        "signedSshPublicKey": {
-          "description": "The signed SSH public key to use in the SSH handshake.",
-          "type": "string"
-        }
-      }
-    },
-    "SignSshPublicKeyRequest": {
-      "id": "SignSshPublicKeyRequest",
-      "properties": {
-        "sshPublicKey": {
-          "description": "Required. The SSH public key to sign.",
-          "type": "string"
+          "description": "Relying party ID for Web Authentication."
         }
       },
+      "description": "Security key information specific to the Web Authentication protocol.",
       "type": "object"
     },
-    "ProvisionPosixAccountRequest": {
-      "id": "ProvisionPosixAccountRequest",
-      "properties": {
-        "regions": {
-          "type": "array",
-          "description": "Optional. The regions to wait for a POSIX account to be written to before returning a response. If unspecified, defaults to all regions. Regions are listed at https://cloud.google.com/about/locations#region.",
-          "items": {
-            "type": "string"
-          }
-        }
-      },
-      "type": "object",
-      "description": "A request message for creating a POSIX account entry."
-    },
-    "ImportSshPublicKeyResponse": {
-      "id": "ImportSshPublicKeyResponse",
-      "properties": {
-        "loginProfile": {
-          "description": "The login profile information for the user.",
-          "$ref": "LoginProfile"
-        },
-        "details": {
-          "description": "Detailed information about import results.",
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "description": "A response message for importing an SSH public key."
-    },
     "GoogleCloudOsloginControlplaneRegionalV1betaSignSshPublicKeyRequest": {
+      "description": "A request message for signing an SSH public key.",
+      "type": "object",
       "id": "GoogleCloudOsloginControlplaneRegionalV1betaSignSshPublicKeyRequest",
       "properties": {
-        "appEngineInstance": {
+        "serviceAccount": {
+          "description": "Optional. The service account for the instance. If the instance in question does not have a service account, this field should be left empty. If the wrong service account is provided, this operation will return a signed certificate that will not be accepted by the VM.",
+          "type": "string"
+        },
+        "sshPublicKey": {
           "type": "string",
-          "description": "The App Engine instance to sign the SSH public key for. Expected format: apps/{app}/services/{service}/versions/{version}/instances/{instance}"
+          "description": "Required. The SSH public key to sign."
+        },
+        "appEngineInstance": {
+          "description": "The App Engine instance to sign the SSH public key for. Expected format: apps/{app}/services/{service}/versions/{version}/instances/{instance}",
+          "type": "string"
         },
         "cloudRunResource": {
           "type": "string",
           "description": "Optional. The Cloud Run resource to sign the SSH public key for. Expected formats: - `projects/{project}/locations/{location}/services/{service}` - `projects/{project}/locations/{location}/workerPools/{worker_pool}` - `projects/{project}/locations/{location}/jobs/{job}` - `projects/{project}/locations/{location}/instances/{instance}`"
         },
         "computeInstance": {
-          "type": "string",
-          "description": "The Compute instance to sign the SSH public key for. Expected format: projects/{project}/zones/{zone}/instances/{numeric_instance_id}"
-        },
-        "serviceAccount": {
-          "type": "string",
-          "description": "Optional. The service account for the instance. If the instance in question does not have a service account, this field should be left empty. If the wrong service account is provided, this operation will return a signed certificate that will not be accepted by the VM."
-        },
-        "sshPublicKey": {
-          "type": "string",
-          "description": "Required. The SSH public key to sign."
+          "description": "The Compute instance to sign the SSH public key for. Expected format: projects/{project}/zones/{zone}/instances/{numeric_instance_id}",
+          "type": "string"
         }
-      },
-      "description": "A request message for signing an SSH public key.",
-      "type": "object"
+      }
     },
     "GoogleCloudOsloginControlplaneRegionalV1betaSignSshPublicKeyResponse": {
       "id": "GoogleCloudOsloginControlplaneRegionalV1betaSignSshPublicKeyResponse",
@@ -653,14 +590,12 @@
       "type": "object"
     },
     "Empty": {
-      "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
       "type": "object",
+      "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
       "id": "Empty",
       "properties": {}
     },
     "PosixAccount": {
-      "description": "The POSIX account information associated with a Google account.",
-      "type": "object",
       "id": "PosixAccount",
       "properties": {
         "username": {
@@ -668,8 +603,8 @@
           "description": "The username of the POSIX account."
         },
         "homeDirectory": {
-          "description": "The path to the home directory for this account.",
-          "type": "string"
+          "type": "string",
+          "description": "The path to the home directory for this account."
         },
         "uid": {
           "description": "The user ID.",
@@ -677,9 +612,9 @@
           "format": "int64"
         },
         "accountId": {
+          "readOnly": true,
           "type": "string",
-          "description": "Output only. A POSIX account identifier.",
-          "readOnly": true
+          "description": "Output only. A POSIX account identifier."
         },
         "operatingSystemType": {
           "description": "The operating system type where this account applies.",
@@ -695,54 +630,76 @@
             "WINDOWS"
           ]
         },
-        "systemId": {
-          "description": "System identifier for which account the username or uid applies to. By default, the empty value is used.",
-          "type": "string"
-        },
         "gecos": {
-          "description": "The GECOS (user information) entry for this account.",
-          "type": "string"
+          "type": "string",
+          "description": "The GECOS (user information) entry for this account."
+        },
+        "systemId": {
+          "type": "string",
+          "description": "System identifier for which account the username or uid applies to. By default, the empty value is used."
         },
         "primary": {
           "description": "Only one POSIX account can be marked as primary.",
           "type": "boolean"
         },
         "shell": {
-          "description": "The path to the logic shell for this account.",
+          "type": "string",
+          "description": "The path to the logic shell for this account."
+        },
+        "name": {
+          "readOnly": true,
+          "description": "Output only. The canonical resource name.",
           "type": "string"
         },
         "gid": {
+          "type": "string",
           "description": "The default group ID.",
-          "type": "string",
           "format": "int64"
-        },
-        "name": {
-          "type": "string",
-          "description": "Output only. The canonical resource name.",
-          "readOnly": true
         }
-      }
+      },
+      "type": "object",
+      "description": "The POSIX account information associated with a Google account."
+    },
+    "SecurityKey": {
+      "id": "SecurityKey",
+      "properties": {
+        "privateKey": {
+          "description": "Hardware-backed private key text in SSH format.",
+          "type": "string"
+        },
+        "universalTwoFactor": {
+          "$ref": "UniversalTwoFactor",
+          "description": "The U2F protocol type."
+        },
+        "publicKey": {
+          "description": "Public key text in SSH format, defined by [RFC4253](\"https://www.ietf.org/rfc/rfc4253.txt\") section 6.6.",
+          "type": "string"
+        },
+        "webAuthn": {
+          "description": "The Web Authentication protocol type.",
+          "$ref": "WebAuthn"
+        },
+        "deviceNickname": {
+          "type": "string",
+          "description": "The security key nickname explicitly set by the user."
+        }
+      },
+      "type": "object",
+      "description": "The credential information for a Google registered security key."
     },
     "LoginProfile": {
       "id": "LoginProfile",
       "properties": {
         "securityKeys": {
-          "type": "array",
           "description": "The registered security key credentials for a user.",
           "items": {
             "$ref": "SecurityKey"
-          }
-        },
-        "posixAccounts": {
-          "description": "The list of POSIX accounts associated with the user.",
-          "items": {
-            "$ref": "PosixAccount"
           },
           "type": "array"
         },
         "name": {
-          "description": "Required. A unique user ID.",
-          "type": "string"
+          "type": "string",
+          "description": "Required. A unique user ID."
         },
         "sshPublicKeys": {
           "additionalProperties": {
@@ -750,39 +707,82 @@
           },
           "description": "A map from SSH public key fingerprint to the associated key object.",
           "type": "object"
-        }
-      },
-      "description": "The user profile information used for logging in to a virtual machine on Google Compute Engine.",
-      "type": "object"
-    },
-    "SecurityKey": {
-      "id": "SecurityKey",
-      "properties": {
-        "publicKey": {
-          "type": "string",
-          "description": "Public key text in SSH format, defined by [RFC4253](\"https://www.ietf.org/rfc/rfc4253.txt\") section 6.6."
         },
-        "webAuthn": {
-          "$ref": "WebAuthn",
-          "description": "The Web Authentication protocol type."
-        },
-        "deviceNickname": {
-          "description": "The security key nickname explicitly set by the user.",
-          "type": "string"
-        },
-        "privateKey": {
-          "description": "Hardware-backed private key text in SSH format.",
-          "type": "string"
-        },
-        "universalTwoFactor": {
-          "description": "The U2F protocol type.",
-          "$ref": "UniversalTwoFactor"
+        "posixAccounts": {
+          "description": "The list of POSIX accounts associated with the user.",
+          "items": {
+            "$ref": "PosixAccount"
+          },
+          "type": "array"
         }
       },
       "type": "object",
-      "description": "The credential information for a Google registered security key."
+      "description": "The user profile information used for logging in to a virtual machine on Google Compute Engine."
+    },
+    "SignSshPublicKeyRequest": {
+      "id": "SignSshPublicKeyRequest",
+      "properties": {
+        "sshPublicKey": {
+          "type": "string",
+          "description": "Required. The SSH public key to sign."
+        }
+      },
+      "type": "object"
+    },
+    "SignSshPublicKeyResponse": {
+      "id": "SignSshPublicKeyResponse",
+      "properties": {
+        "signedSshPublicKey": {
+          "type": "string",
+          "description": "The signed SSH public key to use in the SSH handshake."
+        }
+      },
+      "type": "object"
+    },
+    "ProvisionPosixAccountRequest": {
+      "description": "A request message for creating a POSIX account entry.",
+      "type": "object",
+      "id": "ProvisionPosixAccountRequest",
+      "properties": {
+        "regions": {
+          "description": "Optional. The regions to wait for a POSIX account to be written to before returning a response. If unspecified, defaults to all regions. Regions are listed at https://cloud.google.com/about/locations#region.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      }
+    },
+    "ImportSshPublicKeyResponse": {
+      "description": "A response message for importing an SSH public key.",
+      "type": "object",
+      "id": "ImportSshPublicKeyResponse",
+      "properties": {
+        "loginProfile": {
+          "$ref": "LoginProfile",
+          "description": "The login profile information for the user."
+        },
+        "details": {
+          "type": "string",
+          "description": "Detailed information about import results."
+        }
+      }
     }
   },
+  "version": "v1beta",
+  "ownerDomain": "google.com",
+  "canonicalName": "Cloud OS Login",
   "rootUrl": "https://oslogin.googleapis.com/",
-  "canonicalName": "Cloud OS Login"
+  "icons": {
+    "x16": "http://www.google.com/images/icons/product/search-16.gif",
+    "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  },
+  "servicePath": "",
+  "batchPath": "batch",
+  "id": "oslogin:v1beta",
+  "protocol": "rest",
+  "description": "You can use OS Login to manage access to your VM instances using IAM roles.",
+  "ownerName": "Google",
+  "basePath": "",
+  "name": "oslogin"
 }
