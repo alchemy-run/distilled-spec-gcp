@@ -1,21 +1,99 @@
 {
-  "protocol": "rest",
-  "revision": "20260724",
-  "ownerName": "Google",
-  "description": "The Cloud Storage for Firebase API enables programmatic management of Cloud Storage buckets for use in Firebase projects",
+  "canonicalName": "Firebasestorage",
+  "schemas": {
+    "ListBucketsResponse": {
+      "properties": {
+        "nextPageToken": {
+          "description": "A token that can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+          "type": "string"
+        },
+        "buckets": {
+          "description": "The list of linked buckets.",
+          "type": "array",
+          "items": {
+            "$ref": "Bucket"
+          }
+        }
+      },
+      "description": "The response returned by `ListBuckets`.",
+      "type": "object",
+      "id": "ListBucketsResponse"
+    },
+    "DefaultBucket": {
+      "id": "DefaultBucket",
+      "type": "object",
+      "description": "Spark tier-eligible Cloud Storage bucket. One per project. This resource exists if the underlying Cloud Storage bucket exists and it is linked to your Firebase project. See https://firebase.google.com/pricing for pricing details.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Identifier. Resource name of the default bucket."
+        },
+        "bucket": {
+          "$ref": "Bucket",
+          "description": "Output only. Underlying bucket resource.",
+          "readOnly": true
+        },
+        "storageClass": {
+          "description": "Immutable. Storage class of the default bucket. Supported values are available at https://cloud.google.com/storage/docs/storage-classes#classes.",
+          "type": "string"
+        },
+        "location": {
+          "description": "Required. Immutable. Location of the default bucket.",
+          "type": "string"
+        }
+      }
+    },
+    "Bucket": {
+      "properties": {
+        "name": {
+          "description": "Output only. Resource name of the bucket.",
+          "readOnly": true,
+          "type": "string"
+        }
+      },
+      "description": "A storage bucket and its relation to a parent Firebase project.",
+      "type": "object",
+      "id": "Bucket"
+    },
+    "AddFirebaseRequest": {
+      "properties": {},
+      "description": "The request used to link a Google Cloud Storage bucket to a Firebase project.",
+      "type": "object",
+      "id": "AddFirebaseRequest"
+    },
+    "Empty": {
+      "properties": {},
+      "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
+      "type": "object",
+      "id": "Empty"
+    },
+    "RemoveFirebaseRequest": {
+      "description": "The request used to unlink a Google Cloud Storage bucket from a Firebase project.",
+      "properties": {},
+      "id": "RemoveFirebaseRequest",
+      "type": "object"
+    }
+  },
+  "ownerDomain": "google.com",
+  "title": "Cloud Storage for Firebase API",
   "resources": {
     "projects": {
       "methods": {
         "getDefaultBucket": {
-          "id": "firebasestorage.projects.getDefaultBucket",
-          "flatPath": "v1beta/projects/{projectsId}/defaultBucket",
+          "httpMethod": "GET",
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/firebase"
+          ],
+          "description": "Gets the default bucket.",
+          "path": "v1beta/{+name}",
           "parameters": {
             "name": {
-              "type": "string",
-              "location": "path",
               "required": true,
+              "location": "path",
               "description": "Required. The name of the default bucket to retrieve, `projects/{project_id_or_number}/defaultBucket`.",
-              "pattern": "^projects/[^/]+/defaultBucket$"
+              "pattern": "^projects/[^/]+/defaultBucket$",
+              "type": "string"
             }
           },
           "response": {
@@ -24,109 +102,89 @@
           "parameterOrder": [
             "name"
           ],
-          "path": "v1beta/{+name}",
-          "httpMethod": "GET",
-          "description": "Gets the default bucket.",
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform",
-            "https://www.googleapis.com/auth/firebase"
-          ]
+          "id": "firebasestorage.projects.getDefaultBucket",
+          "flatPath": "v1beta/projects/{projectsId}/defaultBucket"
         },
         "deleteDefaultBucket": {
+          "httpMethod": "DELETE",
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform",
             "https://www.googleapis.com/auth/firebase"
           ],
           "description": "Unlinks and deletes the default bucket.",
-          "httpMethod": "DELETE",
           "path": "v1beta/{+name}",
-          "parameterOrder": [
-            "name"
-          ],
           "parameters": {
             "name": {
-              "description": "Required. The name of the default bucket to delete, `projects/{project_id_or_number}/defaultBucket`.",
-              "pattern": "^projects/[^/]+/defaultBucket$",
               "location": "path",
               "required": true,
+              "description": "Required. The name of the default bucket to delete, `projects/{project_id_or_number}/defaultBucket`.",
+              "pattern": "^projects/[^/]+/defaultBucket$",
               "type": "string"
             }
           },
           "response": {
             "$ref": "Empty"
           },
-          "flatPath": "v1beta/projects/{projectsId}/defaultBucket",
-          "id": "firebasestorage.projects.deleteDefaultBucket"
+          "parameterOrder": [
+            "name"
+          ],
+          "id": "firebasestorage.projects.deleteDefaultBucket",
+          "flatPath": "v1beta/projects/{projectsId}/defaultBucket"
         }
       },
       "resources": {
-        "buckets": {
+        "defaultBucket": {
           "methods": {
-            "get": {
-              "flatPath": "v1beta/projects/{projectsId}/buckets/{bucketsId}",
-              "id": "firebasestorage.projects.buckets.get",
+            "create": {
+              "flatPath": "v1beta/projects/{projectsId}/defaultBucket",
+              "id": "firebasestorage.projects.defaultBucket.create",
               "parameterOrder": [
-                "name"
+                "parent"
               ],
               "parameters": {
-                "name": {
-                  "type": "string",
-                  "description": "Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_id_or_number}/buckets/{bucket_id}`.",
-                  "pattern": "^projects/[^/]+/buckets/[^/]+$",
-                  "required": true,
-                  "location": "path"
-                }
-              },
-              "response": {
-                "$ref": "Bucket"
-              },
-              "path": "v1beta/{+name}",
-              "description": "Gets a single linked storage bucket.",
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/firebase"
-              ],
-              "httpMethod": "GET"
-            },
-            "removeFirebase": {
-              "id": "firebasestorage.projects.buckets.removeFirebase",
-              "flatPath": "v1beta/projects/{projectsId}/buckets/{bucketsId}:removeFirebase",
-              "parameters": {
-                "bucket": {
-                  "type": "string",
+                "parent": {
                   "required": true,
                   "location": "path",
-                  "description": "Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_id_or_number}/buckets/{bucket_id}`.",
-                  "pattern": "^projects/[^/]+/buckets/[^/]+$"
+                  "description": "Required. The parent resource where the default bucket will be created, `projects/{project_id_or_number}`.",
+                  "pattern": "^projects/[^/]+$",
+                  "type": "string"
                 }
               },
               "response": {
-                "$ref": "Empty"
+                "$ref": "DefaultBucket"
               },
-              "parameterOrder": [
-                "bucket"
-              ],
+              "path": "v1beta/{+parent}/defaultBucket",
               "request": {
-                "$ref": "RemoveFirebaseRequest"
+                "$ref": "DefaultBucket"
               },
-              "path": "v1beta/{+bucket}:removeFirebase",
-              "httpMethod": "POST",
-              "description": "Unlinks a linked Google Cloud Storage bucket from a Firebase project.",
+              "description": "Creates a Spark tier-eligible Cloud Storage bucket and links it to your Firebase project. If the default bucket already exists, this method will re-link it to your Firebase project. See https://firebase.google.com/pricing for pricing details.",
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/firebase"
-              ]
-            },
+              ],
+              "httpMethod": "POST"
+            }
+          }
+        },
+        "buckets": {
+          "methods": {
             "list": {
+              "path": "v1beta/{+parent}/buckets",
+              "httpMethod": "GET",
+              "description": "Lists the linked storage buckets for a project.",
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/firebase"
+              ],
               "id": "firebasestorage.projects.buckets.list",
               "flatPath": "v1beta/projects/{projectsId}/buckets",
               "parameters": {
                 "parent": {
-                  "type": "string",
+                  "description": "Required. Resource name of the parent Firebase project, `projects/{project_id_or_number}`.",
+                  "pattern": "^projects/[^/]+$",
                   "required": true,
                   "location": "path",
-                  "description": "Required. Resource name of the parent Firebase project, `projects/{project_id_or_number}`.",
-                  "pattern": "^projects/[^/]+$"
+                  "type": "string"
                 },
                 "pageToken": {
                   "type": "string",
@@ -134,10 +192,10 @@
                   "description": "A page token, received from a previous `ListBuckets` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListBuckets` must match the call that provided the page token."
                 },
                 "pageSize": {
-                  "format": "int32",
                   "description": "The maximum number of buckets to return. If not set, the server will use a reasonable default.",
-                  "type": "integer",
-                  "location": "query"
+                  "format": "int32",
+                  "location": "query",
+                  "type": "integer"
                 }
               },
               "response": {
@@ -145,25 +203,73 @@
               },
               "parameterOrder": [
                 "parent"
-              ],
-              "path": "v1beta/{+parent}/buckets",
-              "httpMethod": "GET",
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/firebase"
-              ],
-              "description": "Lists the linked storage buckets for a project."
+              ]
             },
             "addFirebase": {
-              "description": "Links a Google Cloud Storage bucket to a Firebase project.",
+              "parameterOrder": [
+                "bucket"
+              ],
+              "parameters": {
+                "bucket": {
+                  "description": "Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_id_or_number}/buckets/{bucket_id}`.",
+                  "pattern": "^projects/[^/]+/buckets/[^/]+$",
+                  "required": true,
+                  "location": "path",
+                  "type": "string"
+                }
+              },
+              "response": {
+                "$ref": "Bucket"
+              },
+              "flatPath": "v1beta/projects/{projectsId}/buckets/{bucketsId}:addFirebase",
+              "id": "firebasestorage.projects.buckets.addFirebase",
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform",
                 "https://www.googleapis.com/auth/firebase"
               ],
+              "description": "Links a Google Cloud Storage bucket to a Firebase project.",
               "httpMethod": "POST",
               "path": "v1beta/{+bucket}:addFirebase",
               "request": {
                 "$ref": "AddFirebaseRequest"
+              }
+            },
+            "get": {
+              "id": "firebasestorage.projects.buckets.get",
+              "flatPath": "v1beta/projects/{projectsId}/buckets/{bucketsId}",
+              "parameters": {
+                "name": {
+                  "description": "Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_id_or_number}/buckets/{bucket_id}`.",
+                  "pattern": "^projects/[^/]+/buckets/[^/]+$",
+                  "location": "path",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "response": {
+                "$ref": "Bucket"
+              },
+              "parameterOrder": [
+                "name"
+              ],
+              "path": "v1beta/{+name}",
+              "httpMethod": "GET",
+              "description": "Gets a single linked storage bucket.",
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/firebase"
+              ]
+            },
+            "removeFirebase": {
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/firebase"
+              ],
+              "description": "Unlinks a linked Google Cloud Storage bucket from a Firebase project.",
+              "httpMethod": "POST",
+              "path": "v1beta/{+bucket}:removeFirebase",
+              "request": {
+                "$ref": "RemoveFirebaseRequest"
               },
               "parameterOrder": [
                 "bucket"
@@ -171,238 +277,132 @@
               "parameters": {
                 "bucket": {
                   "type": "string",
-                  "description": "Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_id_or_number}/buckets/{bucket_id}`.",
-                  "pattern": "^projects/[^/]+/buckets/[^/]+$",
-                  "location": "path",
-                  "required": true
-                }
-              },
-              "response": {
-                "$ref": "Bucket"
-              },
-              "flatPath": "v1beta/projects/{projectsId}/buckets/{bucketsId}:addFirebase",
-              "id": "firebasestorage.projects.buckets.addFirebase"
-            }
-          }
-        },
-        "defaultBucket": {
-          "methods": {
-            "create": {
-              "parameters": {
-                "parent": {
-                  "type": "string",
                   "location": "path",
                   "required": true,
-                  "description": "Required. The parent resource where the default bucket will be created, `projects/{project_id_or_number}`.",
-                  "pattern": "^projects/[^/]+$"
+                  "description": "Required. Resource name of the bucket, mirrors the ID of the underlying Google Cloud Storage bucket, `projects/{project_id_or_number}/buckets/{bucket_id}`.",
+                  "pattern": "^projects/[^/]+/buckets/[^/]+$"
                 }
               },
               "response": {
-                "$ref": "DefaultBucket"
+                "$ref": "Empty"
               },
-              "parameterOrder": [
-                "parent"
-              ],
-              "id": "firebasestorage.projects.defaultBucket.create",
-              "flatPath": "v1beta/projects/{projectsId}/defaultBucket",
-              "httpMethod": "POST",
-              "description": "Creates a Spark tier-eligible Cloud Storage bucket and links it to your Firebase project. If the default bucket already exists, this method will re-link it to your Firebase project. See https://firebase.google.com/pricing for pricing details.",
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/firebase"
-              ],
-              "request": {
-                "$ref": "DefaultBucket"
-              },
-              "path": "v1beta/{+parent}/defaultBucket"
+              "flatPath": "v1beta/projects/{projectsId}/buckets/{bucketsId}:removeFirebase",
+              "id": "firebasestorage.projects.buckets.removeFirebase"
             }
           }
         }
       }
     }
   },
-  "title": "Cloud Storage for Firebase API",
   "auth": {
     "oauth2": {
       "scopes": {
-        "https://www.googleapis.com/auth/cloud-platform": {
-          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
-        },
         "https://www.googleapis.com/auth/firebase": {
           "description": "View and administer all your Firebase data and settings"
+        },
+        "https://www.googleapis.com/auth/cloud-platform": {
+          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
         }
       }
     }
   },
   "mtlsRootUrl": "https://firebasestorage.mtls.googleapis.com/",
-  "schemas": {
-    "Bucket": {
-      "properties": {
-        "name": {
-          "type": "string",
-          "description": "Output only. Resource name of the bucket.",
-          "readOnly": true
-        }
-      },
-      "description": "A storage bucket and its relation to a parent Firebase project.",
-      "type": "object",
-      "id": "Bucket"
-    },
-    "ListBucketsResponse": {
-      "id": "ListBucketsResponse",
-      "type": "object",
-      "description": "The response returned by `ListBuckets`.",
-      "properties": {
-        "buckets": {
-          "type": "array",
-          "items": {
-            "$ref": "Bucket"
-          },
-          "description": "The list of linked buckets."
-        },
-        "nextPageToken": {
-          "type": "string",
-          "description": "A token that can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages."
-        }
-      }
-    },
-    "DefaultBucket": {
-      "properties": {
-        "location": {
-          "type": "string",
-          "description": "Required. Immutable. Location of the default bucket."
-        },
-        "bucket": {
-          "description": "Output only. Underlying bucket resource.",
-          "readOnly": true,
-          "$ref": "Bucket"
-        },
-        "storageClass": {
-          "description": "Immutable. Storage class of the default bucket. Supported values are available at https://cloud.google.com/storage/docs/storage-classes#classes.",
-          "type": "string"
-        },
-        "name": {
-          "description": "Identifier. Resource name of the default bucket.",
-          "type": "string"
-        }
-      },
-      "description": "Spark tier-eligible Cloud Storage bucket. One per project. This resource exists if the underlying Cloud Storage bucket exists and it is linked to your Firebase project. See https://firebase.google.com/pricing for pricing details.",
-      "type": "object",
-      "id": "DefaultBucket"
-    },
-    "RemoveFirebaseRequest": {
-      "id": "RemoveFirebaseRequest",
-      "type": "object",
-      "description": "The request used to unlink a Google Cloud Storage bucket from a Firebase project.",
-      "properties": {}
-    },
-    "AddFirebaseRequest": {
-      "id": "AddFirebaseRequest",
-      "type": "object",
-      "description": "The request used to link a Google Cloud Storage bucket to a Firebase project.",
-      "properties": {}
-    },
-    "Empty": {
-      "properties": {},
-      "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
-      "type": "object",
-      "id": "Empty"
-    }
-  },
-  "ownerDomain": "google.com",
-  "canonicalName": "Firebasestorage",
-  "documentationLink": "https://firebase.google.com/docs/storage",
-  "baseUrl": "https://firebasestorage.googleapis.com/",
-  "name": "firebasestorage",
-  "version": "v1beta",
-  "id": "firebasestorage:v1beta",
-  "fullyEncodeReservedExpansion": true,
-  "kind": "discovery#restDescription",
-  "rootUrl": "https://firebasestorage.googleapis.com/",
-  "version_module": true,
-  "batchPath": "batch",
-  "discoveryVersion": "v1",
-  "icons": {
-    "x16": "http://www.google.com/images/icons/product/search-16.gif",
-    "x32": "http://www.google.com/images/icons/product/search-32.gif"
-  },
-  "servicePath": "",
+  "revision": "20260724",
+  "ownerName": "Google",
+  "description": "The Cloud Storage for Firebase API enables programmatic management of Cloud Storage buckets for use in Firebase projects",
+  "protocol": "rest",
   "parameters": {
-    "fields": {
-      "description": "Selector specifying which fields to include in a partial response.",
-      "type": "string",
-      "location": "query"
-    },
-    "uploadType": {
-      "type": "string",
+    "quotaUser": {
       "location": "query",
-      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\")."
-    },
-    "callback": {
       "type": "string",
-      "location": "query",
-      "description": "JSONP"
-    },
-    "upload_protocol": {
-      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").",
-      "location": "query",
-      "type": "string"
-    },
-    "access_token": {
-      "type": "string",
-      "location": "query",
-      "description": "OAuth access token."
-    },
-    "$.xgafv": {
-      "location": "query",
-      "enum": [
-        "1",
-        "2"
-      ],
-      "description": "V1 error format.",
-      "type": "string",
-      "enumDescriptions": [
-        "v1 error format",
-        "v2 error format"
-      ]
+      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters."
     },
     "prettyPrint": {
-      "default": "true",
-      "description": "Returns response with indentations and line breaks.",
       "type": "boolean",
-      "location": "query"
-    },
-    "oauth_token": {
       "location": "query",
-      "type": "string",
-      "description": "OAuth 2.0 token for the current user."
+      "default": "true",
+      "description": "Returns response with indentations and line breaks."
     },
     "alt": {
-      "type": "string",
-      "default": "json",
-      "enumDescriptions": [
-        "Responses with Content-Type of application/json",
-        "Media download with context-dependent Content-Type",
-        "Responses with Content-Type of application/x-protobuf"
-      ],
       "location": "query",
       "enum": [
         "json",
         "media",
         "proto"
       ],
-      "description": "Data format for response."
+      "description": "Data format for response.",
+      "type": "string",
+      "default": "json",
+      "enumDescriptions": [
+        "Responses with Content-Type of application/json",
+        "Media download with context-dependent Content-Type",
+        "Responses with Content-Type of application/x-protobuf"
+      ]
     },
     "key": {
-      "type": "string",
       "location": "query",
+      "type": "string",
       "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token."
     },
-    "quotaUser": {
+    "oauth_token": {
+      "description": "OAuth 2.0 token for the current user.",
+      "type": "string",
+      "location": "query"
+    },
+    "access_token": {
       "type": "string",
       "location": "query",
-      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters."
+      "description": "OAuth access token."
+    },
+    "upload_protocol": {
+      "type": "string",
+      "location": "query",
+      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\")."
+    },
+    "$.xgafv": {
+      "location": "query",
+      "description": "V1 error format.",
+      "enum": [
+        "1",
+        "2"
+      ],
+      "type": "string",
+      "enumDescriptions": [
+        "v1 error format",
+        "v2 error format"
+      ]
+    },
+    "callback": {
+      "location": "query",
+      "type": "string",
+      "description": "JSONP"
+    },
+    "fields": {
+      "location": "query",
+      "type": "string",
+      "description": "Selector specifying which fields to include in a partial response."
+    },
+    "uploadType": {
+      "location": "query",
+      "type": "string",
+      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\")."
     }
   },
-  "basePath": ""
+  "basePath": "",
+  "servicePath": "",
+  "discoveryVersion": "v1",
+  "icons": {
+    "x16": "http://www.google.com/images/icons/product/search-16.gif",
+    "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  },
+  "batchPath": "batch",
+  "version_module": true,
+  "kind": "discovery#restDescription",
+  "rootUrl": "https://firebasestorage.googleapis.com/",
+  "id": "firebasestorage:v1beta",
+  "fullyEncodeReservedExpansion": true,
+  "baseUrl": "https://firebasestorage.googleapis.com/",
+  "name": "firebasestorage",
+  "version": "v1beta",
+  "documentationLink": "https://firebase.google.com/docs/storage"
 }
