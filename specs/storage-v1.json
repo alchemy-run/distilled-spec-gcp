@@ -1019,6 +1019,96 @@
         }
       }
     },
+    "RapidCache": {
+      "id": "RapidCache",
+      "type": "object",
+      "description": "A Rapid Cache instance.",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "The kind of item this is. For Rapid Cache, this is always storage#rapidCache.",
+          "default": "storage#rapidCache"
+        },
+        "id": {
+          "type": "string",
+          "description": "The ID of the resource, including the project number, bucket name and rapid cache ID."
+        },
+        "selfLink": {
+          "type": "string",
+          "description": "The link to this cache instance."
+        },
+        "bucket": {
+          "type": "string",
+          "description": "The name of the bucket containing this cache instance."
+        },
+        "rapidCacheId": {
+          "type": "string",
+          "description": "The ID of the Rapid cache instance."
+        },
+        "zone": {
+          "type": "string",
+          "description": "The zone in which the cache instance is running. For example, us-central1-a."
+        },
+        "state": {
+          "type": "string",
+          "description": "The current state of the cache instance."
+        },
+        "createTime": {
+          "type": "string",
+          "description": "The creation time of the cache instance in RFC 3339 format.",
+          "format": "date-time"
+        },
+        "updateTime": {
+          "type": "string",
+          "description": "The modification time of the cache instance metadata in RFC 3339 format.",
+          "format": "date-time"
+        },
+        "ttl": {
+          "type": "string",
+          "description": "The TTL of all cache entries in whole seconds. e.g., \"7200s\".",
+          "format": "google-duration"
+        },
+        "admissionPolicy": {
+          "type": "string",
+          "description": "The cache-level entry admission policy."
+        },
+        "pendingUpdate": {
+          "type": "boolean",
+          "description": "True if the cache instance has an active Update long-running operation."
+        },
+        "ingestOnWrite": {
+          "type": "boolean",
+          "description": "Specifies whether objects are ingested into the cache upon write."
+        },
+        "cacheType": {
+          "type": "string",
+          "description": "The type of Rapid Cache this represents. Valid values include: \"rapid-cache\" and \"rapid-cache-ultra\"."
+        }
+      }
+    },
+    "RapidCaches": {
+      "id": "RapidCaches",
+      "type": "object",
+      "description": "A list of Rapid Caches.",
+      "properties": {
+        "kind": {
+          "type": "string",
+          "description": "The kind of item this is. For lists of Rapid Caches, this is always storage#rapidCaches.",
+          "default": "storage#rapidCaches"
+        },
+        "nextPageToken": {
+          "type": "string",
+          "description": "The continuation token, used to page through large result sets. Provide this value in a subsequent request to return the next page of results."
+        },
+        "items": {
+          "type": "array",
+          "description": "The list of items.",
+          "items": {
+            "$ref": "RapidCache"
+          }
+        }
+      }
+    },
     "BucketAccessControl": {
       "id": "BucketAccessControl",
       "type": "object",
@@ -1625,6 +1715,47 @@
           "type": "string",
           "description": "The last update time of the managed folder metadata in RFC 3339 format.",
           "format": "date-time"
+        },
+        "rapidCacheConfig": {
+          "$ref": "RapidCacheConfig",
+          "description": "The rapid cache configuration for the managed folder."
+        }
+      }
+    },
+    "RapidCacheConfig": {
+      "id": "RapidCacheConfig",
+      "type": "object",
+      "description": "Configuration options for the rapid cache of a managed folder.",
+      "properties": {
+        "policies": {
+          "type": "object",
+          "description": "A map of rapid cache IDs to the corresponding `RapidCachePolicy` configurations for a managed folder.",
+          "additionalProperties": {
+            "$ref": "RapidCachePolicy"
+          }
+        }
+      }
+    },
+    "RapidCachePolicy": {
+      "id": "RapidCachePolicy",
+      "type": "object",
+      "description": "The rapid cache policy configuration for a managed folder.",
+      "properties": {
+        "rapidCacheId": {
+          "type": "string",
+          "description": "The unique identifier of the rapid cache."
+        },
+        "ingestOnWrite": {
+          "type": "string",
+          "description": "The ingest-on-write policy for objects in the managed folder. When set to `enabled`, objects are automatically ingested into the cache when they are written to the managed folder.",
+          "enum": [
+            "enabled",
+            "unspecified"
+          ],
+          "enumDescriptions": [
+            "Ingestion on write is explicitly enabled for the managed folder.",
+            "Ingestion on write isn't specified at the managed folder level and is inherited from the parent resource's configuration. This is the default value."
+          ]
         }
       }
     },
@@ -2553,6 +2684,178 @@
           ],
           "response": {
             "$ref": "AnywhereCache"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/devstorage.full_control",
+            "https://www.googleapis.com/auth/devstorage.read_write"
+          ]
+        }
+      }
+    },
+    "rapidCaches": {
+      "methods": {
+        "insert": {
+          "id": "storage.rapidCaches.insert",
+          "path": "b/{bucket}/rapidCaches",
+          "httpMethod": "POST",
+          "description": "Creates a Rapid Cache instance.",
+          "parameters": {
+            "bucket": {
+              "type": "string",
+              "description": "Name of the parent bucket.",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "parameterOrder": [
+            "bucket"
+          ],
+          "request": {
+            "$ref": "RapidCache"
+          },
+          "response": {
+            "$ref": "GoogleLongrunningOperation"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/devstorage.full_control",
+            "https://www.googleapis.com/auth/devstorage.read_write"
+          ]
+        },
+        "update": {
+          "id": "storage.rapidCaches.update",
+          "path": "b/{bucket}/rapidCaches/{rapidCacheId}",
+          "httpMethod": "PATCH",
+          "description": "Updates the configuration of a Rapid Cache instance.",
+          "parameters": {
+            "bucket": {
+              "type": "string",
+              "description": "Name of the parent bucket.",
+              "required": true,
+              "location": "path"
+            },
+            "rapidCacheId": {
+              "type": "string",
+              "description": "The ID of the requested Rapid Cache instance.",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "parameterOrder": [
+            "bucket",
+            "rapidCacheId"
+          ],
+          "request": {
+            "$ref": "RapidCache"
+          },
+          "response": {
+            "$ref": "GoogleLongrunningOperation"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/devstorage.full_control",
+            "https://www.googleapis.com/auth/devstorage.read_write"
+          ]
+        },
+        "get": {
+          "id": "storage.rapidCaches.get",
+          "path": "b/{bucket}/rapidCaches/{rapidCacheId}",
+          "httpMethod": "GET",
+          "description": "Returns the metadata of a Rapid Cache instance.",
+          "parameters": {
+            "bucket": {
+              "type": "string",
+              "description": "Name of the parent bucket.",
+              "required": true,
+              "location": "path"
+            },
+            "rapidCacheId": {
+              "type": "string",
+              "description": "The ID of the requested Rapid Cache instance.",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "parameterOrder": [
+            "bucket",
+            "rapidCacheId"
+          ],
+          "response": {
+            "$ref": "RapidCache"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/cloud-platform.read-only",
+            "https://www.googleapis.com/auth/devstorage.full_control",
+            "https://www.googleapis.com/auth/devstorage.read_only",
+            "https://www.googleapis.com/auth/devstorage.read_write"
+          ]
+        },
+        "list": {
+          "id": "storage.rapidCaches.list",
+          "path": "b/{bucket}/rapidCaches",
+          "httpMethod": "GET",
+          "description": "Returns a list of Rapid Cache instances of the bucket.",
+          "parameters": {
+            "bucket": {
+              "type": "string",
+              "description": "Name of the parent bucket.",
+              "required": true,
+              "location": "path"
+            },
+            "pageSize": {
+              "type": "integer",
+              "description": "Maximum number of items to return in a single page of responses.",
+              "format": "int32",
+              "minimum": "0",
+              "location": "query"
+            },
+            "pageToken": {
+              "type": "string",
+              "description": "A previously-returned page token representing part of the larger set of results to view.",
+              "location": "query"
+            }
+          },
+          "parameterOrder": [
+            "bucket"
+          ],
+          "response": {
+            "$ref": "RapidCaches"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/cloud-platform.read-only",
+            "https://www.googleapis.com/auth/devstorage.full_control",
+            "https://www.googleapis.com/auth/devstorage.read_only",
+            "https://www.googleapis.com/auth/devstorage.read_write"
+          ]
+        },
+        "disable": {
+          "id": "storage.rapidCaches.disable",
+          "path": "b/{bucket}/rapidCaches/{rapidCacheId}/disable",
+          "httpMethod": "POST",
+          "description": "Disables a Rapid Cache instance.",
+          "parameters": {
+            "bucket": {
+              "type": "string",
+              "description": "Name of the parent bucket.",
+              "required": true,
+              "location": "path"
+            },
+            "rapidCacheId": {
+              "type": "string",
+              "description": "The ID of the requested Rapid Cache instance.",
+              "required": true,
+              "location": "path"
+            }
+          },
+          "parameterOrder": [
+            "bucket",
+            "rapidCacheId"
+          ],
+          "response": {
+            "$ref": "GoogleLongrunningOperation"
           },
           "scopes": [
             "https://www.googleapis.com/auth/cloud-platform",
@@ -4258,6 +4561,53 @@
             "https://www.googleapis.com/auth/cloud-platform.read-only",
             "https://www.googleapis.com/auth/devstorage.full_control",
             "https://www.googleapis.com/auth/devstorage.read_only",
+            "https://www.googleapis.com/auth/devstorage.read_write"
+          ]
+        },
+        "update": {
+          "id": "storage.managedFolders.update",
+          "path": "b/{bucket}/managedFolders/{managedFolder}",
+          "httpMethod": "PATCH",
+          "description": "Updates a managed folder using patch semantics.",
+          "parameters": {
+            "bucket": {
+              "type": "string",
+              "description": "The name of the bucket containing the managed folder.",
+              "required": true,
+              "location": "path"
+            },
+            "managedFolder": {
+              "type": "string",
+              "description": "The name of the managed folder.",
+              "required": true,
+              "location": "path"
+            },
+            "ifMetagenerationMatch": {
+              "type": "string",
+              "description": "Makes the operation conditional on whether the metageneration of the managed folder matches the specified value.",
+              "format": "int64",
+              "location": "query"
+            },
+            "ifMetagenerationNotMatch": {
+              "type": "string",
+              "description": "Makes the operation conditional on whether the metageneration of the managed folder doesn't match the specified value.",
+              "format": "int64",
+              "location": "query"
+            }
+          },
+          "parameterOrder": [
+            "bucket",
+            "managedFolder"
+          ],
+          "request": {
+            "$ref": "ManagedFolder"
+          },
+          "response": {
+            "$ref": "ManagedFolder"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform",
+            "https://www.googleapis.com/auth/devstorage.full_control",
             "https://www.googleapis.com/auth/devstorage.read_write"
           ]
         },
@@ -6517,6 +6867,6 @@
       }
     }
   },
-  "revision": "20260719",
-  "etag": "\"35383531303536383737353933333433313638\""
+  "revision": "20260805",
+  "etag": "\"38353639383032313035393733313136383533\""
 }
