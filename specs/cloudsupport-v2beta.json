@@ -1,16 +1,550 @@
 {
-  "baseUrl": "https://cloudsupport.googleapis.com/",
-  "discoveryVersion": "v1",
-  "basePath": "",
-  "ownerName": "Google",
+  "protocol": "rest",
   "name": "cloudsupport",
+  "id": "cloudsupport:v2beta",
+  "ownerDomain": "google.com",
+  "description": "Manages Google Cloud technical support cases for Customer Care support offerings. ",
+  "icons": {
+    "x16": "http://www.google.com/images/icons/product/search-16.gif",
+    "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  },
+  "documentationLink": "https://cloud.google.com/support/docs/apis",
   "resources": {
+    "media": {
+      "methods": {
+        "upload": {
+          "description": "Create a file attachment on a case or Cloud resource. The attachment must have the following fields set: `filename`. EXAMPLES: cURL: ```shell echo \"This text is in a file I'm uploading using CSAPI.\" \\ > \"./example_file.txt\" case=\"projects/some-project/cases/43594844\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ --data-binary @\"./example_file.txt\" \\ \"https://cloudsupport.googleapis.com/upload/v2beta/$case/attachments?attachment.filename=uploaded_via_curl.txt\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) file_path = \"./example_file.txt\" with open(file_path, \"w\") as file: file.write( \"This text is inside a file I'm going to upload using the Cloud Support API.\", ) request = supportApiService.media().upload( parent=\"projects/some-project/cases/43595344\", media_body=file_path ) request.uri = request.uri.split(\"?\")[0] + \"?attachment.filename=uploaded_via_python.txt\" print(request.execute()) ```",
+          "supportsMediaUpload": true,
+          "id": "cloudsupport.media.upload",
+          "path": "v2beta/{+parent}/attachments",
+          "parameters": {
+            "parent": {
+              "type": "string",
+              "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
+              "location": "path",
+              "description": "Required. The name of the case or Cloud resource to which the attachment should be attached.",
+              "required": true
+            }
+          },
+          "mediaUpload": {
+            "protocols": {
+              "simple": {
+                "multipart": true,
+                "path": "/upload/v2beta/{+parent}/attachments"
+              }
+            },
+            "accept": [
+              "*/*"
+            ]
+          },
+          "response": {
+            "$ref": "Attachment"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ],
+          "httpMethod": "POST",
+          "parameterOrder": [
+            "parent"
+          ],
+          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/attachments",
+          "request": {
+            "$ref": "CreateAttachmentRequest"
+          }
+        },
+        "download": {
+          "useMediaDownloadService": true,
+          "httpMethod": "GET",
+          "parameterOrder": [
+            "name"
+          ],
+          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/attachments/{attachmentsId}:download",
+          "description": "Download a file attached to a case. When this endpoint is called, no \"response body\" will be returned. Instead, the attachment's blob will be returned. Note: HTTP requests must append \"?alt=media\" to the URL. EXAMPLES: cURL: ```shell name=\"projects/some-project/cases/43594844/attachments/0674M00000WijAnZAJ\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$name:download?alt=media\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.media().download( name=\"projects/some-project/cases/43595344/attachments/0684M00000Pw6pHQAR\" ) request.uri = request.uri.split(\"?\")[0] + \"?alt=media\" print(request.execute()) ```",
+          "supportsMediaDownload": true,
+          "id": "cloudsupport.media.download",
+          "path": "v2beta/{+name}:download",
+          "parameters": {
+            "name": {
+              "type": "string",
+              "description": "The name of the file attachment to download.",
+              "required": true,
+              "pattern": "^[^/]+/[^/]+/cases/[^/]+/attachments/[^/]+$",
+              "location": "path"
+            }
+          },
+          "response": {
+            "$ref": "Media"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ]
+        }
+      }
+    },
+    "cases": {
+      "methods": {
+        "showFeed": {
+          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}:showFeed",
+          "httpMethod": "GET",
+          "parameterOrder": [
+            "parent"
+          ],
+          "id": "cloudsupport.cases.showFeed",
+          "path": "v2beta/{+parent}:showFeed",
+          "parameters": {
+            "pageSize": {
+              "description": "Optional. The maximum number of feed items fetched with each request.",
+              "location": "query",
+              "type": "integer",
+              "format": "int32"
+            },
+            "pageToken": {
+              "description": "Optional. A token identifying the page of results to return. If unspecified, it retrieves the first page.",
+              "location": "query",
+              "type": "string"
+            },
+            "parent": {
+              "description": "Required. The resource name of the case for which feed items should be listed.",
+              "required": true,
+              "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
+              "location": "path",
+              "type": "string"
+            },
+            "orderBy": {
+              "location": "query",
+              "type": "string",
+              "description": "Optional. Field to order feed items by, followed by `asc` or `desc` postfix. The only valid field is `creation_time`. This list is case-insensitive, default sorting order is ascending, and the redundant space characters are insignificant. Example: `creation_time desc`"
+            }
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ],
+          "response": {
+            "$ref": "ShowFeedResponse"
+          },
+          "description": "Show items in the feed of this case, including case emails, attachments, and comments."
+        },
+        "get": {
+          "description": "Retrieve a case. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/16033687\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$case\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().get( name=\"projects/some-project/cases/43595344\", ) print(request.execute()) ```",
+          "id": "cloudsupport.cases.get",
+          "path": "v2beta/{+name}",
+          "parameters": {
+            "name": {
+              "type": "string",
+              "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
+              "location": "path",
+              "description": "Required. The full name of a case to be retrieved.",
+              "required": true
+            }
+          },
+          "response": {
+            "$ref": "Case"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ],
+          "httpMethod": "GET",
+          "parameterOrder": [
+            "name"
+          ],
+          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}"
+        },
+        "create": {
+          "id": "cloudsupport.cases.create",
+          "path": "v2beta/{+parent}/cases",
+          "parameters": {
+            "parent": {
+              "pattern": "^[^/]+/[^/]+$",
+              "location": "path",
+              "description": "Required. The name of the parent under which the case should be created.",
+              "required": true,
+              "type": "string"
+            }
+          },
+          "response": {
+            "$ref": "Case"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ],
+          "description": "Create a new case and associate it with a parent. It must have the following fields set: `display_name`, `description`, `classification`, and `priority`. If you're just testing the API and don't want to route your case to an agent, set `testCase=true`. EXAMPLES: cURL: ```shell parent=\"projects/some-project\" curl \\ --request POST \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ --header 'Content-Type: application/json' \\ --data '{ \"display_name\": \"Test case created by me.\", \"description\": \"a random test case, feel free to close\", \"classification\": { \"id\": \"100IK2AKCLHMGRJ9CDGMOCGP8DM6UTB4BT262T31BT1M2T31DHNMENPO6KS36CPJ786L2TBFEHGN6NPI64R3CDHN8880G08I1H3MURR7DHII0GRCDTQM8\" }, \"time_zone\": \"-07:00\", \"subscriber_email_addresses\": [ \"foo@domain.com\", \"bar@domain.com\" ], \"testCase\": true, \"priority\": \"P3\" }' \\ \"https://cloudsupport.googleapis.com/v2beta/$parent/cases\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().create( parent=\"projects/some-project\", body={ \"displayName\": \"A Test Case\", \"description\": \"This is a test case.\", \"testCase\": True, \"priority\": \"P2\", \"classification\": { \"id\": \"100IK2AKCLHMGRJ9CDGMOCGP8DM6UTB4BT262T31BT1M2T31DHNMENPO6KS36CPJ786L2TBFEHGN6NPI64R3CDHN8880G08I1H3MURR7DHII0GRCDTQM8\" }, }, ) print(request.execute()) ```",
+          "request": {
+            "$ref": "Case"
+          },
+          "httpMethod": "POST",
+          "parameterOrder": [
+            "parent"
+          ],
+          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases"
+        },
+        "search": {
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ],
+          "response": {
+            "$ref": "SearchCasesResponse"
+          },
+          "id": "cloudsupport.cases.search",
+          "path": "v2beta/cases:search",
+          "parameters": {
+            "parent": {
+              "description": "The name of the parent resource to search for cases under.",
+              "location": "query",
+              "type": "string"
+            },
+            "query": {
+              "location": "query",
+              "type": "string",
+              "description": "An expression used to filter cases. Expressions use the following fields separated by `AND` and specified with `=`: - `state`: Can be `OPEN` or `CLOSED`. - `priority`: Can be `P0`, `P1`, `P2`, `P3`, or `P4`. You can specify multiple values for priority using the `OR` operator. For example, `priority=P1 OR priority=P2`. - `creator.email`: The email address of the case creator. To search across `displayName`, `description`, and comments, use a global restriction with no keyword or operator. For example, `\"my search\"`. To search only cases updated after a certain date, use `update_time` restricted with that particular date, time, and timezone in ISO datetime format. For example, `update_time>\"2020-01-01T00:00:00-05:00\"`. `update_time` only supports the greater than operator (`>`). If you are using the `v2` version of the API, you must specify the case parent in the `parent` field. If you provide an empty `query`, all cases under the parent resource will be returned. If you are using the `v2beta` version of the API, you must specify the case parent in the `query` field using one of the two fields below, which are only available for `v2beta`. The `parent` field will be ignored. - `organization`: An organization name in the form `organizations/`. - `project`: A project name in the form `projects/`. Examples: For `v2`: - `state=CLOSED` - `state=OPEN AND creator.email=\"tester@example.com\"` - `state=OPEN AND (priority=P0 OR priority=P1)` - `update_time>\"2020-01-01T00:00:00-05:00\"` For `v2beta`: - `organization=\"organizations/123456789\"` - `project=\"projects/my-project-id\"` - `project=\"projects/123456789\"` - `organization=\"organizations/123456789\" AND state=CLOSED` - `project=\"projects/my-project-id\" AND creator.email=\"tester@example.com\"` - `project=\"projects/my-project-id\" AND (priority=P0 OR priority=P1)`"
+            },
+            "pageSize": {
+              "description": "The maximum number of cases fetched with each request. The default page size is 10.",
+              "location": "query",
+              "type": "integer",
+              "format": "int32"
+            },
+            "pageToken": {
+              "description": "A token identifying the page of results to return. If unspecified, the first page is retrieved.",
+              "location": "query",
+              "type": "string"
+            }
+          },
+          "description": "Search for cases using a query. EXAMPLES: cURL: ```shell parent=\"projects/some-project\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$parent/cases:search\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().search( parent=\"projects/some-project\", query=\"state=OPEN\" ) print(request.execute()) ```",
+          "flatPath": "v2beta/cases:search",
+          "httpMethod": "GET",
+          "parameterOrder": []
+        },
+        "patch": {
+          "description": "Update a case. Only some fields can be updated. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/43595344\" curl \\ --request PATCH \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ --header \"Content-Type: application/json\" \\ --data '{ \"priority\": \"P1\" }' \\ \"https://cloudsupport.googleapis.com/v2beta/$case?updateMask=priority\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().patch( name=\"projects/some-project/cases/43112854\", body={ \"displayName\": \"This is Now a New Title\", \"priority\": \"P2\", }, ) print(request.execute()) ```",
+          "response": {
+            "$ref": "Case"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ],
+          "id": "cloudsupport.cases.patch",
+          "path": "v2beta/{+name}",
+          "parameters": {
+            "name": {
+              "type": "string",
+              "description": "Identifier. The resource name for the case.",
+              "required": true,
+              "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
+              "location": "path"
+            },
+            "updateMask": {
+              "location": "query",
+              "type": "string",
+              "format": "google-fieldmask",
+              "description": "A list of attributes of the case that should be updated. Supported values are `priority`, `display_name`, and `subscriber_email_addresses`. If no fields are specified, all supported fields are updated. Be careful - if you do not provide a field mask, then you might accidentally clear some fields. For example, if you leave the field mask empty and do not provide a value for `subscriber_email_addresses`, then `subscriber_email_addresses` is updated to empty."
+            }
+          },
+          "httpMethod": "PATCH",
+          "parameterOrder": [
+            "name"
+          ],
+          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}",
+          "request": {
+            "$ref": "Case"
+          }
+        },
+        "close": {
+          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}:close",
+          "httpMethod": "POST",
+          "parameterOrder": [
+            "name"
+          ],
+          "request": {
+            "$ref": "CloseCaseRequest"
+          },
+          "description": "Close a case. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/43595344\" curl \\ --request POST \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$case:close\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().close( name=\"projects/some-project/cases/43595344\" ) print(request.execute()) ```",
+          "id": "cloudsupport.cases.close",
+          "path": "v2beta/{+name}:close",
+          "parameters": {
+            "name": {
+              "type": "string",
+              "description": "Required. The name of the case to close.",
+              "required": true,
+              "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
+              "location": "path"
+            }
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ],
+          "response": {
+            "$ref": "Case"
+          }
+        },
+        "list": {
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ],
+          "response": {
+            "$ref": "ListCasesResponse"
+          },
+          "id": "cloudsupport.cases.list",
+          "path": "v2beta/{+parent}/cases",
+          "parameters": {
+            "pageToken": {
+              "location": "query",
+              "type": "string",
+              "description": "A token identifying the page of results to return. If unspecified, the first page is retrieved."
+            },
+            "productLine": {
+              "enum": [
+                "PRODUCT_LINE_UNSPECIFIED",
+                "GOOGLE_CLOUD",
+                "GOOGLE_MAPS"
+              ],
+              "type": "string",
+              "description": "The product line to request cases for. If unspecified, only Google Cloud cases will be returned.",
+              "location": "query",
+              "enumDescriptions": [
+                "Unknown product type.",
+                "Google Cloud",
+                "Google Maps"
+              ]
+            },
+            "parent": {
+              "type": "string",
+              "pattern": "^[^/]+/[^/]+$",
+              "location": "path",
+              "description": "Required. The name of a parent to list cases under.",
+              "required": true
+            },
+            "filter": {
+              "location": "query",
+              "type": "string",
+              "description": "An expression used to filter cases. If it's an empty string, then no filtering happens. Otherwise, the endpoint returns the cases that match the filter. Expressions use the following fields separated by `AND` and specified with `=`: - `state`: Can be `OPEN` or `CLOSED`. - `priority`: Can be `P0`, `P1`, `P2`, `P3`, or `P4`. You can specify multiple values for priority using the `OR` operator. For example, `priority=P1 OR priority=P2`. - `creator.email`: The email address of the case creator. EXAMPLES: - `state=CLOSED` - `state=OPEN AND creator.email=\"tester@example.com\"` - `state=OPEN AND (priority=P0 OR priority=P1)`"
+            },
+            "pageSize": {
+              "location": "query",
+              "type": "integer",
+              "format": "int32",
+              "description": "The maximum number of cases fetched with each request. Defaults to 10."
+            }
+          },
+          "description": "Retrieve all cases under a parent, but not its children. For example, listing cases under an organization only returns the cases that are directly parented by that organization. To retrieve cases under an organization and its projects, use `cases.search`. EXAMPLES: cURL: ```shell parent=\"projects/some-project\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$parent/cases\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().list(parent=\"projects/some-project\") print(request.execute()) ```",
+          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases",
+          "httpMethod": "GET",
+          "parameterOrder": [
+            "parent"
+          ]
+        },
+        "escalate": {
+          "id": "cloudsupport.cases.escalate",
+          "path": "v2beta/{+name}:escalate",
+          "parameters": {
+            "name": {
+              "type": "string",
+              "description": "Required. The name of the case to be escalated.",
+              "required": true,
+              "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
+              "location": "path"
+            }
+          },
+          "response": {
+            "$ref": "Case"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ],
+          "description": "Escalate a case, starting the Google Cloud Support escalation management process. This operation is only available for some support services. Go to https://cloud.google.com/support and look for 'Technical support escalations' in the feature list to find out which ones let you do that. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/43595344\" curl \\ --request POST \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ --header \"Content-Type: application/json\" \\ --data '{ \"escalation\": { \"reason\": \"BUSINESS_IMPACT\", \"justification\": \"This is a test escalation.\" } }' \\ \"https://cloudsupport.googleapis.com/v2beta/$case:escalate\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().escalate( name=\"projects/some-project/cases/43595344\", body={ \"escalation\": { \"reason\": \"BUSINESS_IMPACT\", \"justification\": \"This is a test escalation.\", }, }, ) print(request.execute()) ```",
+          "request": {
+            "$ref": "EscalateCaseRequest"
+          },
+          "httpMethod": "POST",
+          "parameterOrder": [
+            "name"
+          ],
+          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}:escalate"
+        }
+      },
+      "resources": {
+        "attachments": {
+          "methods": {
+            "list": {
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "response": {
+                "$ref": "ListAttachmentsResponse"
+              },
+              "id": "cloudsupport.cases.attachments.list",
+              "path": "v2beta/{+parent}/attachments",
+              "parameters": {
+                "parent": {
+                  "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
+                  "location": "path",
+                  "description": "Required. The name of the case for which attachments should be listed.",
+                  "required": true,
+                  "type": "string"
+                },
+                "pageSize": {
+                  "location": "query",
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "The maximum number of attachments fetched with each request. If not provided, the default is 10. The maximum page size that will be returned is 100. The size of each page can be smaller than the requested page size and can include zero. For example, you could request 100 attachments on one page, receive 0, and then on the next page, receive 90."
+                },
+                "pageToken": {
+                  "location": "query",
+                  "type": "string",
+                  "description": "A token identifying the page of results to return. If unspecified, the first page is retrieved."
+                }
+              },
+              "description": "List all the attachments associated with a support case. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/23598314\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$case/attachments\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = ( supportApiService.cases() .attachments() .list(parent=\"projects/some-project/cases/43595344\") ) print(request.execute()) ```",
+              "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/attachments",
+              "httpMethod": "GET",
+              "parameterOrder": [
+                "parent"
+              ]
+            },
+            "get": {
+              "id": "cloudsupport.cases.attachments.get",
+              "path": "v2beta/{+name}",
+              "parameters": {
+                "name": {
+                  "pattern": "^[^/]+/[^/]+/cases/[^/]+/attachments/[^/]+$",
+                  "location": "path",
+                  "description": "Required. The name of the attachment to get.",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "response": {
+                "$ref": "Attachment"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Retrieve an attachment associated with a support case. EXAMPLES: cURL: ```shell attachment=\"projects/some-project/cases/23598314/attachments/0684M00000P3h1fQAB\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$attachment\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = ( supportApiService.cases() .attachments() .get(name=\"projects/some-project/cases/43595344/attachments/0684M00000P3h1fQAB\") ) print(request.execute()) ```",
+              "httpMethod": "GET",
+              "parameterOrder": [
+                "name"
+              ],
+              "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/attachments/{attachmentsId}"
+            }
+          }
+        },
+        "comments": {
+          "methods": {
+            "create": {
+              "response": {
+                "$ref": "Comment"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "id": "cloudsupport.cases.comments.create",
+              "path": "v2beta/{+parent}/comments",
+              "parameters": {
+                "parent": {
+                  "type": "string",
+                  "description": "Required. The name of the case to which the comment should be added.",
+                  "required": true,
+                  "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
+                  "location": "path"
+                }
+              },
+              "description": "Add a new comment to a case. The comment must have the following fields set: `body`. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/43591344\" curl \\ --request POST \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ --header 'Content-Type: application/json' \\ --data '{ \"body\": \"This is a test comment.\" }' \\ \"https://cloudsupport.googleapis.com/v2beta/$case/comments\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = ( supportApiService.cases() .comments() .create( parent=\"projects/some-project/cases/43595344\", body={\"body\": \"This is a test comment.\"}, ) ) print(request.execute()) ```",
+              "request": {
+                "$ref": "Comment"
+              },
+              "httpMethod": "POST",
+              "parameterOrder": [
+                "parent"
+              ],
+              "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/comments"
+            },
+            "get": {
+              "description": "Retrieve a comment. EXAMPLES: cURL: ```shell comment=\"projects/some-project/cases/43595344/comments/234567890\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$comment\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().comments().get( name=\"projects/some-project/cases/43595344/comments/234567890\", ) print(request.execute()) ```",
+              "id": "cloudsupport.cases.comments.get",
+              "path": "v2beta/{+name}",
+              "parameters": {
+                "name": {
+                  "type": "string",
+                  "description": "Required. The name of the comment to retrieve.",
+                  "required": true,
+                  "pattern": "^[^/]+/[^/]+/cases/[^/]+/comments/[^/]+$",
+                  "location": "path"
+                }
+              },
+              "response": {
+                "$ref": "Comment"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "httpMethod": "GET",
+              "parameterOrder": [
+                "name"
+              ],
+              "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/comments/{commentsId}"
+            },
+            "list": {
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "response": {
+                "$ref": "ListCommentsResponse"
+              },
+              "id": "cloudsupport.cases.comments.list",
+              "path": "v2beta/{+parent}/comments",
+              "parameters": {
+                "pageSize": {
+                  "description": "The maximum number of comments to fetch. Defaults to 10.",
+                  "location": "query",
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "pageToken": {
+                  "location": "query",
+                  "type": "string",
+                  "description": "A token identifying the page of results to return. If unspecified, the first page is returned."
+                },
+                "parent": {
+                  "description": "Required. The name of the case for which to list comments.",
+                  "required": true,
+                  "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
+                  "location": "path",
+                  "type": "string"
+                }
+              },
+              "description": "List all the comments associated with a case. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/43595344\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$case/comments\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = ( supportApiService.cases() .comments() .list(parent=\"projects/some-project/cases/43595344\") ) print(request.execute()) ```",
+              "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/comments",
+              "httpMethod": "GET",
+              "parameterOrder": [
+                "parent"
+              ]
+            }
+          }
+        }
+      }
+    },
     "organizations": {
       "resources": {
         "supportEventSubscriptions": {
           "methods": {
             "patch": {
-              "flatPath": "v2beta/organizations/{organizationsId}/supportEventSubscriptions/{supportEventSubscriptionsId}",
+              "description": "Updates a support event subscription. EXAMPLES: cURL: ```shell support_event_subscription=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" curl \\ --request PATCH \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ --header \"Content-Type: application/json\" \\ --data '{ \"pub_sub_topic\": \"projects/my-project/topics/new-topic\" }' \\ \"https://cloudsupport.googleapis.com/v2beta/$support_event_subscription?updateMask=pub_sub_topic\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.supportEventSubscriptions().patch( name=\"organizations/123456789/supportEventSubscriptions/abcdef123456\", body={ \"pub_sub_topic\": \"projects/my-project/topics/new-topic\" }, ) print(request.execute()) ```",
+              "id": "cloudsupport.organizations.supportEventSubscriptions.patch",
+              "path": "v2beta/{+name}",
+              "parameters": {
+                "name": {
+                  "type": "string",
+                  "description": "Identifier. The resource name of the support event subscription.",
+                  "required": true,
+                  "pattern": "^organizations/[^/]+/supportEventSubscriptions/[^/]+$",
+                  "location": "path"
+                },
+                "updateMask": {
+                  "location": "query",
+                  "type": "string",
+                  "format": "google-fieldmask",
+                  "description": "Optional. The list of fields to update. The only supported value is pub_sub_topic."
+                }
+              },
               "response": {
                 "$ref": "SupportEventSubscription"
               },
@@ -18,809 +552,316 @@
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
               "httpMethod": "PATCH",
-              "path": "v2beta/{+name}",
-              "parameters": {
-                "name": {
-                  "description": "Identifier. The resource name of the support event subscription.",
-                  "required": true,
-                  "pattern": "^organizations/[^/]+/supportEventSubscriptions/[^/]+$",
-                  "type": "string",
-                  "location": "path"
-                },
-                "updateMask": {
-                  "type": "string",
-                  "description": "Optional. The list of fields to update. The only supported value is pub_sub_topic.",
-                  "location": "query",
-                  "format": "google-fieldmask"
-                }
-              },
               "parameterOrder": [
                 "name"
               ],
-              "description": "Updates a support event subscription. EXAMPLES: cURL: ```shell support_event_subscription=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" curl \\ --request PATCH \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ --header \"Content-Type: application/json\" \\ --data '{ \"pub_sub_topic\": \"projects/my-project/topics/new-topic\" }' \\ \"https://cloudsupport.googleapis.com/v2beta/$support_event_subscription?updateMask=pub_sub_topic\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.supportEventSubscriptions().patch( name=\"organizations/123456789/supportEventSubscriptions/abcdef123456\", body={ \"pub_sub_topic\": \"projects/my-project/topics/new-topic\" }, ) print(request.execute()) ```",
-              "request": {
-                "$ref": "SupportEventSubscription"
-              },
-              "id": "cloudsupport.organizations.supportEventSubscriptions.patch"
-            },
-            "get": {
-              "id": "cloudsupport.organizations.supportEventSubscriptions.get",
-              "parameterOrder": [
-                "name"
-              ],
-              "description": "Gets a support event subscription. EXAMPLES: cURL: ```shell support_event_subscription=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$support_event_subscription\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.supportEventSubscriptions().get( name=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" ) print(request.execute()) ```",
-              "parameters": {
-                "name": {
-                  "description": "Required. The name of the support event subscription to retrieve. Format: organizations/{organization_id}/supportEventSubscriptions/{subscription_id}",
-                  "required": true,
-                  "pattern": "^organizations/[^/]+/supportEventSubscriptions/[^/]+$",
-                  "type": "string",
-                  "location": "path"
-                }
-              },
-              "httpMethod": "GET",
-              "path": "v2beta/{+name}",
               "flatPath": "v2beta/organizations/{organizationsId}/supportEventSubscriptions/{supportEventSubscriptionsId}",
-              "response": {
-                "$ref": "SupportEventSubscription"
-              },
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ]
-            },
-            "undelete": {
-              "httpMethod": "POST",
-              "path": "v2beta/{+name}:undelete",
-              "flatPath": "v2beta/organizations/{organizationsId}/supportEventSubscriptions/{supportEventSubscriptionsId}:undelete",
-              "response": {
-                "$ref": "SupportEventSubscription"
-              },
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "id": "cloudsupport.organizations.supportEventSubscriptions.undelete",
-              "parameterOrder": [
-                "name"
-              ],
-              "description": "Undeletes a support event subscription. EXAMPLES: cURL: ```shell support_event_subscription=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" curl \\ --request POST \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$support_event_subscription:undelete\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.supportEventSubscriptions().undelete( name=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" ) print(request.execute()) ```",
               "request": {
-                "$ref": "UndeleteSupportEventSubscriptionRequest"
-              },
-              "parameters": {
-                "name": {
-                  "location": "path",
-                  "required": true,
-                  "description": "Required. The name of the support event subscription to undelete. Format: organizations/{organization_id}/supportEventSubscriptions/{subscription_id}",
-                  "pattern": "^organizations/[^/]+/supportEventSubscriptions/[^/]+$",
-                  "type": "string"
-                }
+                "$ref": "SupportEventSubscription"
               }
             },
-            "delete": {
-              "parameterOrder": [
-                "name"
-              ],
-              "description": "Soft deletes a support event subscription. EXAMPLES: cURL: ```shell support_event_subscription=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" curl \\ --request DELETE \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$support_event_subscription\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService).supportEventSubscriptions().delete( name=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" ) print(request.execute()) ```",
-              "parameters": {
-                "name": {
-                  "pattern": "^organizations/[^/]+/supportEventSubscriptions/[^/]+$",
-                  "type": "string",
-                  "required": true,
-                  "description": "Required. The name of the support event subscription to delete. Format: organizations/{organization_id}/supportEventSubscriptions/{subscription_id}",
-                  "location": "path"
-                }
-              },
-              "id": "cloudsupport.organizations.supportEventSubscriptions.delete",
-              "flatPath": "v2beta/organizations/{organizationsId}/supportEventSubscriptions/{supportEventSubscriptionsId}",
-              "response": {
-                "$ref": "SupportEventSubscription"
-              },
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "httpMethod": "DELETE",
-              "path": "v2beta/{+name}"
-            },
-            "expunge": {
-              "request": {
-                "$ref": "ExpungeSupportEventSubscriptionRequest"
-              },
-              "parameterOrder": [
-                "name"
-              ],
-              "description": "Expunges a support event subscription. EXAMPLES: cURL: ```shell support_event_subscription=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" curl \\ --request POST \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$support_event_subscription:expunge\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.supportEventSubscriptions().expunge( name=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" ) print(request.execute()) ```",
-              "parameters": {
-                "name": {
-                  "location": "path",
-                  "description": "Required. The name of the support event subscription to expunge. Format: organizations/{organization_id}/supportEventSubscriptions/{subscription_id}",
-                  "required": true,
-                  "pattern": "^organizations/[^/]+/supportEventSubscriptions/[^/]+$",
-                  "type": "string"
-                }
-              },
-              "id": "cloudsupport.organizations.supportEventSubscriptions.expunge",
-              "response": {
-                "$ref": "Empty"
-              },
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "flatPath": "v2beta/organizations/{organizationsId}/supportEventSubscriptions/{supportEventSubscriptionsId}:expunge",
-              "path": "v2beta/{+name}:expunge",
-              "httpMethod": "POST"
-            },
             "list": {
+              "flatPath": "v2beta/organizations/{organizationsId}/supportEventSubscriptions",
+              "httpMethod": "GET",
+              "parameterOrder": [
+                "parent"
+              ],
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "response": {
+                "$ref": "ListSupportEventSubscriptionsResponse"
+              },
+              "id": "cloudsupport.organizations.supportEventSubscriptions.list",
+              "path": "v2beta/{+parent}/supportEventSubscriptions",
               "parameters": {
+                "filter": {
+                  "description": "Optional. Filter expression based on AIP-160. Supported fields: - pub_sub_topic - state Examples: - `pub_sub_topic=\"projects/example-project/topics/example-topic\"` - `state=WORKING` - `pub_sub_topic=\"projects/example-project/topics/example-topic\" AND state=WORKING`",
+                  "location": "query",
+                  "type": "string"
+                },
                 "pageSize": {
-                  "type": "integer",
-                  "format": "int32",
                   "description": "Optional. The maximum number of support event subscriptions to return.",
-                  "location": "query"
+                  "location": "query",
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "showDeleted": {
+                  "location": "query",
+                  "type": "boolean",
+                  "description": "Optional. Whether to show deleted subscriptions. By default, deleted subscriptions are not returned."
                 },
                 "pageToken": {
                   "description": "Optional. A token identifying the page of results to return. If unspecified, the first page is retrieved. When paginating, all other parameters provided to `ListSupportEventSubscriptions` must match the call that provided the page token.",
                   "location": "query",
                   "type": "string"
                 },
-                "filter": {
-                  "type": "string",
-                  "description": "Optional. Filter expression based on AIP-160. Supported fields: - pub_sub_topic - state Examples: - `pub_sub_topic=\"projects/example-project/topics/example-topic\"` - `state=WORKING` - `pub_sub_topic=\"projects/example-project/topics/example-topic\" AND state=WORKING`",
-                  "location": "query"
-                },
-                "showDeleted": {
-                  "description": "Optional. Whether to show deleted subscriptions. By default, deleted subscriptions are not returned.",
-                  "location": "query",
-                  "type": "boolean"
-                },
                 "parent": {
-                  "pattern": "^organizations/[^/]+$",
-                  "type": "string",
                   "description": "Required. The fully qualified name of the Cloud resource to list support event subscriptions under. Format: organizations/{organization_id}",
                   "required": true,
-                  "location": "path"
+                  "pattern": "^organizations/[^/]+$",
+                  "location": "path",
+                  "type": "string"
                 }
               },
+              "description": "Lists support event subscriptions. EXAMPLES: cURL: ```shell parent=\"organizations/123456789\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$parent/supportEventSubscriptions\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.supportEventSubscriptions().list( parent=\"organizations/123456789\" ) print(request.execute()) ```"
+            },
+            "delete": {
+              "httpMethod": "DELETE",
               "parameterOrder": [
-                "parent"
+                "name"
               ],
-              "description": "Lists support event subscriptions. EXAMPLES: cURL: ```shell parent=\"organizations/123456789\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$parent/supportEventSubscriptions\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.supportEventSubscriptions().list( parent=\"organizations/123456789\" ) print(request.execute()) ```",
-              "id": "cloudsupport.organizations.supportEventSubscriptions.list",
-              "flatPath": "v2beta/organizations/{organizationsId}/supportEventSubscriptions",
+              "flatPath": "v2beta/organizations/{organizationsId}/supportEventSubscriptions/{supportEventSubscriptionsId}",
+              "description": "Soft deletes a support event subscription. EXAMPLES: cURL: ```shell support_event_subscription=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" curl \\ --request DELETE \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$support_event_subscription\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService).supportEventSubscriptions().delete( name=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" ) print(request.execute()) ```",
               "response": {
-                "$ref": "ListSupportEventSubscriptionsResponse"
+                "$ref": "SupportEventSubscription"
               },
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "httpMethod": "GET",
-              "path": "v2beta/{+parent}/supportEventSubscriptions"
+              "id": "cloudsupport.organizations.supportEventSubscriptions.delete",
+              "path": "v2beta/{+name}",
+              "parameters": {
+                "name": {
+                  "description": "Required. The name of the support event subscription to delete. Format: organizations/{organization_id}/supportEventSubscriptions/{subscription_id}",
+                  "required": true,
+                  "pattern": "^organizations/[^/]+/supportEventSubscriptions/[^/]+$",
+                  "location": "path",
+                  "type": "string"
+                }
+              }
+            },
+            "undelete": {
+              "request": {
+                "$ref": "UndeleteSupportEventSubscriptionRequest"
+              },
+              "httpMethod": "POST",
+              "parameterOrder": [
+                "name"
+              ],
+              "flatPath": "v2beta/organizations/{organizationsId}/supportEventSubscriptions/{supportEventSubscriptionsId}:undelete",
+              "id": "cloudsupport.organizations.supportEventSubscriptions.undelete",
+              "path": "v2beta/{+name}:undelete",
+              "parameters": {
+                "name": {
+                  "description": "Required. The name of the support event subscription to undelete. Format: organizations/{organization_id}/supportEventSubscriptions/{subscription_id}",
+                  "required": true,
+                  "pattern": "^organizations/[^/]+/supportEventSubscriptions/[^/]+$",
+                  "location": "path",
+                  "type": "string"
+                }
+              },
+              "response": {
+                "$ref": "SupportEventSubscription"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Undeletes a support event subscription. EXAMPLES: cURL: ```shell support_event_subscription=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" curl \\ --request POST \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$support_event_subscription:undelete\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.supportEventSubscriptions().undelete( name=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" ) print(request.execute()) ```"
+            },
+            "expunge": {
+              "description": "Expunges a support event subscription. EXAMPLES: cURL: ```shell support_event_subscription=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" curl \\ --request POST \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$support_event_subscription:expunge\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.supportEventSubscriptions().expunge( name=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" ) print(request.execute()) ```",
+              "id": "cloudsupport.organizations.supportEventSubscriptions.expunge",
+              "path": "v2beta/{+name}:expunge",
+              "parameters": {
+                "name": {
+                  "description": "Required. The name of the support event subscription to expunge. Format: organizations/{organization_id}/supportEventSubscriptions/{subscription_id}",
+                  "required": true,
+                  "pattern": "^organizations/[^/]+/supportEventSubscriptions/[^/]+$",
+                  "location": "path",
+                  "type": "string"
+                }
+              },
+              "response": {
+                "$ref": "Empty"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "httpMethod": "POST",
+              "parameterOrder": [
+                "name"
+              ],
+              "flatPath": "v2beta/organizations/{organizationsId}/supportEventSubscriptions/{supportEventSubscriptionsId}:expunge",
+              "request": {
+                "$ref": "ExpungeSupportEventSubscriptionRequest"
+              }
             },
             "create": {
+              "description": "Creates a support event subscription for an organization. EXAMPLES: cURL: ```shell parent=\"organizations/123456789\" curl \\ --request POST \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ --header 'Content-Type: application/json' \\ --data '{ \"pub_sub_topic\": \"projects/my-project/topics/my-topic\" }' \\ \"https://cloudsupport.googleapis.com/v2beta/$parent/supportEventSubscriptions\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.supportEventSubscriptions().create( parent=\"organizations/123456789\", body={ \"pub_sub_topic\": \"projects/my-project/topics/my-topic\" }, ) print(request.execute()) ```",
+              "response": {
+                "$ref": "SupportEventSubscription"
+              },
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "id": "cloudsupport.organizations.supportEventSubscriptions.create",
+              "path": "v2beta/{+parent}/supportEventSubscriptions",
               "parameters": {
                 "parent": {
                   "pattern": "^organizations/[^/]+$",
-                  "type": "string",
-                  "required": true,
+                  "location": "path",
                   "description": "Required. The parent resource name where the support event subscription will be created. Format: organizations/{organization_id}",
-                  "location": "path"
+                  "required": true,
+                  "type": "string"
                 }
               },
-              "request": {
-                "$ref": "SupportEventSubscription"
-              },
+              "httpMethod": "POST",
               "parameterOrder": [
                 "parent"
-              ],
-              "description": "Creates a support event subscription for an organization. EXAMPLES: cURL: ```shell parent=\"organizations/123456789\" curl \\ --request POST \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ --header 'Content-Type: application/json' \\ --data '{ \"pub_sub_topic\": \"projects/my-project/topics/my-topic\" }' \\ \"https://cloudsupport.googleapis.com/v2beta/$parent/supportEventSubscriptions\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.supportEventSubscriptions().create( parent=\"organizations/123456789\", body={ \"pub_sub_topic\": \"projects/my-project/topics/my-topic\" }, ) print(request.execute()) ```",
-              "id": "cloudsupport.organizations.supportEventSubscriptions.create",
-              "response": {
-                "$ref": "SupportEventSubscription"
-              },
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
               ],
               "flatPath": "v2beta/organizations/{organizationsId}/supportEventSubscriptions",
-              "path": "v2beta/{+parent}/supportEventSubscriptions",
-              "httpMethod": "POST"
-            }
-          }
-        }
-      }
-    },
-    "media": {
-      "methods": {
-        "upload": {
-          "supportsMediaUpload": true,
-          "response": {
-            "$ref": "Attachment"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/attachments",
-          "path": "v2beta/{+parent}/attachments",
-          "httpMethod": "POST",
-          "mediaUpload": {
-            "protocols": {
-              "simple": {
-                "path": "/upload/v2beta/{+parent}/attachments",
-                "multipart": true
+              "request": {
+                "$ref": "SupportEventSubscription"
               }
             },
-            "accept": [
-              "*/*"
-            ]
-          },
-          "request": {
-            "$ref": "CreateAttachmentRequest"
-          },
-          "parameterOrder": [
-            "parent"
-          ],
-          "description": "Create a file attachment on a case or Cloud resource. The attachment must have the following fields set: `filename`. EXAMPLES: cURL: ```shell echo \"This text is in a file I'm uploading using CSAPI.\" \\ > \"./example_file.txt\" case=\"projects/some-project/cases/43594844\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ --data-binary @\"./example_file.txt\" \\ \"https://cloudsupport.googleapis.com/upload/v2beta/$case/attachments?attachment.filename=uploaded_via_curl.txt\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) file_path = \"./example_file.txt\" with open(file_path, \"w\") as file: file.write( \"This text is inside a file I'm going to upload using the Cloud Support API.\", ) request = supportApiService.media().upload( parent=\"projects/some-project/cases/43595344\", media_body=file_path ) request.uri = request.uri.split(\"?\")[0] + \"?attachment.filename=uploaded_via_python.txt\" print(request.execute()) ```",
-          "parameters": {
-            "parent": {
-              "location": "path",
-              "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
-              "type": "string",
-              "required": true,
-              "description": "Required. The name of the case or Cloud resource to which the attachment should be attached."
-            }
-          },
-          "id": "cloudsupport.media.upload"
-        },
-        "download": {
-          "parameters": {
-            "name": {
-              "description": "The name of the file attachment to download.",
-              "required": true,
-              "pattern": "^[^/]+/[^/]+/cases/[^/]+/attachments/[^/]+$",
-              "type": "string",
-              "location": "path"
-            }
-          },
-          "supportsMediaDownload": true,
-          "parameterOrder": [
-            "name"
-          ],
-          "description": "Download a file attached to a case. When this endpoint is called, no \"response body\" will be returned. Instead, the attachment's blob will be returned. Note: HTTP requests must append \"?alt=media\" to the URL. EXAMPLES: cURL: ```shell name=\"projects/some-project/cases/43594844/attachments/0674M00000WijAnZAJ\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$name:download?alt=media\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.media().download( name=\"projects/some-project/cases/43595344/attachments/0684M00000Pw6pHQAR\" ) request.uri = request.uri.split(\"?\")[0] + \"?alt=media\" print(request.execute()) ```",
-          "id": "cloudsupport.media.download",
-          "useMediaDownloadService": true,
-          "response": {
-            "$ref": "Media"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/attachments/{attachmentsId}:download",
-          "path": "v2beta/{+name}:download",
-          "httpMethod": "GET"
-        }
-      }
-    },
-    "cases": {
-      "resources": {
-        "attachments": {
-          "methods": {
             "get": {
-              "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/attachments/{attachmentsId}",
               "response": {
-                "$ref": "Attachment"
+                "$ref": "SupportEventSubscription"
               },
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
               ],
-              "httpMethod": "GET",
+              "id": "cloudsupport.organizations.supportEventSubscriptions.get",
               "path": "v2beta/{+name}",
+              "parameters": {
+                "name": {
+                  "pattern": "^organizations/[^/]+/supportEventSubscriptions/[^/]+$",
+                  "location": "path",
+                  "description": "Required. The name of the support event subscription to retrieve. Format: organizations/{organization_id}/supportEventSubscriptions/{subscription_id}",
+                  "required": true,
+                  "type": "string"
+                }
+              },
+              "description": "Gets a support event subscription. EXAMPLES: cURL: ```shell support_event_subscription=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$support_event_subscription\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.supportEventSubscriptions().get( name=\"organizations/123456789/supportEventSubscriptions/abcdef123456\" ) print(request.execute()) ```",
+              "httpMethod": "GET",
               "parameterOrder": [
                 "name"
               ],
-              "description": "Retrieve an attachment associated with a support case. EXAMPLES: cURL: ```shell attachment=\"projects/some-project/cases/23598314/attachments/0684M00000P3h1fQAB\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$attachment\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = ( supportApiService.cases() .attachments() .get(name=\"projects/some-project/cases/43595344/attachments/0684M00000P3h1fQAB\") ) print(request.execute()) ```",
-              "parameters": {
-                "name": {
-                  "pattern": "^[^/]+/[^/]+/cases/[^/]+/attachments/[^/]+$",
-                  "type": "string",
-                  "required": true,
-                  "description": "Required. The name of the attachment to get.",
-                  "location": "path"
-                }
-              },
-              "id": "cloudsupport.cases.attachments.get"
-            },
-            "list": {
-              "parameters": {
-                "parent": {
-                  "location": "path",
-                  "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
-                  "type": "string",
-                  "description": "Required. The name of the case for which attachments should be listed.",
-                  "required": true
-                },
-                "pageSize": {
-                  "type": "integer",
-                  "format": "int32",
-                  "description": "The maximum number of attachments fetched with each request. If not provided, the default is 10. The maximum page size that will be returned is 100. The size of each page can be smaller than the requested page size and can include zero. For example, you could request 100 attachments on one page, receive 0, and then on the next page, receive 90.",
-                  "location": "query"
-                },
-                "pageToken": {
-                  "type": "string",
-                  "description": "A token identifying the page of results to return. If unspecified, the first page is retrieved.",
-                  "location": "query"
-                }
-              },
-              "parameterOrder": [
-                "parent"
-              ],
-              "description": "List all the attachments associated with a support case. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/23598314\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$case/attachments\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = ( supportApiService.cases() .attachments() .list(parent=\"projects/some-project/cases/43595344\") ) print(request.execute()) ```",
-              "id": "cloudsupport.cases.attachments.list",
-              "response": {
-                "$ref": "ListAttachmentsResponse"
-              },
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/attachments",
-              "path": "v2beta/{+parent}/attachments",
-              "httpMethod": "GET"
+              "flatPath": "v2beta/organizations/{organizationsId}/supportEventSubscriptions/{supportEventSubscriptionsId}"
             }
           }
-        },
-        "comments": {
-          "methods": {
-            "create": {
-              "response": {
-                "$ref": "Comment"
-              },
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/comments",
-              "path": "v2beta/{+parent}/comments",
-              "httpMethod": "POST",
-              "request": {
-                "$ref": "Comment"
-              },
-              "parameterOrder": [
-                "parent"
-              ],
-              "description": "Add a new comment to a case. The comment must have the following fields set: `body`. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/43591344\" curl \\ --request POST \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ --header 'Content-Type: application/json' \\ --data '{ \"body\": \"This is a test comment.\" }' \\ \"https://cloudsupport.googleapis.com/v2beta/$case/comments\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = ( supportApiService.cases() .comments() .create( parent=\"projects/some-project/cases/43595344\", body={\"body\": \"This is a test comment.\"}, ) ) print(request.execute()) ```",
-              "parameters": {
-                "parent": {
-                  "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
-                  "type": "string",
-                  "description": "Required. The name of the case to which the comment should be added.",
-                  "required": true,
-                  "location": "path"
-                }
-              },
-              "id": "cloudsupport.cases.comments.create"
-            },
-            "get": {
-              "httpMethod": "GET",
-              "path": "v2beta/{+name}",
-              "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/comments/{commentsId}",
-              "response": {
-                "$ref": "Comment"
-              },
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "id": "cloudsupport.cases.comments.get",
-              "parameters": {
-                "name": {
-                  "description": "Required. The name of the comment to retrieve.",
-                  "required": true,
-                  "pattern": "^[^/]+/[^/]+/cases/[^/]+/comments/[^/]+$",
-                  "type": "string",
-                  "location": "path"
-                }
-              },
-              "parameterOrder": [
-                "name"
-              ],
-              "description": "Retrieve a comment. EXAMPLES: cURL: ```shell comment=\"projects/some-project/cases/43595344/comments/234567890\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$comment\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().comments().get( name=\"projects/some-project/cases/43595344/comments/234567890\", ) print(request.execute()) ```"
-            },
-            "list": {
-              "response": {
-                "$ref": "ListCommentsResponse"
-              },
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}/comments",
-              "path": "v2beta/{+parent}/comments",
-              "httpMethod": "GET",
-              "parameterOrder": [
-                "parent"
-              ],
-              "description": "List all the comments associated with a case. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/43595344\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$case/comments\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = ( supportApiService.cases() .comments() .list(parent=\"projects/some-project/cases/43595344\") ) print(request.execute()) ```",
-              "parameters": {
-                "pageToken": {
-                  "type": "string",
-                  "description": "A token identifying the page of results to return. If unspecified, the first page is returned.",
-                  "location": "query"
-                },
-                "parent": {
-                  "location": "path",
-                  "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
-                  "type": "string",
-                  "required": true,
-                  "description": "Required. The name of the case for which to list comments."
-                },
-                "pageSize": {
-                  "description": "The maximum number of comments to fetch. Defaults to 10.",
-                  "location": "query",
-                  "format": "int32",
-                  "type": "integer"
-                }
-              },
-              "id": "cloudsupport.cases.comments.list"
-            }
-          }
-        }
-      },
-      "methods": {
-        "create": {
-          "request": {
-            "$ref": "Case"
-          },
-          "parameterOrder": [
-            "parent"
-          ],
-          "description": "Create a new case and associate it with a parent. It must have the following fields set: `display_name`, `description`, `classification`, and `priority`. If you're just testing the API and don't want to route your case to an agent, set `testCase=true`. EXAMPLES: cURL: ```shell parent=\"projects/some-project\" curl \\ --request POST \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ --header 'Content-Type: application/json' \\ --data '{ \"display_name\": \"Test case created by me.\", \"description\": \"a random test case, feel free to close\", \"classification\": { \"id\": \"100IK2AKCLHMGRJ9CDGMOCGP8DM6UTB4BT262T31BT1M2T31DHNMENPO6KS36CPJ786L2TBFEHGN6NPI64R3CDHN8880G08I1H3MURR7DHII0GRCDTQM8\" }, \"time_zone\": \"-07:00\", \"subscriber_email_addresses\": [ \"foo@domain.com\", \"bar@domain.com\" ], \"testCase\": true, \"priority\": \"P3\" }' \\ \"https://cloudsupport.googleapis.com/v2beta/$parent/cases\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().create( parent=\"projects/some-project\", body={ \"displayName\": \"A Test Case\", \"description\": \"This is a test case.\", \"testCase\": True, \"priority\": \"P2\", \"classification\": { \"id\": \"100IK2AKCLHMGRJ9CDGMOCGP8DM6UTB4BT262T31BT1M2T31DHNMENPO6KS36CPJ786L2TBFEHGN6NPI64R3CDHN8880G08I1H3MURR7DHII0GRCDTQM8\" }, }, ) print(request.execute()) ```",
-          "parameters": {
-            "parent": {
-              "pattern": "^[^/]+/[^/]+$",
-              "type": "string",
-              "description": "Required. The name of the parent under which the case should be created.",
-              "required": true,
-              "location": "path"
-            }
-          },
-          "id": "cloudsupport.cases.create",
-          "response": {
-            "$ref": "Case"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases",
-          "path": "v2beta/{+parent}/cases",
-          "httpMethod": "POST"
-        },
-        "showFeed": {
-          "path": "v2beta/{+parent}:showFeed",
-          "httpMethod": "GET",
-          "response": {
-            "$ref": "ShowFeedResponse"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}:showFeed",
-          "id": "cloudsupport.cases.showFeed",
-          "parameterOrder": [
-            "parent"
-          ],
-          "description": "Show items in the feed of this case, including case emails, attachments, and comments.",
-          "parameters": {
-            "parent": {
-              "description": "Required. The resource name of the case for which feed items should be listed.",
-              "required": true,
-              "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
-              "type": "string",
-              "location": "path"
-            },
-            "orderBy": {
-              "type": "string",
-              "description": "Optional. Field to order feed items by, followed by `asc` or `desc` postfix. The only valid field is `creation_time`. This list is case-insensitive, default sorting order is ascending, and the redundant space characters are insignificant. Example: `creation_time desc`",
-              "location": "query"
-            },
-            "pageSize": {
-              "format": "int32",
-              "description": "Optional. The maximum number of feed items fetched with each request.",
-              "location": "query",
-              "type": "integer"
-            },
-            "pageToken": {
-              "description": "Optional. A token identifying the page of results to return. If unspecified, it retrieves the first page.",
-              "location": "query",
-              "type": "string"
-            }
-          }
-        },
-        "list": {
-          "parameters": {
-            "productLine": {
-              "enumDescriptions": [
-                "Unknown product type.",
-                "Google Cloud",
-                "Google Maps"
-              ],
-              "enum": [
-                "PRODUCT_LINE_UNSPECIFIED",
-                "GOOGLE_CLOUD",
-                "GOOGLE_MAPS"
-              ],
-              "location": "query",
-              "type": "string",
-              "description": "The product line to request cases for. If unspecified, only Google Cloud cases will be returned."
-            },
-            "parent": {
-              "pattern": "^[^/]+/[^/]+$",
-              "type": "string",
-              "description": "Required. The name of a parent to list cases under.",
-              "required": true,
-              "location": "path"
-            },
-            "pageToken": {
-              "description": "A token identifying the page of results to return. If unspecified, the first page is retrieved.",
-              "location": "query",
-              "type": "string"
-            },
-            "filter": {
-              "type": "string",
-              "description": "An expression used to filter cases. If it's an empty string, then no filtering happens. Otherwise, the endpoint returns the cases that match the filter. Expressions use the following fields separated by `AND` and specified with `=`: - `state`: Can be `OPEN` or `CLOSED`. - `priority`: Can be `P0`, `P1`, `P2`, `P3`, or `P4`. You can specify multiple values for priority using the `OR` operator. For example, `priority=P1 OR priority=P2`. - `creator.email`: The email address of the case creator. EXAMPLES: - `state=CLOSED` - `state=OPEN AND creator.email=\"tester@example.com\"` - `state=OPEN AND (priority=P0 OR priority=P1)`",
-              "location": "query"
-            },
-            "pageSize": {
-              "format": "int32",
-              "description": "The maximum number of cases fetched with each request. Defaults to 10.",
-              "location": "query",
-              "type": "integer"
-            }
-          },
-          "parameterOrder": [
-            "parent"
-          ],
-          "description": "Retrieve all cases under a parent, but not its children. For example, listing cases under an organization only returns the cases that are directly parented by that organization. To retrieve cases under an organization and its projects, use `cases.search`. EXAMPLES: cURL: ```shell parent=\"projects/some-project\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$parent/cases\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().list(parent=\"projects/some-project\") print(request.execute()) ```",
-          "id": "cloudsupport.cases.list",
-          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases",
-          "response": {
-            "$ref": "ListCasesResponse"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "httpMethod": "GET",
-          "path": "v2beta/{+parent}/cases"
-        },
-        "search": {
-          "flatPath": "v2beta/cases:search",
-          "response": {
-            "$ref": "SearchCasesResponse"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "httpMethod": "GET",
-          "path": "v2beta/cases:search",
-          "parameters": {
-            "parent": {
-              "type": "string",
-              "description": "The name of the parent resource to search for cases under.",
-              "location": "query"
-            },
-            "pageSize": {
-              "type": "integer",
-              "description": "The maximum number of cases fetched with each request. The default page size is 10.",
-              "location": "query",
-              "format": "int32"
-            },
-            "pageToken": {
-              "type": "string",
-              "description": "A token identifying the page of results to return. If unspecified, the first page is retrieved.",
-              "location": "query"
-            },
-            "query": {
-              "description": "An expression used to filter cases. Expressions use the following fields separated by `AND` and specified with `=`: - `state`: Can be `OPEN` or `CLOSED`. - `priority`: Can be `P0`, `P1`, `P2`, `P3`, or `P4`. You can specify multiple values for priority using the `OR` operator. For example, `priority=P1 OR priority=P2`. - `creator.email`: The email address of the case creator. To search across `displayName`, `description`, and comments, use a global restriction with no keyword or operator. For example, `\"my search\"`. To search only cases updated after a certain date, use `update_time` restricted with that particular date, time, and timezone in ISO datetime format. For example, `update_time>\"2020-01-01T00:00:00-05:00\"`. `update_time` only supports the greater than operator (`>`). If you are using the `v2` version of the API, you must specify the case parent in the `parent` field. If you provide an empty `query`, all cases under the parent resource will be returned. If you are using the `v2beta` version of the API, you must specify the case parent in the `query` field using one of the two fields below, which are only available for `v2beta`. The `parent` field will be ignored. - `organization`: An organization name in the form `organizations/`. - `project`: A project name in the form `projects/`. Examples: For `v2`: - `state=CLOSED` - `state=OPEN AND creator.email=\"tester@example.com\"` - `state=OPEN AND (priority=P0 OR priority=P1)` - `update_time>\"2020-01-01T00:00:00-05:00\"` For `v2beta`: - `organization=\"organizations/123456789\"` - `project=\"projects/my-project-id\"` - `project=\"projects/123456789\"` - `organization=\"organizations/123456789\" AND state=CLOSED` - `project=\"projects/my-project-id\" AND creator.email=\"tester@example.com\"` - `project=\"projects/my-project-id\" AND (priority=P0 OR priority=P1)`",
-              "location": "query",
-              "type": "string"
-            }
-          },
-          "parameterOrder": [],
-          "description": "Search for cases using a query. EXAMPLES: cURL: ```shell parent=\"projects/some-project\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$parent/cases:search\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().search( parent=\"projects/some-project\", query=\"state=OPEN\" ) print(request.execute()) ```",
-          "id": "cloudsupport.cases.search"
-        },
-        "escalate": {
-          "id": "cloudsupport.cases.escalate",
-          "parameters": {
-            "name": {
-              "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
-              "type": "string",
-              "description": "Required. The name of the case to be escalated.",
-              "required": true,
-              "location": "path"
-            }
-          },
-          "request": {
-            "$ref": "EscalateCaseRequest"
-          },
-          "parameterOrder": [
-            "name"
-          ],
-          "description": "Escalate a case, starting the Google Cloud Support escalation management process. This operation is only available for some support services. Go to https://cloud.google.com/support and look for 'Technical support escalations' in the feature list to find out which ones let you do that. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/43595344\" curl \\ --request POST \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ --header \"Content-Type: application/json\" \\ --data '{ \"escalation\": { \"reason\": \"BUSINESS_IMPACT\", \"justification\": \"This is a test escalation.\" } }' \\ \"https://cloudsupport.googleapis.com/v2beta/$case:escalate\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().escalate( name=\"projects/some-project/cases/43595344\", body={ \"escalation\": { \"reason\": \"BUSINESS_IMPACT\", \"justification\": \"This is a test escalation.\", }, }, ) print(request.execute()) ```",
-          "path": "v2beta/{+name}:escalate",
-          "httpMethod": "POST",
-          "response": {
-            "$ref": "Case"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}:escalate"
-        },
-        "get": {
-          "path": "v2beta/{+name}",
-          "httpMethod": "GET",
-          "response": {
-            "$ref": "Case"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}",
-          "id": "cloudsupport.cases.get",
-          "parameterOrder": [
-            "name"
-          ],
-          "description": "Retrieve a case. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/16033687\" curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$case\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().get( name=\"projects/some-project/cases/43595344\", ) print(request.execute()) ```",
-          "parameters": {
-            "name": {
-              "required": true,
-              "description": "Required. The full name of a case to be retrieved.",
-              "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
-              "type": "string",
-              "location": "path"
-            }
-          }
-        },
-        "patch": {
-          "id": "cloudsupport.cases.patch",
-          "parameters": {
-            "name": {
-              "location": "path",
-              "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
-              "type": "string",
-              "description": "Identifier. The resource name for the case.",
-              "required": true
-            },
-            "updateMask": {
-              "format": "google-fieldmask",
-              "description": "A list of attributes of the case that should be updated. Supported values are `priority`, `display_name`, and `subscriber_email_addresses`. If no fields are specified, all supported fields are updated. Be careful - if you do not provide a field mask, then you might accidentally clear some fields. For example, if you leave the field mask empty and do not provide a value for `subscriber_email_addresses`, then `subscriber_email_addresses` is updated to empty.",
-              "location": "query",
-              "type": "string"
-            }
-          },
-          "parameterOrder": [
-            "name"
-          ],
-          "description": "Update a case. Only some fields can be updated. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/43595344\" curl \\ --request PATCH \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ --header \"Content-Type: application/json\" \\ --data '{ \"priority\": \"P1\" }' \\ \"https://cloudsupport.googleapis.com/v2beta/$case?updateMask=priority\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().patch( name=\"projects/some-project/cases/43112854\", body={ \"displayName\": \"This is Now a New Title\", \"priority\": \"P2\", }, ) print(request.execute()) ```",
-          "request": {
-            "$ref": "Case"
-          },
-          "httpMethod": "PATCH",
-          "path": "v2beta/{+name}",
-          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}",
-          "response": {
-            "$ref": "Case"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ]
-        },
-        "close": {
-          "id": "cloudsupport.cases.close",
-          "parameters": {
-            "name": {
-              "required": true,
-              "description": "Required. The name of the case to close.",
-              "pattern": "^[^/]+/[^/]+/cases/[^/]+$",
-              "type": "string",
-              "location": "path"
-            }
-          },
-          "request": {
-            "$ref": "CloseCaseRequest"
-          },
-          "parameterOrder": [
-            "name"
-          ],
-          "description": "Close a case. EXAMPLES: cURL: ```shell case=\"projects/some-project/cases/43595344\" curl \\ --request POST \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ \"https://cloudsupport.googleapis.com/v2beta/$case:close\" ``` Python: ```python import googleapiclient.discovery api_version = \"v2beta\" supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=api_version, discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version={api_version}\", ) request = supportApiService.cases().close( name=\"projects/some-project/cases/43595344\" ) print(request.execute()) ```",
-          "path": "v2beta/{+name}:close",
-          "httpMethod": "POST",
-          "response": {
-            "$ref": "Case"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "flatPath": "v2beta/{v2betaId}/{v2betaId1}/cases/{casesId}:close"
         }
       }
     },
     "caseClassifications": {
       "methods": {
         "search": {
+          "flatPath": "v2beta/caseClassifications:search",
+          "httpMethod": "GET",
+          "parameterOrder": [],
+          "description": "Retrieve valid classifications to use when creating a support case. Classifications are hierarchical. Each classification is a string containing all levels of the hierarchy separated by `\" > \"`. For example, `\"Technical Issue > Compute > Compute Engine\"`. Classification IDs returned by this endpoint are valid for at least six months. When a classification is deactivated, this endpoint immediately stops returning it. After six months, `case.create` requests using the classification will fail. EXAMPLES: cURL: ```shell curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ 'https://cloudsupport.googleapis.com/v2beta/caseClassifications:search?query=display_name:\"*Compute%20Engine*\"' ``` Python: ```python import googleapiclient.discovery supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=\"v2beta\", discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version=v2\", ) request = supportApiService.caseClassifications().search( query='display_name:\"*Compute Engine*\"' ) print(request.execute()) ```",
+          "scopes": [
+            "https://www.googleapis.com/auth/cloud-platform"
+          ],
+          "response": {
+            "$ref": "SearchCaseClassificationsResponse"
+          },
+          "id": "cloudsupport.caseClassifications.search",
+          "path": "v2beta/caseClassifications:search",
           "parameters": {
+            "query": {
+              "description": "An expression used to filter case classifications. If it's an empty string, then no filtering happens. Otherwise, case classifications will be returned that match the filter.",
+              "location": "query",
+              "type": "string"
+            },
             "pageSize": {
               "description": "The maximum number of classifications fetched with each request.",
               "location": "query",
-              "format": "int32",
-              "type": "integer"
+              "type": "integer",
+              "format": "int32"
+            },
+            "pageToken": {
+              "location": "query",
+              "type": "string",
+              "description": "A token identifying the page of results to return. If unspecified, the first page is retrieved."
             },
             "product.productLine": {
-              "location": "query",
-              "enumDescriptions": [
-                "Unknown product type.",
-                "Google Cloud",
-                "Google Maps"
-              ],
               "enum": [
                 "PRODUCT_LINE_UNSPECIFIED",
                 "GOOGLE_CLOUD",
                 "GOOGLE_MAPS"
               ],
+              "type": "string",
               "description": "The product line of the Product.",
-              "type": "string"
-            },
-            "query": {
-              "type": "string",
-              "description": "An expression used to filter case classifications. If it's an empty string, then no filtering happens. Otherwise, case classifications will be returned that match the filter.",
-              "location": "query"
-            },
-            "pageToken": {
-              "type": "string",
-              "description": "A token identifying the page of results to return. If unspecified, the first page is retrieved.",
-              "location": "query"
+              "location": "query",
+              "enumDescriptions": [
+                "Unknown product type.",
+                "Google Cloud",
+                "Google Maps"
+              ]
             }
-          },
-          "parameterOrder": [],
-          "description": "Retrieve valid classifications to use when creating a support case. Classifications are hierarchical. Each classification is a string containing all levels of the hierarchy separated by `\" > \"`. For example, `\"Technical Issue > Compute > Compute Engine\"`. Classification IDs returned by this endpoint are valid for at least six months. When a classification is deactivated, this endpoint immediately stops returning it. After six months, `case.create` requests using the classification will fail. EXAMPLES: cURL: ```shell curl \\ --header \"Authorization: Bearer $(gcloud auth print-access-token)\" \\ 'https://cloudsupport.googleapis.com/v2beta/caseClassifications:search?query=display_name:\"*Compute%20Engine*\"' ``` Python: ```python import googleapiclient.discovery supportApiService = googleapiclient.discovery.build( serviceName=\"cloudsupport\", version=\"v2beta\", discoveryServiceUrl=f\"https://cloudsupport.googleapis.com/$discovery/rest?version=v2\", ) request = supportApiService.caseClassifications().search( query='display_name:\"*Compute Engine*\"' ) print(request.execute()) ```",
-          "id": "cloudsupport.caseClassifications.search",
-          "response": {
-            "$ref": "SearchCaseClassificationsResponse"
-          },
-          "scopes": [
-            "https://www.googleapis.com/auth/cloud-platform"
-          ],
-          "flatPath": "v2beta/caseClassifications:search",
-          "path": "v2beta/caseClassifications:search",
-          "httpMethod": "GET"
+          }
         }
       }
     }
   },
-  "rootUrl": "https://cloudsupport.googleapis.com/",
-  "fullyEncodeReservedExpansion": true,
-  "mtlsRootUrl": "https://cloudsupport.mtls.googleapis.com/",
-  "description": "Manages Google Cloud technical support cases for Customer Care support offerings. ",
-  "protocol": "rest",
-  "documentationLink": "https://cloud.google.com/support/docs/apis",
+  "version_module": true,
+  "batchPath": "batch",
+  "title": "Google Cloud Support API",
+  "version": "v2beta",
+  "servicePath": "",
+  "kind": "discovery#restDescription",
   "schemas": {
-    "ListAttachmentsResponse": {
-      "description": "The response message for the ListAttachments endpoint.",
-      "id": "ListAttachmentsResponse",
-      "type": "object",
+    "SearchCasesResponse": {
+      "id": "SearchCasesResponse",
+      "description": "The response message for the SearchCases endpoint.",
       "properties": {
+        "cases": {
+          "type": "array",
+          "items": {
+            "$ref": "Case"
+          },
+          "description": "The list of cases associated with the parent after any filters have been applied."
+        },
         "nextPageToken": {
-          "description": "A token to retrieve the next page of results. Set this in the `page_token` field of subsequent `cases.attachments.list` requests. If unspecified, there are no more results to retrieve.",
+          "description": "A token to retrieve the next page of results. Set this in the `page_token` field of subsequent `cases.search` requests. If unspecified, there are no more results to retrieve.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ContentTypeInfo": {
+      "properties": {
+        "fromBytes": {
+          "description": "# gdata.* are outside protos with mising documentation",
           "type": "string"
         },
-        "attachments": {
-          "items": {
-            "$ref": "Attachment"
-          },
-          "type": "array",
-          "description": "The list of attachments associated with a case."
+        "fromHeader": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string"
+        },
+        "fromFusionId": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string"
+        },
+        "bestGuess": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string"
+        },
+        "fromUrlPath": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string"
+        },
+        "fromFileName": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string"
+        },
+        "fusionIdDetectionMetadata": {
+          "type": "string",
+          "format": "byte",
+          "description": "# gdata.* are outside protos with mising documentation"
         }
-      }
+      },
+      "id": "ContentTypeInfo",
+      "description": "# gdata.* are outside protos with mising documentation",
+      "type": "object"
     },
     "CompositeMedia": {
-      "id": "CompositeMedia",
       "type": "object",
       "properties": {
         "referenceType": {
+          "type": "string",
           "enumDescriptions": [
             "# gdata.* are outside protos with mising documentation",
             "# gdata.* are outside protos with mising documentation",
@@ -828,244 +869,193 @@
             "# gdata.* are outside protos with mising documentation",
             "# gdata.* are outside protos with mising documentation"
           ],
+          "description": "# gdata.* are outside protos with mising documentation",
           "enum": [
             "PATH",
             "BLOB_REF",
             "INLINE",
             "BIGSTORE_REF",
             "COSMO_BINARY_REFERENCE"
-          ],
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation"
-        },
-        "crc32cHash": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "format": "uint32",
-          "type": "integer"
-        },
-        "objectId": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "$ref": "ObjectId"
-        },
-        "cosmoBinaryReference": {
-          "format": "byte",
-          "description": "# gdata.* are outside protos with mising documentation",
-          "type": "string"
-        },
-        "length": {
-          "format": "int64",
-          "description": "# gdata.* are outside protos with mising documentation",
-          "type": "string"
-        },
-        "inline": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation",
-          "format": "byte"
-        },
-        "sha1Hash": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "format": "byte",
-          "type": "string"
+          ]
         },
         "path": {
           "description": "# gdata.* are outside protos with mising documentation",
           "type": "string"
         },
         "blobRef": {
-          "type": "string",
+          "description": "# gdata.* are outside protos with mising documentation",
           "deprecated": true,
-          "format": "byte",
-          "description": "# gdata.* are outside protos with mising documentation"
-        },
-        "md5Hash": {
           "type": "string",
-          "format": "byte",
-          "description": "# gdata.* are outside protos with mising documentation"
+          "format": "byte"
         },
         "blobstore2Info": {
           "description": "# gdata.* are outside protos with mising documentation",
           "$ref": "Blobstore2Info"
-        }
-      },
-      "description": "# gdata.* are outside protos with mising documentation"
-    },
-    "ListCasesResponse": {
-      "type": "object",
-      "properties": {
-        "nextPageToken": {
+        },
+        "md5Hash": {
+          "description": "# gdata.* are outside protos with mising documentation",
           "type": "string",
-          "description": "A token to retrieve the next page of results. Set this in the `page_token` field of subsequent `cases.list` requests. If unspecified, there are no more results to retrieve."
-        },
-        "cases": {
-          "items": {
-            "$ref": "Case"
-          },
-          "type": "array",
-          "description": "The list of cases associated with the parent after any filters have been applied."
-        }
-      },
-      "id": "ListCasesResponse",
-      "description": "The response message for the ListCases endpoint."
-    },
-    "EscalateCaseRequest": {
-      "type": "object",
-      "properties": {
-        "escalation": {
-          "description": "The escalation information to be sent with the escalation request.",
-          "$ref": "Escalation"
-        }
-      },
-      "id": "EscalateCaseRequest",
-      "description": "The request message for the EscalateCase endpoint."
-    },
-    "DiffChecksumsResponse": {
-      "type": "object",
-      "properties": {
-        "objectSizeBytes": {
-          "type": "string",
-          "format": "int64",
-          "description": "# gdata.* are outside protos with mising documentation"
-        },
-        "chunkSizeBytes": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation",
-          "format": "int64"
-        },
-        "objectLocation": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "$ref": "CompositeMedia"
-        },
-        "checksumsLocation": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "$ref": "CompositeMedia"
-        },
-        "objectVersion": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation"
-        }
-      },
-      "id": "DiffChecksumsResponse",
-      "description": "# gdata.* are outside protos with mising documentation"
-    },
-    "Blobstore2Info": {
-      "id": "Blobstore2Info",
-      "type": "object",
-      "properties": {
-        "blobGeneration": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "format": "int64",
-          "type": "string"
-        },
-        "uploadMetadataContainer": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "format": "byte",
-          "type": "string"
-        },
-        "blobId": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "type": "string"
-        },
-        "uploadFragmentListCreationInfo": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation",
           "format": "byte"
         },
-        "readToken": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "type": "string"
-        },
-        "downloadExternalReadToken": {
+        "cosmoBinaryReference": {
           "type": "string",
           "format": "byte",
           "description": "# gdata.* are outside protos with mising documentation"
         },
-        "downloadReadHandle": {
-          "format": "byte",
+        "length": {
+          "type": "string",
+          "format": "int64",
+          "description": "# gdata.* are outside protos with mising documentation"
+        },
+        "crc32cHash": {
           "description": "# gdata.* are outside protos with mising documentation",
-          "type": "string"
+          "type": "integer",
+          "format": "uint32"
+        },
+        "inline": {
+          "type": "string",
+          "format": "byte",
+          "description": "# gdata.* are outside protos with mising documentation"
+        },
+        "objectId": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "$ref": "ObjectId"
+        },
+        "sha1Hash": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string",
+          "format": "byte"
         }
       },
+      "id": "CompositeMedia",
       "description": "# gdata.* are outside protos with mising documentation"
     },
-    "ListCommentsResponse": {
+    "Case": {
       "type": "object",
+      "id": "Case",
+      "description": "A Case is an object that contains the details of a support case. It contains fields for the time it was created, its priority, its classification, and more. Cases can also have comments and attachments that get added over time. A case is parented by a Google Cloud organization or project. Organizations are identified by a number, so the name of a case parented by an organization would look like this: ``` organizations/123/cases/456 ``` Projects have two unique identifiers, an ID and a number, and they look like this: ``` projects/abc/cases/456 ``` ``` projects/123/cases/456 ``` You can use either of them when calling the API. To learn more about project identifiers, see [AIP-2510](https://google.aip.dev/cloud/2510).",
       "properties": {
-        "nextPageToken": {
+        "updateTime": {
+          "description": "Output only. The time this case was last updated.",
+          "readOnly": true,
           "type": "string",
-          "description": "A token to retrieve the next page of results. Set this in the `page_token` field of subsequent `cases.comments.list` requests. If unspecified, there are no more results to retrieve."
+          "format": "google-datetime"
         },
-        "comments": {
-          "items": {
-            "$ref": "Comment"
-          },
-          "type": "array",
-          "description": "List of the comments associated with the case."
-        }
-      },
-      "id": "ListCommentsResponse",
-      "description": "The response message for the ListComments endpoint."
-    },
-    "TextContent": {
-      "description": "Stores text attached to a support object.",
-      "type": "object",
-      "properties": {
-        "plainText": {
-          "description": "Content in this field should be rendered and interpreted as-is.",
+        "description": {
+          "description": "A broad description of the issue.",
           "type": "string"
-        }
-      },
-      "id": "TextContent"
-    },
-    "SearchCasesResponse": {
-      "description": "The response message for the SearchCases endpoint.",
-      "type": "object",
-      "properties": {
-        "cases": {
-          "description": "The list of cases associated with the parent after any filters have been applied.",
-          "type": "array",
-          "items": {
-            "$ref": "Case"
-          }
         },
-        "nextPageToken": {
-          "type": "string",
-          "description": "A token to retrieve the next page of results. Set this in the `page_token` field of subsequent `cases.search` requests. If unspecified, there are no more results to retrieve."
-        }
-      },
-      "id": "SearchCasesResponse"
-    },
-    "Escalation": {
-      "type": "object",
-      "properties": {
-        "reason": {
-          "description": "Required. The reason why the Case is being escalated.",
+        "classification": {
+          "description": "The issue classification applicable to this case.",
+          "$ref": "CaseClassification"
+        },
+        "severity": {
+          "description": "REMOVED. The severity of this case. Use priority instead.",
+          "enum": [
+            "SEVERITY_UNSPECIFIED",
+            "S0",
+            "S1",
+            "S2",
+            "S3",
+            "S4"
+          ],
           "type": "string",
           "enumDescriptions": [
-            "The escalation reason is in an unknown state or has not been specified.",
-            "The case is taking too long to resolve.",
-            "The support agent does not have the expertise required to successfully resolve the issue.",
-            "The issue is having a significant business impact."
-          ],
-          "enum": [
-            "REASON_UNSPECIFIED",
-            "RESOLUTION_TIME",
-            "TECHNICAL_EXPERTISE",
-            "BUSINESS_IMPACT"
+            "Severity is undefined or has not been set yet.",
+            "Extreme impact on a production service. Service is hard down.",
+            "Critical impact on a production service. Service is currently unusable.",
+            "Severe impact on a production service. Service is usable but greatly impaired.",
+            "Medium impact on a production service. Service is available, but moderately impaired.",
+            "General questions or minor issues. Production service is fully available."
           ]
         },
-        "justification": {
+        "state": {
           "type": "string",
-          "description": "Required. A free text description to accompany the `reason` field above. Provides additional context on why the case is being escalated."
+          "readOnly": true,
+          "enum": [
+            "STATE_UNSPECIFIED",
+            "NEW",
+            "IN_PROGRESS_GOOGLE_SUPPORT",
+            "ACTION_REQUIRED",
+            "SOLUTION_PROVIDED",
+            "CLOSED"
+          ],
+          "enumDescriptions": [
+            "Case is in an unknown state.",
+            "The case has been created but no one is assigned to work on it yet.",
+            "The case is currently being handled by Google support.",
+            "Google is waiting for a response.",
+            "A solution has been offered for the case, but it isn't yet closed.",
+            "The case has been resolved."
+          ],
+          "description": "Output only. The current status of the support case."
+        },
+        "displayName": {
+          "description": "The short summary of the issue reported in this case.",
+          "type": "string"
+        },
+        "languageCode": {
+          "description": "The language the user has requested to receive support in. This should be a BCP 47 language code (e.g., `\"en\"`, `\"zh-CN\"`, `\"zh-TW\"`, `\"ja\"`, `\"ko\"`). If no language or an unsupported language is specified, this field defaults to English (en). Language selection during case creation may affect your available support options. For a list of supported languages and their support working hours, see: https://cloud.google.com/support/docs/language-working-hours",
+          "type": "string"
+        },
+        "name": {
+          "description": "Identifier. The resource name for the case.",
+          "type": "string"
+        },
+        "timeZone": {
+          "description": "The timezone of the user who created the support case. It should be in a format IANA recognizes: https://www.iana.org/time-zones. There is no additional validation done by the API.",
+          "type": "string"
+        },
+        "priority": {
+          "description": "The priority of this case.",
+          "enum": [
+            "PRIORITY_UNSPECIFIED",
+            "P0",
+            "P1",
+            "P2",
+            "P3",
+            "P4"
+          ],
+          "type": "string",
+          "enumDescriptions": [
+            "Priority is undefined or has not been set yet.",
+            "Extreme impact on a production service. Service is hard down.",
+            "Critical impact on a production service. Service is currently unusable.",
+            "Severe impact on a production service. Service is usable but greatly impaired.",
+            "Medium impact on a production service. Service is available, but moderately impaired.",
+            "General questions or minor issues. Production service is fully available."
+          ]
+        },
+        "creator": {
+          "description": "The user who created the case. Note: The name and email will be obfuscated if the case was created by Google Support.",
+          "$ref": "Actor"
+        },
+        "contactEmail": {
+          "description": "A user-supplied email address to send case update notifications for. This should only be used in BYOID flows, where we cannot infer the user's email address directly from their EUCs.",
+          "type": "string"
+        },
+        "subscriberEmailAddresses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The email addresses to receive updates on this case."
+        },
+        "escalated": {
+          "description": "Whether the case is currently escalated.",
+          "type": "boolean"
+        },
+        "testCase": {
+          "description": "Whether this case was created for internal API testing and should not be acted on by the support team.",
+          "type": "boolean"
+        },
+        "createTime": {
+          "description": "Output only. The time this case was created.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
         }
-      },
-      "id": "Escalation",
-      "description": "An escalation of a support case."
-    },
-    "Empty": {
-      "id": "Empty",
-      "type": "object",
-      "properties": {},
-      "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }"
+      }
     },
     "DiffDownloadResponse": {
       "type": "object",
@@ -1077,137 +1067,6 @@
       },
       "id": "DiffDownloadResponse",
       "description": "# gdata.* are outside protos with mising documentation"
-    },
-    "DiffVersionResponse": {
-      "id": "DiffVersionResponse",
-      "type": "object",
-      "properties": {
-        "objectVersion": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "type": "string"
-        },
-        "objectSizeBytes": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation",
-          "format": "int64"
-        }
-      },
-      "description": "# gdata.* are outside protos with mising documentation"
-    },
-    "UndeleteSupportEventSubscriptionRequest": {
-      "id": "UndeleteSupportEventSubscriptionRequest",
-      "type": "object",
-      "properties": {},
-      "description": "Request message for UndeleteSupportEventSubscription."
-    },
-    "DiffUploadRequest": {
-      "id": "DiffUploadRequest",
-      "type": "object",
-      "properties": {
-        "objectInfo": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "$ref": "CompositeMedia"
-        },
-        "checksumsInfo": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "$ref": "CompositeMedia"
-        },
-        "objectVersion": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation"
-        }
-      },
-      "description": "# gdata.* are outside protos with mising documentation"
-    },
-    "SupportEventSubscription": {
-      "description": "A support event subscription.",
-      "type": "object",
-      "properties": {
-        "updateTime": {
-          "type": "string",
-          "readOnly": true,
-          "format": "google-datetime",
-          "description": "Output only. The time at which the subscription was last updated."
-        },
-        "name": {
-          "description": "Identifier. The resource name of the support event subscription.",
-          "type": "string"
-        },
-        "state": {
-          "type": "string",
-          "description": "Output only. The state of the subscription.",
-          "readOnly": true,
-          "enumDescriptions": [
-            "Unspecified state.",
-            "Subscription is active and working.",
-            "Subscription is failing. Notifications cannot be published for some reason.",
-            "Subscription has been deleted and is pending purge. Notifications are not sent for deleted subscriptions. Deleted subscriptions are purged after their `purge_time` has passed."
-          ],
-          "enum": [
-            "STATE_UNSPECIFIED",
-            "WORKING",
-            "FAILING",
-            "DELETED"
-          ]
-        },
-        "failureReason": {
-          "description": "Output only. Reason why subscription is failing. State of subscription must be FAILING in order for this to have a value.",
-          "type": "string",
-          "readOnly": true,
-          "enumDescriptions": [
-            "Unspecified failure reason.",
-            "The service account (i.e. cloud-support-apievents@system.gserviceaccount.com) lacks the permission to publish to the customer's Pub/Sub topic.",
-            "The specified Pub/Sub topic does not exist.",
-            "Message failed to publish due to a system-side error."
-          ],
-          "enum": [
-            "FAILURE_REASON_UNSPECIFIED",
-            "PERMISSION_DENIED",
-            "TOPIC_NOT_FOUND",
-            "OTHER"
-          ]
-        },
-        "deleteTime": {
-          "readOnly": true,
-          "type": "string",
-          "description": "Output only. The time at which the subscription was deleted.",
-          "format": "google-datetime"
-        },
-        "createTime": {
-          "description": "Output only. The time at which the subscription was created.",
-          "format": "google-datetime",
-          "readOnly": true,
-          "type": "string"
-        },
-        "purgeTime": {
-          "readOnly": true,
-          "type": "string",
-          "description": "Output only. The time at which the subscription will be purged.",
-          "format": "google-datetime"
-        },
-        "pubSubTopic": {
-          "type": "string",
-          "description": "Required. The name of the Pub/Sub topic to publish notifications to. Format: projects/{project}/topics/{topic}"
-        }
-      },
-      "id": "SupportEventSubscription"
-    },
-    "CloseCaseRequest": {
-      "id": "CloseCaseRequest",
-      "type": "object",
-      "properties": {},
-      "description": "The request message for the CloseCase endpoint."
-    },
-    "CreateAttachmentRequest": {
-      "type": "object",
-      "properties": {
-        "attachment": {
-          "description": "Required. The attachment to be created.",
-          "$ref": "Attachment"
-        }
-      },
-      "id": "CreateAttachmentRequest",
-      "description": "The request message for the CreateAttachment endpoint."
     },
     "DiffUploadResponse": {
       "type": "object",
@@ -1224,30 +1083,57 @@
       "id": "DiffUploadResponse",
       "description": "# gdata.* are outside protos with mising documentation"
     },
-    "ShowFeedResponse": {
-      "description": "The response message for the ShowFeed endpoint.",
-      "id": "ShowFeedResponse",
+    "UndeleteSupportEventSubscriptionRequest": {
+      "type": "object",
+      "properties": {},
+      "id": "UndeleteSupportEventSubscriptionRequest",
+      "description": "Request message for UndeleteSupportEventSubscription."
+    },
+    "DiffChecksumsResponse": {
       "type": "object",
       "properties": {
-        "feedItems": {
-          "description": "The list of feed items associated with the given Case.",
-          "items": {
-            "$ref": "FeedItem"
-          },
-          "type": "array"
-        },
-        "nextPageToken": {
+        "chunkSizeBytes": {
+          "description": "# gdata.* are outside protos with mising documentation",
           "type": "string",
-          "description": "A token to retrieve the next page of results. This should be set in the `page_token` field of subsequent `ShowFeedRequests`. If unspecified, there are no more results to retrieve."
+          "format": "int64"
+        },
+        "objectLocation": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "$ref": "CompositeMedia"
+        },
+        "objectSizeBytes": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string",
+          "format": "int64"
+        },
+        "objectVersion": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string"
+        },
+        "checksumsLocation": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "$ref": "CompositeMedia"
+        }
+      },
+      "id": "DiffChecksumsResponse",
+      "description": "# gdata.* are outside protos with mising documentation"
+    },
+    "EscalateCaseRequest": {
+      "type": "object",
+      "id": "EscalateCaseRequest",
+      "description": "The request message for the EscalateCase endpoint.",
+      "properties": {
+        "escalation": {
+          "description": "The escalation information to be sent with the escalation request.",
+          "$ref": "Escalation"
         }
       }
     },
     "DownloadParameters": {
-      "type": "object",
       "properties": {
         "allowGzipCompression": {
-          "type": "boolean",
-          "description": "# gdata.* are outside protos with mising documentation"
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "boolean"
         },
         "ignoreRange": {
           "description": "# gdata.* are outside protos with mising documentation",
@@ -1255,284 +1141,294 @@
         }
       },
       "id": "DownloadParameters",
-      "description": "# gdata.* are outside protos with mising documentation"
+      "description": "# gdata.* are outside protos with mising documentation",
+      "type": "object"
     },
-    "EmailMessage": {
+    "ShowFeedResponse": {
       "type": "object",
+      "id": "ShowFeedResponse",
+      "description": "The response message for the ShowFeed endpoint.",
       "properties": {
-        "actor": {
-          "description": "Output only. The user or Google Support agent that created this email message. This is inferred from the headers on the email message.",
-          "$ref": "Actor",
-          "readOnly": true
-        },
-        "ccEmailAddresses": {
-          "description": "Output only. Email addresses CCed on the email.",
+        "feedItems": {
+          "description": "The list of feed items associated with the given Case.",
           "type": "array",
-          "readOnly": true,
           "items": {
-            "type": "string"
+            "$ref": "FeedItem"
           }
         },
-        "createTime": {
-          "type": "string",
-          "readOnly": true,
-          "format": "google-datetime",
-          "description": "Output only. Time when this email message object was created."
-        },
-        "subject": {
-          "description": "Output only. Subject of the email.",
-          "type": "string",
-          "readOnly": true
-        },
-        "recipientEmailAddresses": {
-          "description": "Output only. Email addresses the email was sent to.",
-          "readOnly": true,
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "name": {
-          "type": "string",
-          "description": "Identifier. Resource name for the email message."
-        },
-        "bodyContent": {
-          "description": "Output only. The full email message body. A best-effort attempt is made to remove extraneous reply threads.",
-          "$ref": "TextContent",
-          "readOnly": true
+        "nextPageToken": {
+          "description": "A token to retrieve the next page of results. This should be set in the `page_token` field of subsequent `ShowFeedRequests`. If unspecified, there are no more results to retrieve.",
+          "type": "string"
         }
-      },
-      "id": "EmailMessage",
-      "description": "An email associated with a support case."
+      }
     },
-    "Product": {
+    "CloseCaseRequest": {
+      "id": "CloseCaseRequest",
+      "description": "The request message for the CloseCase endpoint.",
+      "properties": {},
+      "type": "object"
+    },
+    "ObjectId": {
       "type": "object",
+      "id": "ObjectId",
+      "description": "# gdata.* are outside protos with mising documentation",
       "properties": {
-        "productLine": {
-          "enumDescriptions": [
-            "Unknown product type.",
-            "Google Cloud",
-            "Google Maps"
-          ],
-          "enum": [
-            "PRODUCT_LINE_UNSPECIFIED",
-            "GOOGLE_CLOUD",
-            "GOOGLE_MAPS"
-          ],
-          "type": "string",
-          "description": "The product line of the Product."
-        }
-      },
-      "id": "Product",
-      "description": "The product a case may be associated with."
-    },
-    "ExpungeSupportEventSubscriptionRequest": {
-      "description": "Request message for ExpungeSupportEventSubscription.",
-      "id": "ExpungeSupportEventSubscriptionRequest",
-      "type": "object",
-      "properties": {}
-    },
-    "Comment": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "description": "Output only. Identifier. The resource name of the comment.",
-          "readOnly": true,
+        "objectName": {
+          "description": "# gdata.* are outside protos with mising documentation",
           "type": "string"
         },
-        "body": {
+        "bucketName": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string"
+        },
+        "generation": {
+          "description": "# gdata.* are outside protos with mising documentation",
           "type": "string",
-          "description": "The full comment body. Maximum of 12800 characters."
+          "format": "int64"
+        }
+      }
+    },
+    "Attachment": {
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Output only. Identifier. The resource name of the attachment.",
+          "readOnly": true
         },
         "creator": {
-          "description": "Output only. The user or Google Support agent who created the comment.",
           "$ref": "Actor",
+          "description": "Output only. The user who uploaded the attachment. Note, the name and email will be obfuscated if the attachment was uploaded by Google support.",
           "readOnly": true
         },
-        "plainTextBody": {
-          "type": "string",
+        "mimeType": {
+          "description": "Output only. The MIME type of the attachment (e.g. text/plain).",
           "readOnly": true,
-          "deprecated": true,
-          "description": "Output only. DEPRECATED. DO NOT USE. A duplicate of the `body` field. This field is only present for legacy reasons."
+          "type": "string"
         },
         "createTime": {
-          "description": "Output only. The time when the comment was created.",
+          "type": "string",
           "format": "google-datetime",
-          "readOnly": true,
+          "description": "Output only. The time at which the attachment was created.",
+          "readOnly": true
+        },
+        "filename": {
+          "description": "The filename of the attachment (e.g. `\"graph.jpg\"`).",
+          "type": "string"
+        },
+        "sizeBytes": {
+          "type": "string",
+          "format": "int64",
+          "description": "Output only. The size of the attachment in bytes.",
+          "readOnly": true
+        }
+      },
+      "id": "Attachment",
+      "description": "An Attachment contains metadata about a file that was uploaded to a case - it is NOT a file itself. That being said, the name of an Attachment object can be used to download its accompanying file through the `media.download` endpoint. While attachments can be uploaded in the console at the same time as a comment, they're associated on a \"case\" level, not a \"comment\" level.",
+      "type": "object"
+    },
+    "CreateAttachmentRequest": {
+      "type": "object",
+      "properties": {
+        "attachment": {
+          "description": "Required. The attachment to be created.",
+          "$ref": "Attachment"
+        }
+      },
+      "id": "CreateAttachmentRequest",
+      "description": "The request message for the CreateAttachment endpoint."
+    },
+    "Escalation": {
+      "properties": {
+        "reason": {
+          "description": "Required. The reason why the Case is being escalated.",
+          "enum": [
+            "REASON_UNSPECIFIED",
+            "RESOLUTION_TIME",
+            "TECHNICAL_EXPERTISE",
+            "BUSINESS_IMPACT"
+          ],
+          "type": "string",
+          "enumDescriptions": [
+            "The escalation reason is in an unknown state or has not been specified.",
+            "The case is taking too long to resolve.",
+            "The support agent does not have the expertise required to successfully resolve the issue.",
+            "The issue is having a significant business impact."
+          ]
+        },
+        "justification": {
+          "description": "Required. A free text description to accompany the `reason` field above. Provides additional context on why the case is being escalated.",
           "type": "string"
         }
       },
-      "id": "Comment",
-      "description": "A comment associated with a support case. Case comments are the primary way for Google Support to communicate with a user who has opened a case. When a user responds to Google Support, the user's responses also appear as comments."
+      "id": "Escalation",
+      "description": "An escalation of a support case.",
+      "type": "object"
     },
-    "CaseClassification": {
-      "description": "A Case Classification represents the topic that a case is about. It's very important to use accurate classifications, because they're used to route your cases to specialists who can help you. A classification always has an ID that is its unique identifier. A valid ID is required when creating a case.",
-      "id": "CaseClassification",
-      "type": "object",
+    "ListCommentsResponse": {
+      "id": "ListCommentsResponse",
+      "description": "The response message for the ListComments endpoint.",
       "properties": {
-        "displayName": {
-          "description": "A display name for the classification. The display name is not static and can change. To uniquely and consistently identify classifications, use the `CaseClassification.id` field.",
-          "type": "string"
-        },
-        "id": {
-          "type": "string",
-          "description": "The unique ID for a classification. Must be specified for case creation. To retrieve valid classification IDs for case creation, use `caseClassifications.search`. Classification IDs returned by `caseClassifications.search` are guaranteed to be valid for at least 6 months. If a given classification is deactiveated, it will immediately stop being returned. After 6 months, `case.create` requests using the classification ID will fail."
-        },
-        "product": {
-          "description": "The full product the classification corresponds to.",
-          "$ref": "Product"
-        }
-      }
-    },
-    "ListSupportEventSubscriptionsResponse": {
-      "description": "Response message for ListSupportEventSubscriptions.",
-      "id": "ListSupportEventSubscriptionsResponse",
-      "type": "object",
-      "properties": {
-        "supportEventSubscriptions": {
-          "description": "The support event subscriptions.",
+        "comments": {
+          "type": "array",
           "items": {
-            "$ref": "SupportEventSubscription"
+            "$ref": "Comment"
           },
-          "type": "array"
+          "description": "List of the comments associated with the case."
         },
         "nextPageToken": {
-          "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+          "description": "A token to retrieve the next page of results. Set this in the `page_token` field of subsequent `cases.comments.list` requests. If unspecified, there are no more results to retrieve.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "SupportEventSubscription": {
+      "id": "SupportEventSubscription",
+      "description": "A support event subscription.",
+      "properties": {
+        "name": {
+          "description": "Identifier. The resource name of the support event subscription.",
+          "type": "string"
+        },
+        "createTime": {
+          "description": "Output only. The time at which the subscription was created.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "state": {
+          "description": "Output only. The state of the subscription.",
+          "enumDescriptions": [
+            "Unspecified state.",
+            "Subscription is active and working.",
+            "Subscription is failing. Notifications cannot be published for some reason.",
+            "Subscription has been deleted and is pending purge. Notifications are not sent for deleted subscriptions. Deleted subscriptions are purged after their `purge_time` has passed."
+          ],
+          "readOnly": true,
+          "enum": [
+            "STATE_UNSPECIFIED",
+            "WORKING",
+            "FAILING",
+            "DELETED"
+          ],
+          "type": "string"
+        },
+        "purgeTime": {
+          "description": "Output only. The time at which the subscription will be purged.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "pubSubTopic": {
+          "description": "Required. The name of the Pub/Sub topic to publish notifications to. Format: projects/{project}/topics/{topic}",
+          "type": "string"
+        },
+        "failureReason": {
+          "type": "string",
+          "readOnly": true,
+          "enum": [
+            "FAILURE_REASON_UNSPECIFIED",
+            "PERMISSION_DENIED",
+            "TOPIC_NOT_FOUND",
+            "OTHER"
+          ],
+          "enumDescriptions": [
+            "Unspecified failure reason.",
+            "The service account (i.e. cloud-support-apievents@system.gserviceaccount.com) lacks the permission to publish to the customer's Pub/Sub topic.",
+            "The specified Pub/Sub topic does not exist.",
+            "Message failed to publish due to a system-side error."
+          ],
+          "description": "Output only. Reason why subscription is failing. State of subscription must be FAILING in order for this to have a value."
+        },
+        "updateTime": {
+          "description": "Output only. The time at which the subscription was last updated.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "deleteTime": {
+          "description": "Output only. The time at which the subscription was deleted.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        }
+      },
+      "type": "object"
+    },
+    "Actor": {
+      "type": "object",
+      "id": "Actor",
+      "description": "An Actor represents an entity that performed an action. For example, an actor could be a user who posted a comment on a support case, a user who uploaded an attachment, or a service account that created a support case.",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "The email address of the actor. If not provided, it is inferred from the credentials supplied during case creation. When a name is provided, an email must also be provided. If the user is a Google Support agent, this is obfuscated. This field is deprecated. Use `username` instead.",
+          "deprecated": true
+        },
+        "username": {
+          "description": "Output only. The username of the actor. It may look like an email or other format provided by the identity provider. If not provided, it is inferred from the credentials supplied. When a name is provided, a username must also be provided. If the user is a Google Support agent, this will not be set.",
+          "readOnly": true,
+          "type": "string"
+        },
+        "googleSupport": {
+          "type": "boolean",
+          "description": "Output only. Whether the actor is a Google support actor.",
+          "readOnly": true
+        },
+        "displayName": {
+          "description": "The name to display for the actor. If not provided, it is inferred from credentials supplied during case creation. When an email is provided, a display name must also be provided. This will be obfuscated if the user is a Google Support agent.",
           "type": "string"
         }
       }
+    },
+    "DiffVersionResponse": {
+      "type": "object",
+      "properties": {
+        "objectVersion": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string"
+        },
+        "objectSizeBytes": {
+          "type": "string",
+          "format": "int64",
+          "description": "# gdata.* are outside protos with mising documentation"
+        }
+      },
+      "id": "DiffVersionResponse",
+      "description": "# gdata.* are outside protos with mising documentation"
     },
     "Media": {
       "type": "object",
+      "id": "Media",
+      "description": "# gdata.* are outside protos with mising documentation",
       "properties": {
-        "diffUploadRequest": {
+        "contentTypeInfo": {
           "description": "# gdata.* are outside protos with mising documentation",
-          "$ref": "DiffUploadRequest"
-        },
-        "timestamp": {
-          "type": "string",
-          "format": "uint64",
-          "description": "# gdata.* are outside protos with mising documentation"
-        },
-        "compositeMedia": {
-          "type": "array",
-          "items": {
-            "$ref": "CompositeMedia"
-          },
-          "description": "# gdata.* are outside protos with mising documentation"
-        },
-        "blobRef": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation",
-          "deprecated": true,
-          "format": "byte"
-        },
-        "md5Hash": {
-          "format": "byte",
-          "description": "# gdata.* are outside protos with mising documentation",
-          "type": "string"
+          "$ref": "ContentTypeInfo"
         },
         "objectId": {
           "description": "# gdata.* are outside protos with mising documentation",
           "$ref": "ObjectId"
         },
-        "cosmoBinaryReference": {
+        "mediaId": {
           "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation",
-          "format": "byte"
-        },
-        "downloadParameters": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "$ref": "DownloadParameters"
-        },
-        "blobstore2Info": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "$ref": "Blobstore2Info"
-        },
-        "filename": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation"
-        },
-        "path": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation"
-        },
-        "contentTypeInfo": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "$ref": "ContentTypeInfo"
-        },
-        "diffChecksumsResponse": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "$ref": "DiffChecksumsResponse"
-        },
-        "crc32cHash": {
-          "type": "integer",
-          "format": "uint32",
-          "description": "# gdata.* are outside protos with mising documentation"
-        },
-        "sha512Hash": {
-          "description": "# gdata.* are outside protos with mising documentation",
           "format": "byte",
-          "type": "string"
+          "description": "# gdata.* are outside protos with mising documentation"
+        },
+        "blobRef": {
+          "type": "string",
+          "format": "byte",
+          "deprecated": true,
+          "description": "# gdata.* are outside protos with mising documentation"
         },
         "bigstoreObjectRef": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "deprecated": true,
-          "format": "byte",
-          "type": "string"
-        },
-        "contentType": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation"
-        },
-        "diffDownloadResponse": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "$ref": "DiffDownloadResponse"
-        },
-        "diffVersionResponse": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "$ref": "DiffVersionResponse"
-        },
-        "token": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation"
-        },
-        "mediaId": {
-          "format": "byte",
-          "description": "# gdata.* are outside protos with mising documentation",
-          "type": "string"
-        },
-        "algorithm": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation",
-          "deprecated": true
-        },
-        "diffUploadResponse": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "$ref": "DiffUploadResponse"
-        },
-        "hash": {
           "deprecated": true,
           "description": "# gdata.* are outside protos with mising documentation",
-          "type": "string"
-        },
-        "inline": {
           "type": "string",
-          "format": "byte",
-          "description": "# gdata.* are outside protos with mising documentation"
-        },
-        "sha1Hash": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "format": "byte",
-          "type": "string"
-        },
-        "sha256Hash": {
-          "format": "byte",
-          "description": "# gdata.* are outside protos with mising documentation",
-          "type": "string"
+          "format": "byte"
         },
         "referenceType": {
-          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string",
           "enumDescriptions": [
             "# gdata.* are outside protos with mising documentation",
             "# gdata.* are outside protos with mising documentation",
@@ -1548,6 +1444,7 @@
             "# gdata.* are outside protos with mising documentation",
             "# gdata.* are outside protos with mising documentation"
           ],
+          "description": "# gdata.* are outside protos with mising documentation",
           "enum": [
             "PATH",
             "BLOB_REF",
@@ -1562,374 +1459,458 @@
             "DIFF_UPLOAD_RESPONSE",
             "COSMO_BINARY_REFERENCE",
             "ARBITRARY_BYTES"
-          ],
+          ]
+        },
+        "cosmoBinaryReference": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string",
+          "format": "byte"
+        },
+        "crc32cHash": {
+          "type": "integer",
+          "format": "uint32",
+          "description": "# gdata.* are outside protos with mising documentation"
+        },
+        "compositeMedia": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "array",
+          "items": {
+            "$ref": "CompositeMedia"
+          }
+        },
+        "diffUploadRequest": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "$ref": "DiffUploadRequest"
+        },
+        "sha256Hash": {
+          "type": "string",
+          "format": "byte",
+          "description": "# gdata.* are outside protos with mising documentation"
+        },
+        "diffUploadResponse": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "$ref": "DiffUploadResponse"
+        },
+        "diffChecksumsResponse": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "$ref": "DiffChecksumsResponse"
+        },
+        "inline": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string",
+          "format": "byte"
+        },
+        "isPotentialRetry": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "boolean"
+        },
+        "path": {
+          "description": "# gdata.* are outside protos with mising documentation",
           "type": "string"
+        },
+        "hash": {
+          "type": "string",
+          "deprecated": true,
+          "description": "# gdata.* are outside protos with mising documentation"
+        },
+        "md5Hash": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string",
+          "format": "byte"
+        },
+        "contentType": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string"
+        },
+        "sha1Hash": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string",
+          "format": "byte"
+        },
+        "blobstore2Info": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "$ref": "Blobstore2Info"
         },
         "length": {
           "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation",
-          "format": "int64"
+          "format": "int64",
+          "description": "# gdata.* are outside protos with mising documentation"
         },
-        "isPotentialRetry": {
-          "type": "boolean",
+        "diffVersionResponse": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "$ref": "DiffVersionResponse"
+        },
+        "algorithm": {
+          "deprecated": true,
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "uint64",
           "description": "# gdata.* are outside protos with mising documentation"
         },
         "hashVerified": {
-          "type": "boolean",
-          "description": "# gdata.* are outside protos with mising documentation"
-        }
-      },
-      "id": "Media",
-      "description": "# gdata.* are outside protos with mising documentation"
-    },
-    "Case": {
-      "description": "A Case is an object that contains the details of a support case. It contains fields for the time it was created, its priority, its classification, and more. Cases can also have comments and attachments that get added over time. A case is parented by a Google Cloud organization or project. Organizations are identified by a number, so the name of a case parented by an organization would look like this: ``` organizations/123/cases/456 ``` Projects have two unique identifiers, an ID and a number, and they look like this: ``` projects/abc/cases/456 ``` ``` projects/123/cases/456 ``` You can use either of them when calling the API. To learn more about project identifiers, see [AIP-2510](https://google.aip.dev/cloud/2510).",
-      "type": "object",
-      "properties": {
-        "testCase": {
-          "type": "boolean",
-          "description": "Whether this case was created for internal API testing and should not be acted on by the support team."
-        },
-        "priority": {
-          "description": "The priority of this case.",
-          "enumDescriptions": [
-            "Priority is undefined or has not been set yet.",
-            "Extreme impact on a production service. Service is hard down.",
-            "Critical impact on a production service. Service is currently unusable.",
-            "Severe impact on a production service. Service is usable but greatly impaired.",
-            "Medium impact on a production service. Service is available, but moderately impaired.",
-            "General questions or minor issues. Production service is fully available."
-          ],
-          "enum": [
-            "PRIORITY_UNSPECIFIED",
-            "P0",
-            "P1",
-            "P2",
-            "P3",
-            "P4"
-          ],
-          "type": "string"
-        },
-        "displayName": {
-          "description": "The short summary of the issue reported in this case.",
-          "type": "string"
-        },
-        "updateTime": {
-          "type": "string",
-          "readOnly": true,
-          "format": "google-datetime",
-          "description": "Output only. The time this case was last updated."
-        },
-        "state": {
-          "description": "Output only. The current status of the support case.",
-          "type": "string",
-          "readOnly": true,
-          "enumDescriptions": [
-            "Case is in an unknown state.",
-            "The case has been created but no one is assigned to work on it yet.",
-            "The case is currently being handled by Google support.",
-            "Google is waiting for a response.",
-            "A solution has been offered for the case, but it isn't yet closed.",
-            "The case has been resolved."
-          ],
-          "enum": [
-            "STATE_UNSPECIFIED",
-            "NEW",
-            "IN_PROGRESS_GOOGLE_SUPPORT",
-            "ACTION_REQUIRED",
-            "SOLUTION_PROVIDED",
-            "CLOSED"
-          ]
-        },
-        "description": {
-          "description": "A broad description of the issue.",
-          "type": "string"
-        },
-        "timeZone": {
-          "type": "string",
-          "description": "The timezone of the user who created the support case. It should be in a format IANA recognizes: https://www.iana.org/time-zones. There is no additional validation done by the API."
-        },
-        "classification": {
-          "description": "The issue classification applicable to this case.",
-          "$ref": "CaseClassification"
-        },
-        "severity": {
-          "description": "REMOVED. The severity of this case. Use priority instead.",
-          "type": "string",
-          "enumDescriptions": [
-            "Severity is undefined or has not been set yet.",
-            "Extreme impact on a production service. Service is hard down.",
-            "Critical impact on a production service. Service is currently unusable.",
-            "Severe impact on a production service. Service is usable but greatly impaired.",
-            "Medium impact on a production service. Service is available, but moderately impaired.",
-            "General questions or minor issues. Production service is fully available."
-          ],
-          "enum": [
-            "SEVERITY_UNSPECIFIED",
-            "S0",
-            "S1",
-            "S2",
-            "S3",
-            "S4"
-          ]
-        },
-        "createTime": {
-          "readOnly": true,
-          "type": "string",
-          "description": "Output only. The time this case was created.",
-          "format": "google-datetime"
-        },
-        "escalated": {
-          "description": "Whether the case is currently escalated.",
+          "description": "# gdata.* are outside protos with mising documentation",
           "type": "boolean"
         },
-        "subscriberEmailAddresses": {
-          "description": "The email addresses to receive updates on this case.",
+        "diffDownloadResponse": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "$ref": "DiffDownloadResponse"
+        },
+        "downloadParameters": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "$ref": "DownloadParameters"
+        },
+        "token": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string"
+        },
+        "filename": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string"
+        },
+        "sha512Hash": {
+          "type": "string",
+          "format": "byte",
+          "description": "# gdata.* are outside protos with mising documentation"
+        }
+      }
+    },
+    "ListAttachmentsResponse": {
+      "properties": {
+        "nextPageToken": {
+          "description": "A token to retrieve the next page of results. Set this in the `page_token` field of subsequent `cases.attachments.list` requests. If unspecified, there are no more results to retrieve.",
+          "type": "string"
+        },
+        "attachments": {
+          "type": "array",
+          "items": {
+            "$ref": "Attachment"
+          },
+          "description": "The list of attachments associated with a case."
+        }
+      },
+      "id": "ListAttachmentsResponse",
+      "description": "The response message for the ListAttachments endpoint.",
+      "type": "object"
+    },
+    "Comment": {
+      "id": "Comment",
+      "description": "A comment associated with a support case. Case comments are the primary way for Google Support to communicate with a user who has opened a case. When a user responds to Google Support, the user's responses also appear as comments.",
+      "properties": {
+        "body": {
+          "description": "The full comment body. Maximum of 12800 characters.",
+          "type": "string"
+        },
+        "createTime": {
+          "type": "string",
+          "format": "google-datetime",
+          "description": "Output only. The time when the comment was created.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string",
+          "description": "Output only. Identifier. The resource name of the comment.",
+          "readOnly": true
+        },
+        "creator": {
+          "$ref": "Actor",
+          "description": "Output only. The user or Google Support agent who created the comment.",
+          "readOnly": true
+        },
+        "plainTextBody": {
+          "type": "string",
+          "description": "Output only. DEPRECATED. DO NOT USE. A duplicate of the `body` field. This field is only present for legacy reasons.",
+          "readOnly": true,
+          "deprecated": true
+        }
+      },
+      "type": "object"
+    },
+    "ExpungeSupportEventSubscriptionRequest": {
+      "type": "object",
+      "properties": {},
+      "id": "ExpungeSupportEventSubscriptionRequest",
+      "description": "Request message for ExpungeSupportEventSubscription."
+    },
+    "TextContent": {
+      "type": "object",
+      "id": "TextContent",
+      "description": "Stores text attached to a support object.",
+      "properties": {
+        "plainText": {
+          "description": "Content in this field should be rendered and interpreted as-is.",
+          "type": "string"
+        }
+      }
+    },
+    "Blobstore2Info": {
+      "type": "object",
+      "id": "Blobstore2Info",
+      "description": "# gdata.* are outside protos with mising documentation",
+      "properties": {
+        "blobGeneration": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string",
+          "format": "int64"
+        },
+        "downloadExternalReadToken": {
+          "type": "string",
+          "format": "byte",
+          "description": "# gdata.* are outside protos with mising documentation"
+        },
+        "uploadMetadataContainer": {
+          "type": "string",
+          "format": "byte",
+          "description": "# gdata.* are outside protos with mising documentation"
+        },
+        "uploadFragmentListCreationInfo": {
+          "type": "string",
+          "format": "byte",
+          "description": "# gdata.* are outside protos with mising documentation"
+        },
+        "blobId": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string"
+        },
+        "readToken": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string"
+        },
+        "downloadReadHandle": {
+          "type": "string",
+          "format": "byte",
+          "description": "# gdata.* are outside protos with mising documentation"
+        }
+      }
+    },
+    "DiffUploadRequest": {
+      "type": "object",
+      "properties": {
+        "objectVersion": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "type": "string"
+        },
+        "objectInfo": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "$ref": "CompositeMedia"
+        },
+        "checksumsInfo": {
+          "description": "# gdata.* are outside protos with mising documentation",
+          "$ref": "CompositeMedia"
+        }
+      },
+      "id": "DiffUploadRequest",
+      "description": "# gdata.* are outside protos with mising documentation"
+    },
+    "CaseClassification": {
+      "id": "CaseClassification",
+      "description": "A Case Classification represents the topic that a case is about. It's very important to use accurate classifications, because they're used to route your cases to specialists who can help you. A classification always has an ID that is its unique identifier. A valid ID is required when creating a case.",
+      "properties": {
+        "displayName": {
+          "description": "A display name for the classification. The display name is not static and can change. To uniquely and consistently identify classifications, use the `CaseClassification.id` field.",
+          "type": "string"
+        },
+        "id": {
+          "description": "The unique ID for a classification. Must be specified for case creation. To retrieve valid classification IDs for case creation, use `caseClassifications.search`. Classification IDs returned by `caseClassifications.search` are guaranteed to be valid for at least 6 months. If a given classification is deactiveated, it will immediately stop being returned. After 6 months, `case.create` requests using the classification ID will fail.",
+          "type": "string"
+        },
+        "product": {
+          "description": "The full product the classification corresponds to.",
+          "$ref": "Product"
+        }
+      },
+      "type": "object"
+    },
+    "Product": {
+      "type": "object",
+      "properties": {
+        "productLine": {
+          "description": "The product line of the Product.",
+          "enum": [
+            "PRODUCT_LINE_UNSPECIFIED",
+            "GOOGLE_CLOUD",
+            "GOOGLE_MAPS"
+          ],
+          "type": "string",
+          "enumDescriptions": [
+            "Unknown product type.",
+            "Google Cloud",
+            "Google Maps"
+          ]
+        }
+      },
+      "id": "Product",
+      "description": "The product a case may be associated with."
+    },
+    "EmailMessage": {
+      "properties": {
+        "ccEmailAddresses": {
+          "description": "Output only. Email addresses CCed on the email.",
+          "readOnly": true,
           "type": "array",
           "items": {
             "type": "string"
           }
         },
-        "creator": {
-          "description": "The user who created the case. Note: The name and email will be obfuscated if the case was created by Google Support.",
+        "bodyContent": {
+          "$ref": "TextContent",
+          "description": "Output only. The full email message body. A best-effort attempt is made to remove extraneous reply threads.",
+          "readOnly": true
+        },
+        "recipientEmailAddresses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Output only. Email addresses the email was sent to.",
+          "readOnly": true
+        },
+        "subject": {
+          "type": "string",
+          "description": "Output only. Subject of the email.",
+          "readOnly": true
+        },
+        "createTime": {
+          "description": "Output only. Time when this email message object was created.",
+          "readOnly": true,
+          "type": "string",
+          "format": "google-datetime"
+        },
+        "actor": {
+          "description": "Output only. The user or Google Support agent that created this email message. This is inferred from the headers on the email message.",
+          "readOnly": true,
           "$ref": "Actor"
         },
-        "contactEmail": {
-          "type": "string",
-          "description": "A user-supplied email address to send case update notifications for. This should only be used in BYOID flows, where we cannot infer the user's email address directly from their EUCs."
-        },
-        "languageCode": {
-          "description": "The language the user has requested to receive support in. This should be a BCP 47 language code (e.g., `\"en\"`, `\"zh-CN\"`, `\"zh-TW\"`, `\"ja\"`, `\"ko\"`). If no language or an unsupported language is specified, this field defaults to English (en). Language selection during case creation may affect your available support options. For a list of supported languages and their support working hours, see: https://cloud.google.com/support/docs/language-working-hours",
-          "type": "string"
-        },
         "name": {
-          "description": "Identifier. The resource name for the case.",
+          "description": "Identifier. Resource name for the email message.",
           "type": "string"
         }
       },
-      "id": "Case"
+      "id": "EmailMessage",
+      "description": "An email associated with a support case.",
+      "type": "object"
     },
     "SearchCaseClassificationsResponse": {
-      "type": "object",
+      "id": "SearchCaseClassificationsResponse",
+      "description": "The response message for SearchCaseClassifications endpoint.",
       "properties": {
-        "nextPageToken": {
-          "description": "A token to retrieve the next page of results. Set this in the `page_token` field of subsequent `caseClassifications.list` requests. If unspecified, there are no more results to retrieve.",
-          "type": "string"
-        },
         "caseClassifications": {
+          "description": "The classifications retrieved.",
           "type": "array",
           "items": {
             "$ref": "CaseClassification"
-          },
-          "description": "The classifications retrieved."
+          }
+        },
+        "nextPageToken": {
+          "description": "A token to retrieve the next page of results. Set this in the `page_token` field of subsequent `caseClassifications.list` requests. If unspecified, there are no more results to retrieve.",
+          "type": "string"
         }
       },
-      "id": "SearchCaseClassificationsResponse",
-      "description": "The response message for SearchCaseClassifications endpoint."
+      "type": "object"
     },
-    "Attachment": {
-      "description": "An Attachment contains metadata about a file that was uploaded to a case - it is NOT a file itself. That being said, the name of an Attachment object can be used to download its accompanying file through the `media.download` endpoint. While attachments can be uploaded in the console at the same time as a comment, they're associated on a \"case\" level, not a \"comment\" level.",
-      "type": "object",
+    "ListCasesResponse": {
       "properties": {
-        "filename": {
-          "description": "The filename of the attachment (e.g. `\"graph.jpg\"`).",
-          "type": "string"
+        "cases": {
+          "description": "The list of cases associated with the parent after any filters have been applied.",
+          "type": "array",
+          "items": {
+            "$ref": "Case"
+          }
         },
-        "creator": {
-          "readOnly": true,
-          "description": "Output only. The user who uploaded the attachment. Note, the name and email will be obfuscated if the attachment was uploaded by Google support.",
-          "$ref": "Actor"
-        },
-        "name": {
-          "description": "Output only. Identifier. The resource name of the attachment.",
-          "readOnly": true,
-          "type": "string"
-        },
-        "sizeBytes": {
-          "type": "string",
-          "readOnly": true,
-          "format": "int64",
-          "description": "Output only. The size of the attachment in bytes."
-        },
-        "createTime": {
-          "description": "Output only. The time at which the attachment was created.",
-          "format": "google-datetime",
-          "readOnly": true,
-          "type": "string"
-        },
-        "mimeType": {
-          "description": "Output only. The MIME type of the attachment (e.g. text/plain).",
-          "readOnly": true,
+        "nextPageToken": {
+          "description": "A token to retrieve the next page of results. Set this in the `page_token` field of subsequent `cases.list` requests. If unspecified, there are no more results to retrieve.",
           "type": "string"
         }
       },
-      "id": "Attachment"
+      "id": "ListCasesResponse",
+      "description": "The response message for the ListCases endpoint.",
+      "type": "object"
     },
     "FeedItem": {
       "id": "FeedItem",
-      "type": "object",
+      "description": "A feed item associated with a support case.",
       "properties": {
-        "attachment": {
-          "readOnly": true,
-          "description": "Output only. An attachment attached to the case.",
-          "$ref": "Attachment"
+        "eventTime": {
+          "type": "string",
+          "format": "google-datetime",
+          "description": "Output only. Time corresponding to the event of this item.",
+          "readOnly": true
         },
         "emailMessage": {
           "description": "Output only. An email message received in reply to the case.",
-          "$ref": "EmailMessage",
-          "readOnly": true
+          "readOnly": true,
+          "$ref": "EmailMessage"
         },
         "deletedAttachment": {
-          "readOnly": true,
           "description": "Output only. A deleted attachment that used to be associated with the support case.",
+          "readOnly": true,
           "$ref": "Attachment"
         },
-        "eventTime": {
-          "description": "Output only. Time corresponding to the event of this item.",
-          "format": "google-datetime",
-          "readOnly": true,
-          "type": "string"
-        },
         "comment": {
-          "readOnly": true,
           "description": "Output only. A comment added to the case.",
+          "readOnly": true,
           "$ref": "Comment"
-        }
-      },
-      "description": "A feed item associated with a support case."
-    },
-    "ContentTypeInfo": {
-      "type": "object",
-      "properties": {
-        "bestGuess": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation"
         },
-        "fromBytes": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "type": "string"
-        },
-        "fromFusionId": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation"
-        },
-        "fusionIdDetectionMetadata": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "format": "byte",
-          "type": "string"
-        },
-        "fromHeader": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "type": "string"
-        },
-        "fromFileName": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "type": "string"
-        },
-        "fromUrlPath": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation"
-        }
-      },
-      "id": "ContentTypeInfo",
-      "description": "# gdata.* are outside protos with mising documentation"
-    },
-    "ObjectId": {
-      "description": "# gdata.* are outside protos with mising documentation",
-      "type": "object",
-      "properties": {
-        "generation": {
-          "description": "# gdata.* are outside protos with mising documentation",
-          "format": "int64",
-          "type": "string"
-        },
-        "bucketName": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation"
-        },
-        "objectName": {
-          "type": "string",
-          "description": "# gdata.* are outside protos with mising documentation"
-        }
-      },
-      "id": "ObjectId"
-    },
-    "Actor": {
-      "description": "An Actor represents an entity that performed an action. For example, an actor could be a user who posted a comment on a support case, a user who uploaded an attachment, or a service account that created a support case.",
-      "id": "Actor",
-      "type": "object",
-      "properties": {
-        "googleSupport": {
-          "description": "Output only. Whether the actor is a Google support actor.",
-          "type": "boolean",
+        "attachment": {
+          "$ref": "Attachment",
+          "description": "Output only. An attachment attached to the case.",
           "readOnly": true
+        }
+      },
+      "type": "object"
+    },
+    "Empty": {
+      "id": "Empty",
+      "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
+      "properties": {},
+      "type": "object"
+    },
+    "ListSupportEventSubscriptionsResponse": {
+      "id": "ListSupportEventSubscriptionsResponse",
+      "description": "Response message for ListSupportEventSubscriptions.",
+      "properties": {
+        "supportEventSubscriptions": {
+          "type": "array",
+          "items": {
+            "$ref": "SupportEventSubscription"
+          },
+          "description": "The support event subscriptions."
         },
-        "username": {
-          "description": "Output only. The username of the actor. It may look like an email or other format provided by the identity provider. If not provided, it is inferred from the credentials supplied. When a name is provided, a username must also be provided. If the user is a Google Support agent, this will not be set.",
-          "type": "string",
-          "readOnly": true
-        },
-        "displayName": {
-          "description": "The name to display for the actor. If not provided, it is inferred from credentials supplied during case creation. When an email is provided, a display name must also be provided. This will be obfuscated if the user is a Google Support agent.",
+        "nextPageToken": {
+          "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
           "type": "string"
-        },
-        "email": {
-          "deprecated": true,
-          "description": "The email address of the actor. If not provided, it is inferred from the credentials supplied during case creation. When a name is provided, an email must also be provided. If the user is a Google Support agent, this is obfuscated. This field is deprecated. Use `username` instead.",
-          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "revision": "20260809",
+  "baseUrl": "https://cloudsupport.googleapis.com/",
+  "discoveryVersion": "v1",
+  "fullyEncodeReservedExpansion": true,
+  "auth": {
+    "oauth2": {
+      "scopes": {
+        "https://www.googleapis.com/auth/cloud-platform": {
+          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
         }
       }
     }
   },
-  "servicePath": "",
+  "canonicalName": "Cloud Support",
+  "rootUrl": "https://cloudsupport.googleapis.com/",
+  "basePath": "",
   "parameters": {
-    "uploadType": {
-      "type": "string",
-      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
-      "location": "query"
-    },
-    "callback": {
-      "description": "JSONP",
-      "location": "query",
-      "type": "string"
-    },
-    "$.xgafv": {
-      "description": "V1 error format.",
-      "type": "string",
-      "location": "query",
-      "enum": [
-        "1",
-        "2"
-      ],
-      "enumDescriptions": [
-        "v1 error format",
-        "v2 error format"
-      ]
-    },
-    "key": {
-      "type": "string",
-      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
-      "location": "query"
-    },
     "access_token": {
       "type": "string",
-      "description": "OAuth access token.",
-      "location": "query"
-    },
-    "quotaUser": {
-      "type": "string",
-      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
-      "location": "query"
-    },
-    "oauth_token": {
-      "description": "OAuth 2.0 token for the current user.",
       "location": "query",
-      "type": "string"
+      "description": "OAuth access token."
     },
     "alt": {
       "type": "string",
       "default": "json",
-      "description": "Data format for response.",
       "enum": [
         "json",
         "media",
@@ -1940,45 +1921,64 @@
         "Media download with context-dependent Content-Type",
         "Responses with Content-Type of application/x-protobuf"
       ],
+      "location": "query",
+      "description": "Data format for response."
+    },
+    "oauth_token": {
+      "type": "string",
+      "location": "query",
+      "description": "OAuth 2.0 token for the current user."
+    },
+    "uploadType": {
+      "type": "string",
+      "location": "query",
+      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\")."
+    },
+    "upload_protocol": {
+      "type": "string",
+      "location": "query",
+      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\")."
+    },
+    "quotaUser": {
+      "type": "string",
+      "location": "query",
+      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters."
+    },
+    "$.xgafv": {
+      "enum": [
+        "1",
+        "2"
+      ],
+      "type": "string",
+      "description": "V1 error format.",
+      "enumDescriptions": [
+        "v1 error format",
+        "v2 error format"
+      ],
       "location": "query"
     },
-    "fields": {
+    "key": {
+      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
       "type": "string",
-      "description": "Selector specifying which fields to include in a partial response.",
       "location": "query"
     },
     "prettyPrint": {
       "type": "boolean",
-      "default": "true",
+      "location": "query",
       "description": "Returns response with indentations and line breaks.",
+      "default": "true"
+    },
+    "fields": {
+      "description": "Selector specifying which fields to include in a partial response.",
+      "type": "string",
       "location": "query"
     },
-    "upload_protocol": {
-      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").",
+    "callback": {
+      "type": "string",
       "location": "query",
-      "type": "string"
+      "description": "JSONP"
     }
   },
-  "kind": "discovery#restDescription",
-  "revision": "20260809",
-  "batchPath": "batch",
-  "canonicalName": "Cloud Support",
-  "id": "cloudsupport:v2beta",
-  "version_module": true,
-  "version": "v2beta",
-  "title": "Google Cloud Support API",
-  "icons": {
-    "x16": "http://www.google.com/images/icons/product/search-16.gif",
-    "x32": "http://www.google.com/images/icons/product/search-32.gif"
-  },
-  "auth": {
-    "oauth2": {
-      "scopes": {
-        "https://www.googleapis.com/auth/cloud-platform": {
-          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
-        }
-      }
-    }
-  },
-  "ownerDomain": "google.com"
+  "mtlsRootUrl": "https://cloudsupport.mtls.googleapis.com/",
+  "ownerName": "Google"
 }
