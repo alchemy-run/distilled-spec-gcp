@@ -1,26 +1,93 @@
 {
-  "name": "workflows",
   "description": "Manage workflow definitions. To execute workflows and manage executions, see the Workflows Executions API.",
-  "servicePath": "",
-  "documentationLink": "https://cloud.google.com/workflows",
-  "auth": {
-    "oauth2": {
-      "scopes": {
-        "https://www.googleapis.com/auth/cloud-platform": {
-          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
-        }
-      }
-    }
-  },
-  "protocol": "rest",
-  "rootUrl": "https://workflows.googleapis.com/",
-  "batchPath": "batch",
+  "revision": "20260812",
+  "mtlsRootUrl": "https://workflows.mtls.googleapis.com/",
+  "title": "Workflows API",
   "basePath": "",
+  "discoveryVersion": "v1",
+  "kind": "discovery#restDescription",
+  "protocol": "rest",
+  "fullyEncodeReservedExpansion": true,
+  "ownerName": "Google",
+  "documentationLink": "https://cloud.google.com/workflows",
+  "ownerDomain": "google.com",
+  "icons": {
+    "x16": "http://www.google.com/images/icons/product/search-16.gif",
+    "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  },
+  "name": "workflows",
+  "baseUrl": "https://workflows.googleapis.com/",
   "schemas": {
+    "Workflow": {
+      "description": "Workflow program to be executed by Workflows.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "description": "The resource name of the workflow. Format: projects/{project}/locations/{location}/workflows/{workflow}",
+          "type": "string"
+        },
+        "labels": {
+          "description": "Labels associated with this workflow. Labels can contain at most 64 entries. Keys and values can be no longer than 63 characters and can only contain lowercase letters, numeric characters, underscores and dashes. Label keys must start with a letter. International characters are allowed.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "serviceAccount": {
+          "description": "The service account associated with the latest workflow version. This service account represents the identity of the workflow and determines what permissions the workflow has. Format: projects/{project}/serviceAccounts/{account} or {account} Using `-` as a wildcard for the `{project}` or not providing one at all will infer the project from the account. The `{account}` value can be the `email` address or the `unique_id` of the service account. If not provided, workflow will use the project's default service account. Modifying this field for an existing workflow results in a new workflow revision.",
+          "type": "string"
+        },
+        "sourceContents": {
+          "description": "Workflow code to be executed. The size limit is 128KB.",
+          "type": "string"
+        },
+        "description": {
+          "description": "Description of the workflow provided by the user. Must be at most 1000 unicode characters long.",
+          "type": "string"
+        },
+        "createTime": {
+          "description": "Output only. The timestamp of when the workflow was created.",
+          "type": "string",
+          "readOnly": true,
+          "format": "google-datetime"
+        },
+        "updateTime": {
+          "readOnly": true,
+          "format": "google-datetime",
+          "description": "Output only. The last update timestamp of the workflow.",
+          "type": "string"
+        },
+        "revisionId": {
+          "description": "Output only. The revision of the workflow. A new revision of a workflow is created as a result of updating the following properties of a workflow: - Service account - Workflow code to be executed The format is \"000001-a4d\", where the first 6 characters define the zero-padded revision ordinal number. They are followed by a hyphen and 3 hexadecimal random characters.",
+          "type": "string",
+          "readOnly": true
+        },
+        "state": {
+          "readOnly": true,
+          "description": "Output only. State of the workflow deployment.",
+          "enumDescriptions": [
+            "Invalid state.",
+            "The workflow has been deployed successfully and is serving."
+          ],
+          "enum": [
+            "STATE_UNSPECIFIED",
+            "ACTIVE"
+          ],
+          "type": "string"
+        },
+        "revisionCreateTime": {
+          "description": "Output only. The timestamp that the latest revision of the workflow was created.",
+          "type": "string",
+          "format": "google-datetime",
+          "readOnly": true
+        }
+      },
+      "id": "Workflow"
+    },
     "ListLocationsResponse": {
+      "id": "ListLocationsResponse",
       "description": "The response message for Locations.ListLocations.",
       "type": "object",
-      "id": "ListLocationsResponse",
       "properties": {
         "locations": {
           "items": {
@@ -35,59 +102,28 @@
         }
       }
     },
-    "OperationMetadata": {
-      "id": "OperationMetadata",
-      "description": "Represents the metadata of the long-running operation.",
+    "ListWorkflowsResponse": {
+      "id": "ListWorkflowsResponse",
+      "description": "Response for the ListWorkflows method.",
       "type": "object",
       "properties": {
-        "target": {
-          "description": "Server-defined resource path for the target of the operation.",
+        "nextPageToken": {
+          "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
           "type": "string"
         },
-        "endTime": {
-          "description": "The time the operation finished running.",
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "createTime": {
-          "description": "The time the operation was created.",
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "verb": {
-          "description": "Name of the verb executed by the operation.",
-          "type": "string"
-        },
-        "apiVersion": {
-          "description": "API version used to start the operation.",
-          "type": "string"
-        }
-      }
-    },
-    "Status": {
-      "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).",
-      "type": "object",
-      "id": "Status",
-      "properties": {
-        "code": {
-          "format": "int32",
-          "description": "The status code, which should be an enum value of google.rpc.Code.",
-          "type": "integer"
-        },
-        "details": {
+        "unreachable": {
+          "description": "Unreachable resources.",
+          "type": "array",
           "items": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "any",
-              "description": "Properties of the object. Contains field @type with type URL."
-            }
-          },
-          "description": "A list of messages that carry the error details. There is a common set of message types for APIs to use.",
-          "type": "array"
+            "type": "string"
+          }
         },
-        "message": {
-          "description": "A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.",
-          "type": "string"
+        "workflows": {
+          "items": {
+            "$ref": "Workflow"
+          },
+          "description": "The workflows which match the request.",
+          "type": "array"
         }
       }
     },
@@ -97,40 +133,43 @@
       "type": "object",
       "properties": {}
     },
-    "ListWorkflowsResponse": {
-      "description": "Response for the ListWorkflows method.",
+    "ListOperationsResponse": {
+      "id": "ListOperationsResponse",
+      "description": "The response message for Operations.ListOperations.",
       "type": "object",
-      "id": "ListWorkflowsResponse",
       "properties": {
-        "workflows": {
+        "operations": {
           "items": {
-            "$ref": "Workflow"
+            "$ref": "Operation"
           },
-          "description": "The workflows which match the request.",
+          "description": "A list of operations that matches the specified filter in the request.",
           "type": "array"
         },
         "nextPageToken": {
-          "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+          "description": "The standard List next-page token.",
           "type": "string"
         },
         "unreachable": {
           "items": {
             "type": "string"
           },
-          "description": "Unreachable resources.",
+          "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.",
           "type": "array"
         }
       }
     },
     "Operation": {
+      "id": "Operation",
+      "description": "This resource represents a long-running operation that is the result of a network API call.",
+      "type": "object",
       "properties": {
         "metadata": {
-          "description": "Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.",
-          "type": "object",
           "additionalProperties": {
             "type": "any",
             "description": "Properties of the object. Contains field @type with type URL."
-          }
+          },
+          "description": "Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.",
+          "type": "object"
         },
         "name": {
           "description": "The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.",
@@ -145,108 +184,70 @@
           "type": "boolean"
         },
         "response": {
-          "description": "The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.",
-          "type": "object",
           "additionalProperties": {
             "type": "any",
             "description": "Properties of the object. Contains field @type with type URL."
-          }
-        }
-      },
-      "id": "Operation",
-      "description": "This resource represents a long-running operation that is the result of a network API call.",
-      "type": "object"
-    },
-    "ListOperationsResponse": {
-      "description": "The response message for Operations.ListOperations.",
-      "type": "object",
-      "id": "ListOperationsResponse",
-      "properties": {
-        "nextPageToken": {
-          "description": "The standard List next-page token.",
-          "type": "string"
-        },
-        "operations": {
-          "description": "A list of operations that matches the specified filter in the request.",
-          "type": "array",
-          "items": {
-            "$ref": "Operation"
-          }
-        },
-        "unreachable": {
-          "items": {
-            "type": "string"
           },
-          "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations.",
-          "type": "array"
+          "description": "The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.",
+          "type": "object"
         }
       }
     },
-    "Workflow": {
+    "Status": {
+      "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).",
+      "type": "object",
       "properties": {
-        "description": {
-          "description": "Description of the workflow provided by the user. Must be at most 1000 unicode characters long.",
+        "code": {
+          "description": "The status code, which should be an enum value of google.rpc.Code.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "description": "A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.",
           "type": "string"
         },
-        "serviceAccount": {
-          "description": "The service account associated with the latest workflow version. This service account represents the identity of the workflow and determines what permissions the workflow has. Format: projects/{project}/serviceAccounts/{account} or {account} Using `-` as a wildcard for the `{project}` or not providing one at all will infer the project from the account. The `{account}` value can be the `email` address or the `unique_id` of the service account. If not provided, workflow will use the project's default service account. Modifying this field for an existing workflow results in a new workflow revision.",
-          "type": "string"
-        },
-        "labels": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Labels associated with this workflow. Labels can contain at most 64 entries. Keys and values can be no longer than 63 characters and can only contain lowercase letters, numeric characters, underscores and dashes. Label keys must start with a letter. International characters are allowed.",
-          "type": "object"
-        },
-        "sourceContents": {
-          "description": "Workflow code to be executed. The size limit is 128KB.",
-          "type": "string"
-        },
-        "name": {
-          "description": "The resource name of the workflow. Format: projects/{project}/locations/{location}/workflows/{workflow}",
-          "type": "string"
-        },
-        "state": {
-          "enumDescriptions": [
-            "Invalid state.",
-            "The workflow has been deployed successfully and is serving."
-          ],
-          "enum": [
-            "STATE_UNSPECIFIED",
-            "ACTIVE"
-          ],
-          "description": "Output only. State of the workflow deployment.",
-          "readOnly": true,
-          "type": "string"
-        },
-        "revisionCreateTime": {
-          "format": "google-datetime",
-          "description": "Output only. The timestamp that the latest revision of the workflow was created.",
-          "readOnly": true,
+        "details": {
+          "description": "A list of messages that carry the error details. There is a common set of message types for APIs to use.",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "any",
+              "description": "Properties of the object. Contains field @type with type URL."
+            }
+          }
+        }
+      },
+      "id": "Status"
+    },
+    "OperationMetadata": {
+      "description": "Represents the metadata of the long-running operation.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "description": "Name of the verb executed by the operation.",
           "type": "string"
         },
         "createTime": {
-          "description": "Output only. The timestamp of when the workflow was created.",
-          "readOnly": true,
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "revisionId": {
-          "description": "Output only. The revision of the workflow. A new revision of a workflow is created as a result of updating the following properties of a workflow: - Service account - Workflow code to be executed The format is \"000001-a4d\", where the first 6 characters define the zero-padded revision ordinal number. They are followed by a hyphen and 3 hexadecimal random characters.",
-          "readOnly": true,
+          "format": "google-datetime",
+          "description": "The time the operation was created.",
           "type": "string"
         },
-        "updateTime": {
+        "apiVersion": {
+          "description": "API version used to start the operation.",
+          "type": "string"
+        },
+        "endTime": {
           "format": "google-datetime",
-          "description": "Output only. The last update timestamp of the workflow.",
-          "readOnly": true,
+          "description": "The time the operation finished running.",
+          "type": "string"
+        },
+        "target": {
+          "description": "Server-defined resource path for the target of the operation.",
           "type": "string"
         }
       },
-      "description": "Workflow program to be executed by Workflows.",
-      "type": "object",
-      "id": "Workflow"
+      "id": "OperationMetadata"
     },
     "Location": {
       "id": "Location",
@@ -261,12 +262,12 @@
           }
         },
         "metadata": {
-          "description": "Service-specific metadata. For example the available capacity at the given location.",
-          "type": "object",
           "additionalProperties": {
             "type": "any",
             "description": "Properties of the object. Contains field @type with type URL."
-          }
+          },
+          "description": "Service-specific metadata. For example the available capacity at the given location.",
+          "type": "object"
         },
         "name": {
           "description": "Resource name for the location, which may vary between implementations. For example: `\"projects/example-project/locations/us-east1\"`",
@@ -283,233 +284,346 @@
       }
     }
   },
-  "canonicalName": "Workflows",
+  "auth": {
+    "oauth2": {
+      "scopes": {
+        "https://www.googleapis.com/auth/cloud-platform": {
+          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
+        }
+      }
+    }
+  },
+  "id": "workflows:v1beta",
   "resources": {
     "projects": {
       "resources": {
         "locations": {
           "methods": {
             "get": {
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
+              "id": "workflows.projects.locations.get",
               "parameterOrder": [
                 "name"
               ],
-              "id": "workflows.projects.locations.get",
-              "path": "v1beta/{+name}",
               "httpMethod": "GET",
-              "description": "Gets information about a location.",
-              "parameters": {
-                "name": {
-                  "pattern": "^projects/[^/]+/locations/[^/]+$",
-                  "location": "path",
-                  "description": "Resource name for the location.",
-                  "required": true,
-                  "type": "string"
-                }
-              },
               "response": {
                 "$ref": "Location"
               },
-              "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}"
+              "parameters": {
+                "name": {
+                  "description": "Resource name for the location.",
+                  "type": "string",
+                  "pattern": "^projects/[^/]+/locations/[^/]+$",
+                  "location": "path",
+                  "required": true
+                }
+              },
+              "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}",
+              "path": "v1beta/{+name}",
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "description": "Gets information about a location."
             },
             "list": {
-              "path": "v1beta/{+name}/locations",
+              "id": "workflows.projects.locations.list",
+              "parameterOrder": [
+                "name"
+              ],
+              "httpMethod": "GET",
+              "response": {
+                "$ref": "ListLocationsResponse"
+              },
+              "flatPath": "v1beta/projects/{projectsId}/locations",
               "parameters": {
-                "pageToken": {
-                  "location": "query",
-                  "description": "A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.",
-                  "type": "string"
-                },
-                "name": {
-                  "location": "path",
-                  "pattern": "^projects/[^/]+$",
-                  "description": "The resource that owns the locations collection, if applicable.",
-                  "required": true,
-                  "type": "string"
-                },
-                "pageSize": {
-                  "description": "The maximum number of results to return. If not set, the service selects a default.",
-                  "type": "integer",
-                  "format": "int32",
-                  "location": "query"
-                },
                 "filter": {
                   "location": "query",
                   "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
                   "type": "string"
                 },
+                "name": {
+                  "description": "The resource that owns the locations collection, if applicable.",
+                  "type": "string",
+                  "pattern": "^projects/[^/]+$",
+                  "location": "path",
+                  "required": true
+                },
+                "pageSize": {
+                  "location": "query",
+                  "format": "int32",
+                  "description": "The maximum number of results to return. If not set, the service selects a default.",
+                  "type": "integer"
+                },
+                "pageToken": {
+                  "description": "A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.",
+                  "type": "string",
+                  "location": "query"
+                },
                 "extraLocationTypes": {
                   "description": "Optional. Do not use this field unless explicitly documented otherwise. This is primarily for internal usage.",
-                  "repeated": true,
                   "type": "string",
+                  "repeated": true,
                   "location": "query"
                 }
               },
-              "response": {
-                "$ref": "ListLocationsResponse"
-              },
-              "httpMethod": "GET",
               "description": "Lists information about the supported locations for this service. This method lists locations based on the resource scope provided in the ListLocationsRequest.name field: * **Global locations**: If `name` is empty, the method lists the public locations available to all projects. * **Project-specific locations**: If `name` follows the format `projects/{project}`, the method lists locations visible to that specific project. This includes public, private, or other project-specific locations enabled for the project. For gRPC and client library implementations, the resource name is passed as the `name` field. For direct service calls, the resource name is incorporated into the request path based on the specific service implementation and version.",
-              "flatPath": "v1beta/projects/{projectsId}/locations",
+              "path": "v1beta/{+name}/locations",
               "scopes": [
                 "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "parameterOrder": [
-                "name"
-              ],
-              "id": "workflows.projects.locations.list"
+              ]
             }
           },
           "resources": {
-            "workflows": {
+            "operations": {
               "methods": {
-                "delete": {
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "parameterOrder": [
-                    "name"
-                  ],
-                  "id": "workflows.projects.locations.workflows.delete",
-                  "path": "v1beta/{+name}",
-                  "parameters": {
-                    "name": {
-                      "description": "Required. Name of the workflow to be deleted. Format: projects/{project}/locations/{location}/workflows/{workflow}",
-                      "required": true,
-                      "type": "string",
-                      "location": "path",
-                      "pattern": "^projects/[^/]+/locations/[^/]+/workflows/[^/]+$"
-                    }
-                  },
-                  "response": {
-                    "$ref": "Operation"
-                  },
-                  "httpMethod": "DELETE",
-                  "description": "Deletes a workflow with the specified name. This method also cancels and deletes all running executions of the workflow.",
-                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/workflows/{workflowsId}"
-                },
-                "patch": {
-                  "parameters": {
-                    "name": {
-                      "pattern": "^projects/[^/]+/locations/[^/]+/workflows/[^/]+$",
-                      "location": "path",
-                      "description": "The resource name of the workflow. Format: projects/{project}/locations/{location}/workflows/{workflow}",
-                      "required": true,
-                      "type": "string"
-                    },
-                    "updateMask": {
-                      "location": "query",
-                      "format": "google-fieldmask",
-                      "description": "List of fields to be updated. If not present, the entire workflow will be updated.",
-                      "type": "string"
-                    }
-                  },
-                  "response": {
-                    "$ref": "Operation"
-                  },
-                  "httpMethod": "PATCH",
-                  "description": "Updates an existing workflow. Running this method has no impact on already running executions of the workflow. A new revision of the workflow may be created as a result of a successful update operation. In that case, such revision will be used in new workflow executions.",
-                  "path": "v1beta/{+name}",
-                  "request": {
-                    "$ref": "Workflow"
-                  },
-                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/workflows/{workflowsId}",
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "id": "workflows.projects.locations.workflows.patch",
-                  "parameterOrder": [
-                    "name"
-                  ]
-                },
                 "get": {
-                  "httpMethod": "GET",
-                  "description": "Gets details of a single Workflow.",
+                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
                   "parameters": {
                     "name": {
-                      "location": "path",
-                      "pattern": "^projects/[^/]+/locations/[^/]+/workflows/[^/]+$",
-                      "description": "Required. Name of the workflow which information should be retrieved. Format: projects/{project}/locations/{location}/workflows/{workflow}",
+                      "description": "The name of the operation resource.",
                       "required": true,
+                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
+                      "location": "path",
                       "type": "string"
                     }
                   },
-                  "response": {
-                    "$ref": "Workflow"
-                  },
+                  "description": "Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.",
                   "path": "v1beta/{+name}",
-                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/workflows/{workflowsId}",
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "id": "workflows.projects.locations.workflows.get",
+                  "id": "workflows.projects.locations.operations.get",
                   "parameterOrder": [
                     "name"
-                  ]
+                  ],
+                  "httpMethod": "GET",
+                  "response": {
+                    "$ref": "Operation"
+                  }
                 },
                 "list": {
-                  "id": "workflows.projects.locations.workflows.list",
+                  "id": "workflows.projects.locations.operations.list",
                   "parameterOrder": [
-                    "parent"
+                    "name"
                   ],
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/workflows",
+                  "httpMethod": "GET",
+                  "response": {
+                    "$ref": "ListOperationsResponse"
+                  },
+                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/operations",
                   "parameters": {
-                    "orderBy": {
+                    "returnPartialSuccess": {
                       "location": "query",
-                      "description": "Comma-separated list of fields that that specify the order of the results. Default sorting order for a field is ascending. To specify descending order for a field, append a \" desc\" suffix. If not specified, the results will be returned in an unspecified order.",
-                      "type": "string"
-                    },
-                    "pageToken": {
-                      "location": "query",
-                      "description": "A page token, received from a previous `ListWorkflows` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListWorkflows` must match the call that provided the page token.",
-                      "type": "string"
-                    },
-                    "parent": {
-                      "description": "Required. Project and location from which the workflows should be listed. Format: projects/{project}/locations/{location}",
-                      "required": true,
-                      "type": "string",
-                      "location": "path",
-                      "pattern": "^projects/[^/]+/locations/[^/]+$"
+                      "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `\"projects/example/locations/-\"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                      "type": "boolean"
                     },
                     "pageSize": {
                       "location": "query",
+                      "format": "int32",
+                      "description": "The standard list page size.",
+                      "type": "integer"
+                    },
+                    "pageToken": {
+                      "description": "The standard list page token.",
+                      "type": "string",
+                      "location": "query"
+                    },
+                    "name": {
+                      "description": "The name of the operation's parent resource.",
+                      "type": "string",
+                      "required": true,
+                      "pattern": "^projects/[^/]+/locations/[^/]+$",
+                      "location": "path"
+                    },
+                    "filter": {
+                      "description": "The standard list filter.",
+                      "type": "string",
+                      "location": "query"
+                    }
+                  },
+                  "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.",
+                  "path": "v1beta/{+name}/operations",
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ]
+                },
+                "delete": {
+                  "description": "Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`.",
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "path": "v1beta/{+name}",
+                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
+                  "parameters": {
+                    "name": {
+                      "description": "The name of the operation resource to be deleted.",
+                      "type": "string",
+                      "required": true,
+                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
+                      "location": "path"
+                    }
+                  },
+                  "httpMethod": "DELETE",
+                  "response": {
+                    "$ref": "Empty"
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "id": "workflows.projects.locations.operations.delete"
+                }
+              }
+            },
+            "workflows": {
+              "methods": {
+                "get": {
+                  "httpMethod": "GET",
+                  "response": {
+                    "$ref": "Workflow"
+                  },
+                  "id": "workflows.projects.locations.workflows.get",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "path": "v1beta/{+name}",
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Gets details of a single Workflow.",
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Name of the workflow which information should be retrieved. Format: projects/{project}/locations/{location}/workflows/{workflow}",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/workflows/[^/]+$",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    }
+                  },
+                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/workflows/{workflowsId}"
+                },
+                "list": {
+                  "httpMethod": "GET",
+                  "response": {
+                    "$ref": "ListWorkflowsResponse"
+                  },
+                  "parameterOrder": [
+                    "parent"
+                  ],
+                  "id": "workflows.projects.locations.workflows.list",
+                  "description": "Lists Workflows in a given project and location. The default order is not specified.",
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "path": "v1beta/{+parent}/workflows",
+                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/workflows",
+                  "parameters": {
+                    "pageSize": {
                       "description": "Maximum number of workflows to return per call. The service may return fewer than this value. If the value is not specified, a default value of 500 will be used. The maximum permitted value is 1000 and values greater than 1000 will be coerced down to 1000.",
                       "type": "integer",
+                      "location": "query",
                       "format": "int32"
+                    },
+                    "pageToken": {
+                      "description": "A page token, received from a previous `ListWorkflows` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListWorkflows` must match the call that provided the page token.",
+                      "type": "string",
+                      "location": "query"
+                    },
+                    "orderBy": {
+                      "description": "Comma-separated list of fields that that specify the order of the results. Default sorting order for a field is ascending. To specify descending order for a field, append a \" desc\" suffix. If not specified, the results will be returned in an unspecified order.",
+                      "type": "string",
+                      "location": "query"
                     },
                     "filter": {
                       "location": "query",
                       "description": "Filter to restrict results to specific workflows.",
                       "type": "string"
+                    },
+                    "parent": {
+                      "type": "string",
+                      "required": true,
+                      "pattern": "^projects/[^/]+/locations/[^/]+$",
+                      "location": "path",
+                      "description": "Required. Project and location from which the workflows should be listed. Format: projects/{project}/locations/{location}"
+                    }
+                  }
+                },
+                "delete": {
+                  "id": "workflows.projects.locations.workflows.delete",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "httpMethod": "DELETE",
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Name of the workflow to be deleted. Format: projects/{project}/locations/{location}/workflows/{workflow}",
+                      "type": "string",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/workflows/[^/]+$",
+                      "location": "path",
+                      "required": true
                     }
                   },
-                  "response": {
-                    "$ref": "ListWorkflowsResponse"
-                  },
-                  "httpMethod": "GET",
-                  "description": "Lists Workflows in a given project and location. The default order is not specified.",
-                  "path": "v1beta/{+parent}/workflows"
-                },
-                "create": {
+                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/workflows/{workflowsId}",
+                  "path": "v1beta/{+name}",
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
+                  "description": "Deletes a workflow with the specified name. This method also cancels and deletes all running executions of the workflow."
+                },
+                "patch": {
+                  "path": "v1beta/{+name}",
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Updates an existing workflow. Running this method has no impact on already running executions of the workflow. A new revision of the workflow may be created as a result of a successful update operation. In that case, such revision will be used in new workflow executions.",
+                  "request": {
+                    "$ref": "Workflow"
+                  },
+                  "parameters": {
+                    "name": {
+                      "description": "The resource name of the workflow. Format: projects/{project}/locations/{location}/workflows/{workflow}",
+                      "type": "string",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/workflows/[^/]+$",
+                      "location": "path",
+                      "required": true
+                    },
+                    "updateMask": {
+                      "description": "List of fields to be updated. If not present, the entire workflow will be updated.",
+                      "type": "string",
+                      "location": "query",
+                      "format": "google-fieldmask"
+                    }
+                  },
+                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/workflows/{workflowsId}",
+                  "httpMethod": "PATCH",
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "id": "workflows.projects.locations.workflows.patch",
+                  "parameterOrder": [
+                    "name"
+                  ]
+                },
+                "create": {
                   "id": "workflows.projects.locations.workflows.create",
                   "parameterOrder": [
                     "parent"
                   ],
+                  "httpMethod": "POST",
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "request": {
+                    "$ref": "Workflow"
+                  },
                   "parameters": {
                     "parent": {
-                      "description": "Required. Project and location in which the workflow should be created. Format: projects/{project}/locations/{location}",
                       "required": true,
-                      "type": "string",
                       "pattern": "^projects/[^/]+/locations/[^/]+$",
-                      "location": "path"
+                      "location": "path",
+                      "type": "string",
+                      "description": "Required. Project and location in which the workflow should be created. Format: projects/{project}/locations/{location}"
                     },
                     "workflowId": {
                       "location": "query",
@@ -517,116 +631,12 @@
                       "type": "string"
                     }
                   },
-                  "response": {
-                    "$ref": "Operation"
-                  },
-                  "httpMethod": "POST",
-                  "description": "Creates a new workflow. If a workflow with the specified name already exists in the specified project and location, the long running operation will return ALREADY_EXISTS error.",
+                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/workflows",
                   "path": "v1beta/{+parent}/workflows",
-                  "request": {
-                    "$ref": "Workflow"
-                  },
-                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/workflows"
-                }
-              }
-            },
-            "operations": {
-              "methods": {
-                "get": {
-                  "id": "workflows.projects.locations.operations.get",
-                  "parameterOrder": [
-                    "name"
-                  ],
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
-                  "httpMethod": "GET",
-                  "description": "Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.",
-                  "parameters": {
-                    "name": {
-                      "location": "path",
-                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
-                      "description": "The name of the operation resource.",
-                      "required": true,
-                      "type": "string"
-                    }
-                  },
-                  "response": {
-                    "$ref": "Operation"
-                  },
-                  "path": "v1beta/{+name}"
-                },
-                "delete": {
-                  "path": "v1beta/{+name}",
-                  "httpMethod": "DELETE",
-                  "description": "Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`.",
-                  "parameters": {
-                    "name": {
-                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
-                      "location": "path",
-                      "description": "The name of the operation resource to be deleted.",
-                      "required": true,
-                      "type": "string"
-                    }
-                  },
-                  "response": {
-                    "$ref": "Empty"
-                  },
-                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "parameterOrder": [
-                    "name"
-                  ],
-                  "id": "workflows.projects.locations.operations.delete"
-                },
-                "list": {
-                  "flatPath": "v1beta/projects/{projectsId}/locations/{locationsId}/operations",
-                  "httpMethod": "GET",
-                  "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.",
-                  "parameters": {
-                    "pageSize": {
-                      "description": "The standard list page size.",
-                      "type": "integer",
-                      "format": "int32",
-                      "location": "query"
-                    },
-                    "filter": {
-                      "description": "The standard list filter.",
-                      "type": "string",
-                      "location": "query"
-                    },
-                    "returnPartialSuccess": {
-                      "location": "query",
-                      "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `\"projects/example/locations/-\"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
-                      "type": "boolean"
-                    },
-                    "name": {
-                      "description": "The name of the operation's parent resource.",
-                      "required": true,
-                      "type": "string",
-                      "location": "path",
-                      "pattern": "^projects/[^/]+/locations/[^/]+$"
-                    },
-                    "pageToken": {
-                      "location": "query",
-                      "description": "The standard list page token.",
-                      "type": "string"
-                    }
-                  },
-                  "response": {
-                    "$ref": "ListOperationsResponse"
-                  },
-                  "path": "v1beta/{+name}/operations",
-                  "id": "workflows.projects.locations.operations.list",
-                  "parameterOrder": [
-                    "name"
-                  ],
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ]
+                  "description": "Creates a new workflow. If a workflow with the specified name already exists in the specified project and location, the long running operation will return ALREADY_EXISTS error."
                 }
               }
             }
@@ -635,30 +645,42 @@
       }
     }
   },
-  "discoveryVersion": "v1",
-  "revision": "20260812",
-  "title": "Workflows API",
-  "icons": {
-    "x16": "http://www.google.com/images/icons/product/search-16.gif",
-    "x32": "http://www.google.com/images/icons/product/search-32.gif"
-  },
-  "fullyEncodeReservedExpansion": true,
+  "version_module": true,
+  "servicePath": "",
+  "rootUrl": "https://workflows.googleapis.com/",
+  "version": "v1beta",
+  "batchPath": "batch",
   "parameters": {
-    "uploadType": {
-      "location": "query",
+    "callback": {
       "type": "string",
-      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\")."
+      "description": "JSONP",
+      "location": "query"
+    },
+    "oauth_token": {
+      "type": "string",
+      "description": "OAuth 2.0 token for the current user.",
+      "location": "query"
     },
     "prettyPrint": {
-      "type": "boolean",
-      "description": "Returns response with indentations and line breaks.",
       "default": "true",
+      "location": "query",
+      "type": "boolean",
+      "description": "Returns response with indentations and line breaks."
+    },
+    "upload_protocol": {
+      "type": "string",
+      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").",
+      "location": "query"
+    },
+    "uploadType": {
+      "type": "string",
+      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
       "location": "query"
     },
     "access_token": {
+      "location": "query",
       "type": "string",
-      "description": "OAuth access token.",
-      "location": "query"
+      "description": "OAuth access token."
     },
     "key": {
       "location": "query",
@@ -670,62 +692,40 @@
         "1",
         "2"
       ],
+      "location": "query",
+      "type": "string",
       "enumDescriptions": [
         "v1 error format",
         "v2 error format"
       ],
-      "location": "query",
-      "type": "string",
       "description": "V1 error format."
     },
-    "oauth_token": {
-      "location": "query",
-      "type": "string",
-      "description": "OAuth 2.0 token for the current user."
-    },
-    "upload_protocol": {
-      "location": "query",
-      "type": "string",
-      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\")."
-    },
-    "quotaUser": {
-      "type": "string",
-      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
-      "location": "query"
-    },
     "alt": {
+      "type": "string",
+      "location": "query",
+      "default": "json",
       "enum": [
         "json",
         "media",
         "proto"
       ],
+      "description": "Data format for response.",
       "enumDescriptions": [
         "Responses with Content-Type of application/json",
         "Media download with context-dependent Content-Type",
         "Responses with Content-Type of application/x-protobuf"
-      ],
-      "location": "query",
-      "default": "json",
-      "type": "string",
-      "description": "Data format for response."
-    },
-    "callback": {
-      "type": "string",
-      "description": "JSONP",
-      "location": "query"
+      ]
     },
     "fields": {
       "type": "string",
       "description": "Selector specifying which fields to include in a partial response.",
       "location": "query"
+    },
+    "quotaUser": {
+      "type": "string",
+      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
+      "location": "query"
     }
   },
-  "id": "workflows:v1beta",
-  "kind": "discovery#restDescription",
-  "mtlsRootUrl": "https://workflows.mtls.googleapis.com/",
-  "ownerDomain": "google.com",
-  "ownerName": "Google",
-  "version": "v1beta",
-  "baseUrl": "https://workflows.googleapis.com/",
-  "version_module": true
+  "canonicalName": "Workflows"
 }
