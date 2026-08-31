@@ -1,28 +1,26 @@
 {
-  "version": "reports_v1",
+  "name": "merchantapi",
+  "kind": "discovery#restDescription",
+  "discoveryVersion": "v1",
+  "title": "Merchant API",
+  "fullyEncodeReservedExpansion": true,
+  "rootUrl": "https://merchantapi.googleapis.com/",
+  "servicePath": "",
+  "ownerDomain": "google.com",
+  "batchPath": "batch",
   "schemas": {
     "ProductStatusChangeMessage": {
       "id": "ProductStatusChangeMessage",
-      "type": "object",
       "description": "The message that the merchant will receive to notify about product status change event",
+      "type": "object",
       "properties": {
-        "changes": {
-          "description": "A message to describe the change that happened to the product",
-          "type": "array",
-          "items": {
-            "$ref": "ProductChange"
-          }
-        },
-        "resourceId": {
-          "description": "The product id.",
-          "type": "string"
-        },
-        "account": {
-          "description": "The target account that owns the entity that changed. Format : `accounts/{merchant_id}`",
-          "type": "string"
+        "resource": {
+          "type": "string",
+          "description": "The product name. Format: `accounts/{account}/products/{product}`"
         },
         "resourceType": {
           "type": "string",
+          "description": "The resource that changed, in this case it will always be `Product`.",
           "enum": [
             "RESOURCE_UNSPECIFIED",
             "PRODUCT",
@@ -32,235 +30,269 @@
             "Unspecified resource",
             "Resource type : product",
             "Account service"
-          ],
-          "description": "The resource that changed, in this case it will always be `Product`."
-        },
-        "attribute": {
-          "description": "The attribute in the resource that changed, in this case it will be always `Status`.",
-          "enumDescriptions": [
-            "Unspecified attribute",
-            "Status of the changed entity"
-          ],
-          "type": "string",
-          "enum": [
-            "ATTRIBUTE_UNSPECIFIED",
-            "STATUS"
           ]
         },
         "managingAccount": {
           "type": "string",
           "description": "The account that manages the merchant's account. can be the same as merchant id if it is standalone account. Format : `accounts/{service_provider_id}`"
         },
-        "resource": {
-          "description": "The product name. Format: `accounts/{account}/products/{product}`",
+        "expirationTime": {
+          "format": "google-datetime",
+          "type": "string",
+          "description": "Optional. The product expiration time. This field will not be set if the notification is sent for a product deletion event."
+        },
+        "account": {
+          "type": "string",
+          "description": "The target account that owns the entity that changed. Format : `accounts/{merchant_id}`"
+        },
+        "resourceId": {
+          "description": "The product id.",
           "type": "string"
         },
-        "expirationTime": {
-          "description": "Optional. The product expiration time. This field will not be set if the notification is sent for a product deletion event.",
-          "type": "string",
-          "format": "google-datetime"
-        },
         "eventTime": {
-          "description": "The time at which the event was generated. If you want to order the notification messages you receive you should rely on this field not on the order of receiving the notifications.",
           "format": "google-datetime",
+          "description": "The time at which the event was generated. If you want to order the notification messages you receive you should rely on this field not on the order of receiving the notifications.",
+          "type": "string"
+        },
+        "changes": {
+          "description": "A message to describe the change that happened to the product",
+          "items": {
+            "$ref": "ProductChange"
+          },
+          "type": "array"
+        },
+        "attribute": {
+          "description": "The attribute in the resource that changed, in this case it will be always `Status`.",
+          "enum": [
+            "ATTRIBUTE_UNSPECIFIED",
+            "STATUS"
+          ],
+          "enumDescriptions": [
+            "Unspecified attribute",
+            "Status of the changed entity"
+          ],
           "type": "string"
         }
       }
     },
-    "CompetitiveVisibilityTopMerchantView": {
+    "ItemIssue": {
+      "description": "Item issue associated with the product.",
+      "id": "ItemIssue",
+      "type": "object",
       "properties": {
-        "isYourDomain": {
-          "type": "boolean",
-          "description": "True if this row contains data for your domain. Cannot be filtered on in the 'WHERE' clause."
-        },
-        "trafficSource": {
+        "resolution": {
           "enumDescriptions": [
             "Not specified.",
-            "Organic traffic.",
-            "Traffic from ads.",
-            "Organic and ads traffic."
+            "The merchant has to fix the issue.",
+            "The issue will be resolved automatically (for example, image crawl) or through a Google review. No merchant action is required now. Resolution might lead to another issue (for example, if crawl fails)."
           ],
-          "type": "string",
           "enum": [
-            "TRAFFIC_SOURCE_ENUM_UNSPECIFIED",
-            "ORGANIC",
-            "ADS",
-            "ALL"
+            "ITEM_ISSUE_RESOLUTION_UNSPECIFIED",
+            "MERCHANT_ACTION",
+            "PENDING_PROCESSING"
           ],
-          "description": "Traffic source of impressions. Required in the `SELECT` clause."
-        },
-        "rank": {
-          "description": "Position of the domain in the top merchants ranking for the selected keys (`date`, `report_category_id`, `report_country_code`, `traffic_source`) based on impressions. 1 is the highest. Cannot be filtered on in the 'WHERE' clause.",
-          "format": "int64",
+          "description": "Item issue resolution.",
           "type": "string"
         },
-        "pageOverlapRate": {
-          "format": "double",
-          "type": "number",
-          "description": "[Page overlap rate] (https://support.google.com/merchants/answer/11366442#zippy=%2Cpage-overlap-rate) shows how frequently competing retailers’ offers are shown together with your offers on the same page. Cannot be filtered on in the 'WHERE' clause."
+        "type": {
+          "$ref": "ItemIssueType",
+          "description": "Item issue type."
+        },
+        "severity": {
+          "description": "Item issue severity.",
+          "$ref": "ItemIssueSeverity"
+        }
+      }
+    },
+    "PriceCompetitivenessProductView": {
+      "description": "Fields available for query in `price_competitiveness_product_view` table. [Price competitiveness](https://support.google.com/merchants/answer/9626903) report. Values are only set for fields requested explicitly in the request's search query.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "description": "Title of the product.",
+          "type": "string"
         },
         "reportCountryCode": {
-          "description": "Country where impressions appeared. Required in the `SELECT` clause. A condition on `report_country_code` is required in the `WHERE` clause.",
+          "type": "string",
+          "description": "Country of the price benchmark. Represented in the ISO 3166 format. Required in the `SELECT` clause."
+        },
+        "id": {
+          "description": "REST ID of the product, in the form of `channel~languageCode~feedLabel~offerId`. Can be used to join data with the `product_view` table. Required in the `SELECT` clause.",
           "type": "string"
         },
-        "reportCategoryId": {
-          "format": "int64",
-          "description": "Google product category ID to calculate the report for, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436). Required in the `SELECT` clause. A condition on `report_category_id` is required in the `WHERE` clause.",
+        "categoryL3": {
+          "type": "string",
+          "description": "Product category (3rd level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
+        },
+        "benchmarkPrice": {
+          "$ref": "Price",
+          "description": "Latest available price benchmark for the product's catalog in the benchmark country."
+        },
+        "offerId": {
+          "type": "string",
+          "description": "Merchant-provided id of the product."
+        },
+        "productTypeL3": {
+          "type": "string",
+          "description": "Product type (3rd level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
+        },
+        "productTypeL5": {
+          "description": "Product type (5th level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406).",
           "type": "string"
         },
-        "date": {
-          "$ref": "Date",
-          "description": "Date of this row. Cannot be selected in the `SELECT` clause. A condition on `date` is required in the `WHERE` clause."
+        "categoryL1": {
+          "description": "Product category (1st level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
+          "type": "string"
         },
-        "higherPositionRate": {
-          "format": "double",
-          "description": "[Higher position rate] (https://support.google.com/merchants/answer/11366442#zippy=%2Chigher-position-rate) shows how often a competitor’s offer got placed in a higher position on the page than your offer. Cannot be filtered on in the 'WHERE' clause.",
-          "type": "number"
+        "categoryL2": {
+          "type": "string",
+          "description": "Product category (2nd level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
         },
-        "adsOrganicRatio": {
-          "description": "[Ads / organic ratio] (https://support.google.com/merchants/answer/11366442#zippy=%2Cads-free-ratio) shows how often the domain receives impressions from Shopping ads compared to organic traffic. The number is rounded and bucketed. Cannot be filtered on in the 'WHERE' clause.",
-          "type": "number",
-          "format": "double"
+        "categoryL5": {
+          "type": "string",
+          "description": "Product category (5th level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
         },
-        "domain": {
-          "description": "Domain of your competitor or your domain, if 'is_your_domain' is true. Required in the `SELECT` clause. Cannot be filtered on in the 'WHERE' clause.",
+        "productTypeL4": {
+          "type": "string",
+          "description": "Product type (4th level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
+        },
+        "productTypeL1": {
+          "description": "Product type (1st level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406).",
+          "type": "string"
+        },
+        "categoryL4": {
+          "type": "string",
+          "description": "Product category (4th level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
+        },
+        "productTypeL2": {
+          "description": "Product type (2nd level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406).",
+          "type": "string"
+        },
+        "price": {
+          "$ref": "Price",
+          "description": "Current price of the product."
+        },
+        "brand": {
+          "description": "Brand of the product.",
           "type": "string"
         }
       },
-      "id": "CompetitiveVisibilityTopMerchantView",
+      "id": "PriceCompetitivenessProductView"
+    },
+    "BestSellersBrandView": {
       "type": "object",
-      "description": "Fields available for query in `competitive_visibility_top_merchant_view` table. [Competitive visibility](https://support.google.com/merchants/answer/11366442) report with business with highest visibility. Values are only set for fields requested explicitly in the request's search query."
+      "properties": {
+        "reportCountryCode": {
+          "description": "Country where the ranking is calculated. Represented in the ISO 3166 format. Required in the `SELECT` clause. Condition on `report_country_code` is required in the `WHERE` clause.",
+          "type": "string"
+        },
+        "previousRelativeDemand": {
+          "enum": [
+            "RELATIVE_DEMAND_ENUM_UNSPECIFIED",
+            "VERY_LOW",
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "VERY_HIGH"
+          ],
+          "enumDescriptions": [
+            "Not specified.",
+            "Demand is 0-5% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 6-10% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 11-20% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 21-50% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 51-100% of the demand of the highest ranked product cluster or brand."
+          ],
+          "type": "string",
+          "description": "Estimated demand in relation to the brand with the highest popularity rank in the same category and country in the previous week or month."
+        },
+        "reportCategoryId": {
+          "description": "Google product category ID to calculate the ranking for, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436). Required in the `SELECT` clause. If a `WHERE` condition on `report_category_id` is not specified in the query, rankings for all top-level categories are returned.",
+          "format": "int64",
+          "type": "string"
+        },
+        "relativeDemandChange": {
+          "description": "Change in the estimated demand. Whether it rose, sank or remained flat.",
+          "enumDescriptions": [
+            "Not specified.",
+            "Relative demand is lower than the previous time period.",
+            "Relative demand is equal to the previous time period.",
+            "Relative demand is higher than the previous time period."
+          ],
+          "enum": [
+            "RELATIVE_DEMAND_CHANGE_TYPE_ENUM_UNSPECIFIED",
+            "SINKER",
+            "FLAT",
+            "RISER"
+          ],
+          "type": "string"
+        },
+        "reportDate": {
+          "description": "Report date. The value of this field can only be one of the following: * The first day of the week (Monday) for weekly reports, * The first day of the month for monthly reports. Required in the `SELECT` clause. If a `WHERE` condition on `report_date` is not specified in the query, the latest available weekly or monthly report is returned.",
+          "$ref": "Date"
+        },
+        "brand": {
+          "description": "Name of the brand.",
+          "type": "string"
+        },
+        "rank": {
+          "type": "string",
+          "format": "int64",
+          "description": "Popularity of the brand on Ads and organic surfaces, in the selected category and country, based on the estimated number of units sold."
+        },
+        "previousRank": {
+          "type": "string",
+          "format": "int64",
+          "description": "Popularity rank in the previous week or month."
+        },
+        "reportGranularity": {
+          "type": "string",
+          "enumDescriptions": [
+            "Not specified.",
+            "Report is computed over a week timeframe.",
+            "Report is computed over a month timeframe."
+          ],
+          "enum": [
+            "REPORT_GRANULARITY_ENUM_UNSPECIFIED",
+            "WEEKLY",
+            "MONTHLY"
+          ],
+          "description": "Granularity of the report. The ranking can be done over a week or a month timeframe. Required in the `SELECT` clause. Condition on `report_granularity` is required in the `WHERE` clause."
+        },
+        "relativeDemand": {
+          "enum": [
+            "RELATIVE_DEMAND_ENUM_UNSPECIFIED",
+            "VERY_LOW",
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "VERY_HIGH"
+          ],
+          "enumDescriptions": [
+            "Not specified.",
+            "Demand is 0-5% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 6-10% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 11-20% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 21-50% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 51-100% of the demand of the highest ranked product cluster or brand."
+          ],
+          "type": "string",
+          "description": "Estimated demand in relation to the brand with the highest popularity rank in the same category and country."
+        }
+      },
+      "id": "BestSellersBrandView",
+      "description": "Fields available for query in `best_sellers_brand_view` table. [Best sellers](https://support.google.com/merchants/answer/9488679) report with top brands. Values are only set for fields requested explicitly in the request's search query."
     },
     "ProductPerformanceView": {
       "properties": {
-        "conversionRate": {
-          "format": "double",
-          "description": "Number of conversions divided by the number of clicks, reported on the impression date. Metric. Available only for the `FREE` traffic source.",
-          "type": "number"
-        },
-        "date": {
-          "$ref": "Date",
-          "description": "Date in the Merchant Center account timezone to which metrics apply. Segment. Condition on `date` is required in the `WHERE` clause."
-        },
-        "brand": {
-          "description": "Brand of the product. Segment.",
+        "impressions": {
+          "format": "int64",
+          "description": "Number of times merchant's products are shown. Metric.",
           "type": "string"
         },
         "categoryL3": {
           "type": "string",
           "description": "[Product category (3rd level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in Google's product taxonomy. Segment."
-        },
-        "customerCountryCode": {
-          "type": "string",
-          "description": "Code of the country where the customer is located at the time of the event. Represented in the ISO 3166 format. Segment. If the customer country cannot be determined, a special 'ZZ' code is returned."
-        },
-        "categoryL4": {
-          "type": "string",
-          "description": "[Product category (4th level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in Google's product taxonomy. Segment."
-        },
-        "categoryL1": {
-          "description": "[Product category (1st level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in Google's product taxonomy. Segment.",
-          "type": "string"
-        },
-        "categoryL2": {
-          "description": "[Product category (2nd level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in Google's product taxonomy. Segment.",
-          "type": "string"
-        },
-        "customLabel0": {
-          "type": "string",
-          "description": "Custom label 0 for custom grouping of products. Segment."
-        },
-        "storeType": {
-          "description": "Store type to which metrics apply. Can be `ONLINE_STORE` or `LOCAL_STORES`. Segment. For `LOCAL_STORES` store type, further segmentation by a specific store is not available.",
-          "enumDescriptions": [
-            "Not specified.",
-            "Online store.",
-            "Local (physical) stores."
-          ],
-          "type": "string",
-          "enum": [
-            "STORE_TYPE_ENUM_UNSPECIFIED",
-            "ONLINE_STORE",
-            "LOCAL_STORES"
-          ]
-        },
-        "marketingMethod": {
-          "description": "Marketing method to which metrics apply. Segment.",
-          "type": "string",
-          "enum": [
-            "MARKETING_METHOD_ENUM_UNSPECIFIED",
-            "ORGANIC",
-            "ADS"
-          ],
-          "enumDescriptions": [
-            "Not specified.",
-            "Organic marketing.",
-            "Ads-based marketing."
-          ]
-        },
-        "productTypeL5": {
-          "description": "[Product type (5th level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in merchant's own product taxonomy. Segment.",
-          "type": "string"
-        },
-        "conversions": {
-          "description": "Number of conversions attributed to the product, reported on the conversion date. Depending on the attribution model, a conversion might be distributed across multiple clicks, where each click gets its own credit assigned. This metric is a sum of all such credits. Metric. Available only for the `FREE` traffic source.",
-          "format": "double",
-          "type": "number"
-        },
-        "week": {
-          "$ref": "Date",
-          "description": "First day of the week (Monday) of the metrics date in the Merchant Center account timezone. Segment."
-        },
-        "offerId": {
-          "description": "Merchant-provided id of the product. Segment.",
-          "type": "string"
-        },
-        "clickThroughRate": {
-          "format": "double",
-          "type": "number",
-          "description": "Click-through rate - the number of clicks merchant's products receive (clicks) divided by the number of times the products are shown (impressions). Metric."
-        },
-        "categoryL5": {
-          "description": "[Product category (5th level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in Google's product taxonomy. Segment.",
-          "type": "string"
-        },
-        "conversionValue": {
-          "$ref": "Price",
-          "description": "Value of conversions attributed to the product, reported on the conversion date. Metric. Available only for the `FREE` traffic source."
-        },
-        "impressions": {
-          "type": "string",
-          "format": "int64",
-          "description": "Number of times merchant's products are shown. Metric."
-        },
-        "productTypeL3": {
-          "description": "[Product type (3rd level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in merchant's own product taxonomy. Segment.",
-          "type": "string"
-        },
-        "customLabel3": {
-          "description": "Custom label 3 for custom grouping of products. Segment.",
-          "type": "string"
-        },
-        "title": {
-          "type": "string",
-          "description": "Title of the product. Segment."
-        },
-        "customLabel2": {
-          "type": "string",
-          "description": "Custom label 2 for custom grouping of products. Segment."
-        },
-        "productTypeL1": {
-          "description": "[Product type (1st level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in merchant's own product taxonomy. Segment.",
-          "type": "string"
-        },
-        "clicks": {
-          "type": "string",
-          "format": "int64",
-          "description": "Number of clicks. Metric."
-        },
-        "customLabel1": {
-          "description": "Custom label 1 for custom grouping of products. Segment.",
-          "type": "string"
         },
         "customLabel4": {
           "description": "Custom label 4 for custom grouping of products. Segment.",
@@ -270,27 +302,527 @@
           "description": "[Product type (2nd level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in merchant's own product taxonomy. Segment.",
           "type": "string"
         },
+        "clicks": {
+          "description": "Number of clicks. Metric.",
+          "type": "string",
+          "format": "int64"
+        },
+        "storeType": {
+          "enum": [
+            "STORE_TYPE_ENUM_UNSPECIFIED",
+            "ONLINE_STORE",
+            "LOCAL_STORES"
+          ],
+          "type": "string",
+          "description": "Store type to which metrics apply. Can be `ONLINE_STORE` or `LOCAL_STORES`. Segment. For `LOCAL_STORES` store type, further segmentation by a specific store is not available.",
+          "enumDescriptions": [
+            "Not specified.",
+            "Online store.",
+            "Local (physical) stores."
+          ]
+        },
+        "conversionRate": {
+          "description": "Number of conversions divided by the number of clicks, reported on the impression date. Metric. Available only for the `FREE` traffic source.",
+          "format": "double",
+          "type": "number"
+        },
+        "marketingMethod": {
+          "enumDescriptions": [
+            "Not specified.",
+            "Organic marketing.",
+            "Ads-based marketing."
+          ],
+          "description": "Marketing method to which metrics apply. Segment.",
+          "type": "string",
+          "enum": [
+            "MARKETING_METHOD_ENUM_UNSPECIFIED",
+            "ORGANIC",
+            "ADS"
+          ]
+        },
+        "productTypeL3": {
+          "description": "[Product type (3rd level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in merchant's own product taxonomy. Segment.",
+          "type": "string"
+        },
+        "title": {
+          "description": "Title of the product. Segment.",
+          "type": "string"
+        },
+        "offerId": {
+          "description": "Merchant-provided id of the product. Segment.",
+          "type": "string"
+        },
+        "customLabel3": {
+          "description": "Custom label 3 for custom grouping of products. Segment.",
+          "type": "string"
+        },
+        "customerCountryCode": {
+          "type": "string",
+          "description": "Code of the country where the customer is located at the time of the event. Represented in the ISO 3166 format. Segment. If the customer country cannot be determined, a special 'ZZ' code is returned."
+        },
+        "categoryL1": {
+          "description": "[Product category (1st level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in Google's product taxonomy. Segment.",
+          "type": "string"
+        },
+        "productTypeL1": {
+          "description": "[Product type (1st level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in merchant's own product taxonomy. Segment.",
+          "type": "string"
+        },
         "productTypeL4": {
           "description": "[Product type (4th level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in merchant's own product taxonomy. Segment.",
           "type": "string"
+        },
+        "brand": {
+          "description": "Brand of the product. Segment.",
+          "type": "string"
+        },
+        "categoryL4": {
+          "description": "[Product category (4th level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in Google's product taxonomy. Segment.",
+          "type": "string"
+        },
+        "productTypeL5": {
+          "type": "string",
+          "description": "[Product type (5th level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in merchant's own product taxonomy. Segment."
+        },
+        "customLabel1": {
+          "description": "Custom label 1 for custom grouping of products. Segment.",
+          "type": "string"
+        },
+        "customLabel0": {
+          "description": "Custom label 0 for custom grouping of products. Segment.",
+          "type": "string"
+        },
+        "customLabel2": {
+          "type": "string",
+          "description": "Custom label 2 for custom grouping of products. Segment."
+        },
+        "categoryL2": {
+          "description": "[Product category (2nd level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in Google's product taxonomy. Segment.",
+          "type": "string"
+        },
+        "categoryL5": {
+          "type": "string",
+          "description": "[Product category (5th level)](https://developers.google.com/shopping-content/guides/reports/segmentation#category_and_product_type) in Google's product taxonomy. Segment."
+        },
+        "week": {
+          "description": "First day of the week (Monday) of the metrics date in the Merchant Center account timezone. Segment.",
+          "$ref": "Date"
+        },
+        "conversionValue": {
+          "$ref": "Price",
+          "description": "Value of conversions attributed to the product, reported on the conversion date. Metric. Available only for the `FREE` traffic source."
+        },
+        "date": {
+          "$ref": "Date",
+          "description": "Date in the Merchant Center account timezone to which metrics apply. Segment. Condition on `date` is required in the `WHERE` clause."
+        },
+        "conversions": {
+          "format": "double",
+          "description": "Number of conversions attributed to the product, reported on the conversion date. Depending on the attribution model, a conversion might be distributed across multiple clicks, where each click gets its own credit assigned. This metric is a sum of all such credits. Metric. Available only for the `FREE` traffic source.",
+          "type": "number"
+        },
+        "clickThroughRate": {
+          "description": "Click-through rate - the number of clicks merchant's products receive (clicks) divided by the number of times the products are shown (impressions). Metric.",
+          "type": "number",
+          "format": "double"
         }
       },
-      "type": "object",
       "description": "Fields available for query in `product_performance_view` table. Product performance data for your account, including performance metrics (for example, `clicks`) and dimensions according to which performance metrics are segmented (for example, `offer_id`). Values of product dimensions, such as `offer_id`, reflect the state of a product at the time of the impression. Segment fields cannot be selected in queries without also selecting at least one metric field. Values are only set for fields requested explicitly in the request's search query.",
+      "type": "object",
       "id": "ProductPerformanceView"
     },
-    "ItemIssueSeverity": {
-      "id": "ItemIssueSeverity",
-      "type": "object",
+    "Price": {
       "properties": {
-        "severityPerReportingContext": {
-          "description": "Issue severity per reporting context. Reporting contexts included in this list can be restricted using a filter on the `reporting_context` field.",
-          "items": {
-            "$ref": "IssueSeverityPerReportingContext"
-          },
-          "type": "array"
+        "amountMicros": {
+          "description": "The price represented as a number in micros (1 million micros is an equivalent to one's currency standard unit, for example, 1 USD = 1000000 micros).",
+          "type": "string",
+          "format": "int64"
         },
+        "currencyCode": {
+          "type": "string",
+          "description": "The currency of the price using three-letter acronyms according to [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217)."
+        }
+      },
+      "description": "The price represented as a number and currency.",
+      "id": "Price",
+      "type": "object"
+    },
+    "StatusPerReportingContext": {
+      "description": "Status of the product for a specific reporting context. Equivalent to `DestinationStatus` in Products API.",
+      "properties": {
+        "disapprovedCountries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of disapproved countries in the reporting context, represented in [ISO 3166](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) format, for example, `US`."
+        },
+        "pendingCountries": {
+          "description": "List of pending countries in the reporting context, represented in [ISO 3166](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) format, for example, `US`.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "approvedCountries": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "description": "List of approved countries in the reporting context, represented in [ISO 3166](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) format, for example, `US`."
+        },
+        "reportingContext": {
+          "enumDescriptions": [
+            "Not specified.",
+            "[Shopping ads](https://support.google.com/merchants/answer/6149970).",
+            "Deprecated: Use `DEMAND_GEN_ADS` instead. [Discovery and Demand Gen ads](https://support.google.com/merchants/answer/13389785).",
+            "[Demand Gen ads](https://support.google.com/merchants/answer/13389785).",
+            "[Demand Gen ads on Discover surface](https://support.google.com/merchants/answer/13389785).",
+            "[Video ads](https://support.google.com/google-ads/answer/6340491).",
+            "[Display ads](https://support.google.com/merchants/answer/6069387).",
+            "[Local inventory ads](https://support.google.com/merchants/answer/3271956).",
+            "[Vehicle inventory ads](https://support.google.com/merchants/answer/11544533).",
+            "[Free product listings](https://support.google.com/merchants/answer/9199328).",
+            "[Free product listings on UCP checkout](https://developers.google.com/merchant/ucp).",
+            "[Free local product listings](https://support.google.com/merchants/answer/9825611).",
+            "[Free local vehicle listings](https://support.google.com/merchants/answer/11544533).",
+            "[Youtube Affiliate](https://support.google.com/youtube/answer/13376398).",
+            "[YouTube Shopping](https://support.google.com/merchants/answer/13478370).",
+            "[Cloud retail](https://cloud.google.com/solutions/retail).",
+            "[Local cloud retail](https://cloud.google.com/solutions/retail).",
+            "[Product Reviews](https://support.google.com/merchants/answer/14620732).",
+            "[Merchant Reviews](https://developers.google.com/merchant-review-feeds).",
+            "YouTube Checkout ."
+          ],
+          "enum": [
+            "REPORTING_CONTEXT_ENUM_UNSPECIFIED",
+            "SHOPPING_ADS",
+            "DISCOVERY_ADS",
+            "DEMAND_GEN_ADS",
+            "DEMAND_GEN_ADS_DISCOVER_SURFACE",
+            "VIDEO_ADS",
+            "DISPLAY_ADS",
+            "LOCAL_INVENTORY_ADS",
+            "VEHICLE_INVENTORY_ADS",
+            "FREE_LISTINGS",
+            "FREE_LISTINGS_UCP_CHECKOUT",
+            "FREE_LOCAL_LISTINGS",
+            "FREE_LOCAL_VEHICLE_LISTINGS",
+            "YOUTUBE_AFFILIATE",
+            "YOUTUBE_SHOPPING",
+            "CLOUD_RETAIL",
+            "LOCAL_CLOUD_RETAIL",
+            "PRODUCT_REVIEWS",
+            "MERCHANT_REVIEWS",
+            "YOUTUBE_CHECKOUT"
+          ],
+          "enumDeprecated": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "type": "string",
+          "description": "Reporting context the status applies to."
+        }
+      },
+      "id": "StatusPerReportingContext",
+      "type": "object"
+    },
+    "IssueSeverityPerReportingContext": {
+      "type": "object",
+      "id": "IssueSeverityPerReportingContext",
+      "properties": {
+        "disapprovedCountries": {
+          "description": "List of disapproved countries in the reporting context, represented in ISO 3166 format.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "reportingContext": {
+          "enum": [
+            "REPORTING_CONTEXT_ENUM_UNSPECIFIED",
+            "SHOPPING_ADS",
+            "DISCOVERY_ADS",
+            "DEMAND_GEN_ADS",
+            "DEMAND_GEN_ADS_DISCOVER_SURFACE",
+            "VIDEO_ADS",
+            "DISPLAY_ADS",
+            "LOCAL_INVENTORY_ADS",
+            "VEHICLE_INVENTORY_ADS",
+            "FREE_LISTINGS",
+            "FREE_LISTINGS_UCP_CHECKOUT",
+            "FREE_LOCAL_LISTINGS",
+            "FREE_LOCAL_VEHICLE_LISTINGS",
+            "YOUTUBE_AFFILIATE",
+            "YOUTUBE_SHOPPING",
+            "CLOUD_RETAIL",
+            "LOCAL_CLOUD_RETAIL",
+            "PRODUCT_REVIEWS",
+            "MERCHANT_REVIEWS",
+            "YOUTUBE_CHECKOUT"
+          ],
+          "type": "string",
+          "enumDescriptions": [
+            "Not specified.",
+            "[Shopping ads](https://support.google.com/merchants/answer/6149970).",
+            "Deprecated: Use `DEMAND_GEN_ADS` instead. [Discovery and Demand Gen ads](https://support.google.com/merchants/answer/13389785).",
+            "[Demand Gen ads](https://support.google.com/merchants/answer/13389785).",
+            "[Demand Gen ads on Discover surface](https://support.google.com/merchants/answer/13389785).",
+            "[Video ads](https://support.google.com/google-ads/answer/6340491).",
+            "[Display ads](https://support.google.com/merchants/answer/6069387).",
+            "[Local inventory ads](https://support.google.com/merchants/answer/3271956).",
+            "[Vehicle inventory ads](https://support.google.com/merchants/answer/11544533).",
+            "[Free product listings](https://support.google.com/merchants/answer/9199328).",
+            "[Free product listings on UCP checkout](https://developers.google.com/merchant/ucp).",
+            "[Free local product listings](https://support.google.com/merchants/answer/9825611).",
+            "[Free local vehicle listings](https://support.google.com/merchants/answer/11544533).",
+            "[Youtube Affiliate](https://support.google.com/youtube/answer/13376398).",
+            "[YouTube Shopping](https://support.google.com/merchants/answer/13478370).",
+            "[Cloud retail](https://cloud.google.com/solutions/retail).",
+            "[Local cloud retail](https://cloud.google.com/solutions/retail).",
+            "[Product Reviews](https://support.google.com/merchants/answer/14620732).",
+            "[Merchant Reviews](https://developers.google.com/merchant-review-feeds).",
+            "YouTube Checkout ."
+          ],
+          "enumDeprecated": [
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false,
+            false
+          ],
+          "description": "Reporting context the issue applies to."
+        },
+        "demotedCountries": {
+          "description": "List of demoted countries in the reporting context, represented in ISO 3166 format.",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Issue severity per reporting context."
+    },
+    "CompetitiveVisibilityTopMerchantView": {
+      "id": "CompetitiveVisibilityTopMerchantView",
+      "properties": {
+        "domain": {
+          "description": "Domain of your competitor or your domain, if 'is_your_domain' is true. Required in the `SELECT` clause. Cannot be filtered on in the 'WHERE' clause.",
+          "type": "string"
+        },
+        "pageOverlapRate": {
+          "type": "number",
+          "format": "double",
+          "description": "[Page overlap rate] (https://support.google.com/merchants/answer/11366442#zippy=%2Cpage-overlap-rate) shows how frequently competing retailers’ offers are shown together with your offers on the same page. Cannot be filtered on in the 'WHERE' clause."
+        },
+        "trafficSource": {
+          "type": "string",
+          "enum": [
+            "TRAFFIC_SOURCE_ENUM_UNSPECIFIED",
+            "ORGANIC",
+            "ADS",
+            "ALL"
+          ],
+          "description": "Traffic source of impressions. Required in the `SELECT` clause.",
+          "enumDescriptions": [
+            "Not specified.",
+            "Organic traffic.",
+            "Traffic from ads.",
+            "Organic and ads traffic."
+          ]
+        },
+        "higherPositionRate": {
+          "description": "[Higher position rate] (https://support.google.com/merchants/answer/11366442#zippy=%2Chigher-position-rate) shows how often a competitor’s offer got placed in a higher position on the page than your offer. Cannot be filtered on in the 'WHERE' clause.",
+          "format": "double",
+          "type": "number"
+        },
+        "isYourDomain": {
+          "type": "boolean",
+          "description": "True if this row contains data for your domain. Cannot be filtered on in the 'WHERE' clause."
+        },
+        "date": {
+          "description": "Date of this row. Cannot be selected in the `SELECT` clause. A condition on `date` is required in the `WHERE` clause.",
+          "$ref": "Date"
+        },
+        "rank": {
+          "description": "Position of the domain in the top merchants ranking for the selected keys (`date`, `report_category_id`, `report_country_code`, `traffic_source`) based on impressions. 1 is the highest. Cannot be filtered on in the 'WHERE' clause.",
+          "type": "string",
+          "format": "int64"
+        },
+        "adsOrganicRatio": {
+          "format": "double",
+          "type": "number",
+          "description": "[Ads / organic ratio] (https://support.google.com/merchants/answer/11366442#zippy=%2Cads-free-ratio) shows how often the domain receives impressions from Shopping ads compared to organic traffic. The number is rounded and bucketed. Cannot be filtered on in the 'WHERE' clause."
+        },
+        "reportCountryCode": {
+          "description": "Country where impressions appeared. Required in the `SELECT` clause. A condition on `report_country_code` is required in the `WHERE` clause.",
+          "type": "string"
+        },
+        "reportCategoryId": {
+          "description": "Google product category ID to calculate the report for, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436). Required in the `SELECT` clause. A condition on `report_category_id` is required in the `WHERE` clause.",
+          "type": "string",
+          "format": "int64"
+        }
+      },
+      "description": "Fields available for query in `competitive_visibility_top_merchant_view` table. [Competitive visibility](https://support.google.com/merchants/answer/11366442) report with business with highest visibility. Values are only set for fields requested explicitly in the request's search query.",
+      "type": "object"
+    },
+    "SearchResponse": {
+      "id": "SearchResponse",
+      "description": "Response message for the `ReportService.Search` method.",
+      "properties": {
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "ReportRow"
+          },
+          "description": "Rows that matched the search query."
+        },
+        "nextPageToken": {
+          "description": "Token which can be sent as `page_token` to retrieve the next page. If omitted, there are no subsequent pages.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "NonProductPerformanceView": {
+      "properties": {
+        "clicks": {
+          "description": "Number of clicks on images and online store links leading to your non-product pages. Metric.",
+          "type": "string",
+          "format": "int64"
+        },
+        "impressions": {
+          "type": "string",
+          "format": "int64",
+          "description": "Number of times images and online store links leading to your non-product pages were shown. Metric."
+        },
+        "week": {
+          "description": "First day of the week (Monday) of the metrics date in the Merchant Center account timezone. Segment.",
+          "$ref": "Date"
+        },
+        "clickThroughRate": {
+          "description": "Click-through rate - the number of clicks (`clicks`) divided by the number of impressions (`impressions`) of images and online store links leading to your non-product pages. Metric.",
+          "type": "number",
+          "format": "double"
+        },
+        "date": {
+          "description": "Date in the Merchant Center account timezone to which metrics apply. Segment. Condition on `date` is required in the `WHERE` clause.",
+          "$ref": "Date"
+        }
+      },
+      "id": "NonProductPerformanceView",
+      "description": "Fields available for query in `non_product_performance_view` table. Performance data on images and online store links leading to your non-product pages. This includes performance metrics (for example, `clicks`) and dimensions according to which performance metrics are segmented (for example, `date`). Segment fields cannot be selected in queries without also selecting at least one metric field. Values are only set for fields requested explicitly in the request's search query.",
+      "type": "object"
+    },
+    "CompetitiveVisibilityCompetitorView": {
+      "description": "Fields available for query in `competitive_visibility_competitor_view` table. [Competitive visibility](https://support.google.com/merchants/answer/11366442) report with businesses with similar visibility. Values are only set for fields requested explicitly in the request's search query.",
+      "properties": {
+        "higherPositionRate": {
+          "format": "double",
+          "type": "number",
+          "description": "[Higher position rate] (https://support.google.com/merchants/answer/11366442#zippy=%2Chigher-position-rate) shows how often a competitor’s offer got placed in a higher position on the page than your offer. Cannot be filtered on in the 'WHERE' clause."
+        },
+        "trafficSource": {
+          "enum": [
+            "TRAFFIC_SOURCE_ENUM_UNSPECIFIED",
+            "ORGANIC",
+            "ADS",
+            "ALL"
+          ],
+          "description": "Traffic source of impressions. Required in the `SELECT` clause.",
+          "type": "string",
+          "enumDescriptions": [
+            "Not specified.",
+            "Organic traffic.",
+            "Traffic from ads.",
+            "Organic and ads traffic."
+          ]
+        },
+        "relativeVisibility": {
+          "type": "number",
+          "description": "[Relative visibility] (https://support.google.com/merchants/answer/11366442#zippy=%2Crelative-visibility) shows how often your competitors’ offers are shown compared to your offers. In other words, this is the number of displayed impressions of a competitor retailer divided by the number of your displayed impressions during a selected time range for a selected product category and country. Cannot be filtered on in the 'WHERE' clause.",
+          "format": "double"
+        },
+        "reportCategoryId": {
+          "format": "int64",
+          "type": "string",
+          "description": "Google product category ID to calculate the report for, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436). Required in the `SELECT` clause. A condition on `report_category_id` is required in the `WHERE` clause."
+        },
+        "isYourDomain": {
+          "description": "True if this row contains data for your domain. Cannot be filtered on in the 'WHERE' clause.",
+          "type": "boolean"
+        },
+        "domain": {
+          "type": "string",
+          "description": "Domain of your competitor or your domain, if 'is_your_domain' is true. Required in the `SELECT` clause. Cannot be filtered on in the 'WHERE' clause."
+        },
+        "reportCountryCode": {
+          "type": "string",
+          "description": "Country where impressions appeared. Required in the `SELECT` clause. A condition on `report_country_code` is required in the `WHERE` clause."
+        },
+        "adsOrganicRatio": {
+          "type": "number",
+          "format": "double",
+          "description": "[Ads / organic ratio] (https://support.google.com/merchants/answer/11366442#zippy=%2Cads-free-ratio) shows how often the domain receives impressions from Shopping ads compared to organic traffic. The number is rounded and bucketed. Cannot be filtered on in the 'WHERE' clause."
+        },
+        "date": {
+          "description": "Date of this row. A condition on `date` is required in the `WHERE` clause.",
+          "$ref": "Date"
+        },
+        "rank": {
+          "type": "string",
+          "description": "Position of the domain in the similar businesses ranking for the selected keys (`date`, `report_category_id`, `report_country_code`, `traffic_source`) based on impressions. 1 is the highest. Cannot be filtered on in the 'WHERE' clause.",
+          "format": "int64"
+        },
+        "pageOverlapRate": {
+          "type": "number",
+          "description": "[Page overlap rate] (https://support.google.com/merchants/answer/11366442#zippy=%2Cpage-overlap-rate) shows how frequently competing retailers’ offers are shown together with your offers on the same page. Cannot be filtered on in the 'WHERE' clause.",
+          "format": "double"
+        }
+      },
+      "id": "CompetitiveVisibilityCompetitorView",
+      "type": "object"
+    },
+    "ItemIssueSeverity": {
+      "type": "object",
+      "description": "How the issue affects the serving of the product.",
+      "properties": {
         "aggregatedSeverity": {
+          "description": "Aggregated severity of the issue for all reporting contexts it affects. Reporting contexts included in the computation of the aggregated severity can be restricted using a filter on the `reporting_context` field. **This field can be used for filtering the results.**",
           "enumDescriptions": [
             "Not specified.",
             "Issue disapproves the product in at least one reporting context.",
@@ -303,53 +835,313 @@
             "DISAPPROVED",
             "DEMOTED",
             "PENDING"
-          ],
-          "description": "Aggregated severity of the issue for all reporting contexts it affects. Reporting contexts included in the computation of the aggregated severity can be restricted using a filter on the `reporting_context` field. **This field can be used for filtering the results.**"
+          ]
+        },
+        "severityPerReportingContext": {
+          "type": "array",
+          "items": {
+            "$ref": "IssueSeverityPerReportingContext"
+          },
+          "description": "Issue severity per reporting context. Reporting contexts included in this list can be restricted using a filter on the `reporting_context` field."
         }
       },
-      "description": "How the issue affects the serving of the product."
+      "id": "ItemIssueSeverity"
     },
-    "NonProductPerformanceView": {
+    "BestSellersProductClusterView": {
+      "id": "BestSellersProductClusterView",
       "properties": {
-        "week": {
-          "$ref": "Date",
-          "description": "First day of the week (Monday) of the metrics date in the Merchant Center account timezone. Segment."
+        "relativeDemand": {
+          "description": "Estimated demand in relation to the product cluster with the highest popularity rank in the same category and country.",
+          "enumDescriptions": [
+            "Not specified.",
+            "Demand is 0-5% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 6-10% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 11-20% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 21-50% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 51-100% of the demand of the highest ranked product cluster or brand."
+          ],
+          "enum": [
+            "RELATIVE_DEMAND_ENUM_UNSPECIFIED",
+            "VERY_LOW",
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "VERY_HIGH"
+          ],
+          "type": "string"
         },
-        "date": {
-          "$ref": "Date",
-          "description": "Date in the Merchant Center account timezone to which metrics apply. Segment. Condition on `date` is required in the `WHERE` clause."
-        },
-        "impressions": {
+        "reportCategoryId": {
           "type": "string",
-          "description": "Number of times images and online store links leading to your non-product pages were shown. Metric.",
+          "description": "Google product category ID to calculate the ranking for, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436). Required in the `SELECT` clause. If a `WHERE` condition on `report_category_id` is not specified in the query, rankings for all top-level categories are returned.",
           "format": "int64"
         },
-        "clickThroughRate": {
-          "description": "Click-through rate - the number of clicks (`clicks`) divided by the number of impressions (`impressions`) of images and online store links leading to your non-product pages. Metric.",
+        "reportGranularity": {
+          "enum": [
+            "REPORT_GRANULARITY_ENUM_UNSPECIFIED",
+            "WEEKLY",
+            "MONTHLY"
+          ],
+          "type": "string",
+          "enumDescriptions": [
+            "Not specified.",
+            "Report is computed over a week timeframe.",
+            "Report is computed over a month timeframe."
+          ],
+          "description": "Granularity of the report. The ranking can be done over a week or a month timeframe. Required in the `SELECT` clause. Condition on `report_granularity` is required in the `WHERE` clause."
+        },
+        "previousRelativeDemand": {
+          "type": "string",
+          "enumDescriptions": [
+            "Not specified.",
+            "Demand is 0-5% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 6-10% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 11-20% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 21-50% of the demand of the highest ranked product cluster or brand.",
+            "Demand is 51-100% of the demand of the highest ranked product cluster or brand."
+          ],
+          "enum": [
+            "RELATIVE_DEMAND_ENUM_UNSPECIFIED",
+            "VERY_LOW",
+            "LOW",
+            "MEDIUM",
+            "HIGH",
+            "VERY_HIGH"
+          ],
+          "description": "Estimated demand in relation to the product cluster with the highest popularity rank in the same category and country in the previous week or month."
+        },
+        "reportDate": {
+          "description": "Report date. The value of this field can only be one of the following: * The first day of the week (Monday) for weekly reports, * The first day of the month for monthly reports. Required in the `SELECT` clause. If a `WHERE` condition on `report_date` is not specified in the query, the latest available weekly or monthly report is returned.",
+          "$ref": "Date"
+        },
+        "inventoryStatus": {
+          "type": "string",
+          "enumDescriptions": [
+            "Not specified.",
+            "You have a product for this product cluster or brand in stock.",
+            "You have a product for this product cluster or brand in inventory but it is currently out of stock.",
+            "You do not have a product for this product cluster or brand in inventory."
+          ],
+          "enum": [
+            "INVENTORY_STATUS_UNSPECIFIED",
+            "IN_STOCK",
+            "OUT_OF_STOCK",
+            "NOT_IN_INVENTORY"
+          ],
+          "description": "Whether the product cluster is `IN_STOCK` in your product data source in at least one of the countries, `OUT_OF_STOCK` in your product data source in all countries, or `NOT_IN_INVENTORY` at all. The field doesn't take the Best sellers report country filter into account."
+        },
+        "rank": {
+          "type": "string",
+          "description": "Popularity of the product cluster on Ads and organic surfaces, in the selected category and country, based on the estimated number of units sold.",
+          "format": "int64"
+        },
+        "variantGtins": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "description": "GTINs of example variants of the product cluster."
+        },
+        "previousRank": {
+          "format": "int64",
+          "type": "string",
+          "description": "Popularity rank in the previous week or month."
+        },
+        "categoryL2": {
+          "type": "string",
+          "description": "Product category (2nd level) of the product cluster, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
+        },
+        "categoryL5": {
+          "description": "Product category (5th level) of the product cluster, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
+          "type": "string"
+        },
+        "title": {
+          "description": "Title of the product cluster.",
+          "type": "string"
+        },
+        "brandInventoryStatus": {
+          "enumDescriptions": [
+            "Not specified.",
+            "You have a product for this product cluster or brand in stock.",
+            "You have a product for this product cluster or brand in inventory but it is currently out of stock.",
+            "You do not have a product for this product cluster or brand in inventory."
+          ],
+          "enum": [
+            "INVENTORY_STATUS_UNSPECIFIED",
+            "IN_STOCK",
+            "OUT_OF_STOCK",
+            "NOT_IN_INVENTORY"
+          ],
+          "description": "Whether there is at least one product of the brand currently `IN_STOCK` in your product data source in at least one of the countries, all products are `OUT_OF_STOCK` in your product data source in all countries, or `NOT_IN_INVENTORY`. The field doesn't take the Best sellers report country filter into account.",
+          "type": "string"
+        },
+        "reportCountryCode": {
+          "type": "string",
+          "description": "Country where the ranking is calculated. Represented in the ISO 3166 format. Required in the `SELECT` clause. Condition on `report_country_code` is required in the `WHERE` clause."
+        },
+        "categoryL4": {
+          "type": "string",
+          "description": "Product category (4th level) of the product cluster, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
+        },
+        "brand": {
+          "type": "string",
+          "description": "Brand of the product cluster."
+        },
+        "relativeDemandChange": {
+          "enum": [
+            "RELATIVE_DEMAND_CHANGE_TYPE_ENUM_UNSPECIFIED",
+            "SINKER",
+            "FLAT",
+            "RISER"
+          ],
+          "type": "string",
+          "enumDescriptions": [
+            "Not specified.",
+            "Relative demand is lower than the previous time period.",
+            "Relative demand is equal to the previous time period.",
+            "Relative demand is higher than the previous time period."
+          ],
+          "description": "Change in the estimated demand. Whether it rose, sank or remained flat."
+        },
+        "categoryL1": {
+          "description": "Product category (1st level) of the product cluster, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
+          "type": "string"
+        },
+        "categoryL3": {
+          "description": "Product category (3rd level) of the product cluster, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
+          "type": "string"
+        }
+      },
+      "description": "Fields available for query in `best_sellers_product_cluster_view` table. [Best sellers](https://support.google.com/merchants/answer/9488679) report with top product clusters. A product cluster is a grouping for different offers and variants that represent the same product, for example, Google Pixel 7. Values are only set for fields requested explicitly in the request's search query.",
+      "type": "object"
+    },
+    "CompetitiveVisibilityBenchmarkView": {
+      "properties": {
+        "date": {
+          "$ref": "Date",
+          "description": "Date of this row. Required in the `SELECT` clause. A condition on `date` is required in the `WHERE` clause."
+        },
+        "trafficSource": {
+          "enum": [
+            "TRAFFIC_SOURCE_ENUM_UNSPECIFIED",
+            "ORGANIC",
+            "ADS",
+            "ALL"
+          ],
+          "type": "string",
+          "description": "Traffic source of impressions. Required in the `SELECT` clause.",
+          "enumDescriptions": [
+            "Not specified.",
+            "Organic traffic.",
+            "Traffic from ads.",
+            "Organic and ads traffic."
+          ]
+        },
+        "yourDomainVisibilityTrend": {
+          "type": "number",
+          "format": "double",
+          "description": "Change in visibility based on impressions for your domain with respect to the start of the selected time range (or first day with non-zero impressions). Cannot be filtered on in the 'WHERE' clause."
+        },
+        "reportCountryCode": {
+          "type": "string",
+          "description": "Country where impressions appeared. Required in the `SELECT` clause. A condition on `report_country_code` is required in the `WHERE` clause."
+        },
+        "categoryBenchmarkVisibilityTrend": {
+          "description": "Change in visibility based on impressions with respect to the start of the selected time range (or first day with non-zero impressions) for a combined set of merchants with highest visibility approximating the market. Cannot be filtered on in the 'WHERE' clause.",
           "format": "double",
           "type": "number"
         },
-        "clicks": {
+        "reportCategoryId": {
           "type": "string",
-          "format": "int64",
-          "description": "Number of clicks on images and online store links leading to your non-product pages. Metric."
+          "description": "Google product category ID to calculate the report for, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436). Required in the `SELECT` clause. A condition on `report_category_id` is required in the `WHERE` clause.",
+          "format": "int64"
         }
       },
+      "description": "Fields available for query in `competitive_visibility_benchmark_view` table. [Competitive visibility](https://support.google.com/merchants/answer/11366442) report with the category benchmark. Values are only set for fields requested explicitly in the request's search query.",
       "type": "object",
-      "id": "NonProductPerformanceView",
-      "description": "Fields available for query in `non_product_performance_view` table. Performance data on images and online store links leading to your non-product pages. This includes performance metrics (for example, `clicks`) and dimensions according to which performance metrics are segmented (for example, `date`). Segment fields cannot be selected in queries without also selecting at least one metric field. Values are only set for fields requested explicitly in the request's search query."
+      "id": "CompetitiveVisibilityBenchmarkView"
     },
-    "ProductView": {
-      "description": "Fields available for query in `product_view` table. Products in the current inventory. Products in this table are the same as a [Product resource in Products sub-API](https://developers.google.com/merchant/api/reference/rest/products_v1/accounts.products) but not all product attributes from Products sub-API are available for query in this table. In contrast to Products sub-API, this table allows to filter the returned list of products by product attributes. To retrieve a single product by `id` or list all products, Products sub-API should be used. Values are only set for fields requested explicitly in the request's search query.",
-      "id": "ProductView",
+    "ReportRow": {
       "type": "object",
+      "description": "Result row returned from the search query. Only the message corresponding to the queried table is populated in the response. Within the populated message, only the fields requested explicitly in the query are populated.",
       "properties": {
-        "statusPerReportingContext": {
-          "type": "array",
-          "description": "Detailed product status per reporting context. Reporting contexts included in this list can be restricted using a filter on the `reporting_context` field. Equivalent to `ProductStatus.destination_statuses` in Products API. **This field cannot be used for sorting or filtering the results.**",
-          "items": {
-            "$ref": "StatusPerReportingContext"
-          }
+        "competitiveVisibilityTopMerchantView": {
+          "description": "Fields available for query in `competitive_visibility_top_merchant_view` table.",
+          "$ref": "CompetitiveVisibilityTopMerchantView"
+        },
+        "bestSellersProductClusterView": {
+          "description": "Fields available for query in `best_sellers_product_cluster_view` table.",
+          "$ref": "BestSellersProductClusterView"
+        },
+        "priceInsightsProductView": {
+          "$ref": "PriceInsightsProductView",
+          "description": "Fields available for query in `price_insights_product_view` table."
+        },
+        "priceCompetitivenessProductView": {
+          "description": "Fields available for query in `price_competitiveness_product_view` table.",
+          "$ref": "PriceCompetitivenessProductView"
+        },
+        "competitiveVisibilityBenchmarkView": {
+          "description": "Fields available for query in `competitive_visibility_benchmark_view` table.",
+          "$ref": "CompetitiveVisibilityBenchmarkView"
+        },
+        "bestSellersBrandView": {
+          "$ref": "BestSellersBrandView",
+          "description": "Fields available for query in `best_sellers_brand_view` table."
+        },
+        "competitiveVisibilityCompetitorView": {
+          "description": "Fields available for query in `competitive_visibility_competitor_view` table.",
+          "$ref": "CompetitiveVisibilityCompetitorView"
+        },
+        "nonProductPerformanceView": {
+          "description": "Fields available for query in `non_product_performance_view` table.",
+          "$ref": "NonProductPerformanceView"
+        },
+        "productView": {
+          "$ref": "ProductView",
+          "description": "Fields available for query in `product_view` table."
+        },
+        "productPerformanceView": {
+          "$ref": "ProductPerformanceView",
+          "description": "Fields available for query in `product_performance_view` table."
+        }
+      },
+      "id": "ReportRow"
+    },
+    "Date": {
+      "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values. * A month and day, with a zero year (for example, an anniversary). * A year on its own, with a zero month and a zero day. * A year and month, with a zero day (for example, a credit card expiration date). Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp",
+      "type": "object",
+      "id": "Date",
+      "properties": {
+        "day": {
+          "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.",
+          "type": "integer",
+          "format": "int32"
+        },
+        "year": {
+          "type": "integer",
+          "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.",
+          "format": "int32"
+        },
+        "month": {
+          "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day.",
+          "format": "int32",
+          "type": "integer"
+        }
+      }
+    },
+    "ProductChange": {
+      "properties": {
+        "oldValue": {
+          "type": "string",
+          "description": "The old value of the changed resource or attribute. If empty, it means that the product was created. Will have one of these values : (`approved`, `pending`, `disapproved`, ``)"
+        },
+        "newValue": {
+          "type": "string",
+          "description": "The new value of the changed resource or attribute. If empty, it means that the product was deleted. Will have one of these values : (`approved`, `pending`, `disapproved`, ``)"
+        },
+        "regionCode": {
+          "description": "Countries that have the change (if applicable). Represented in the ISO 3166 format.",
+          "type": "string"
         },
         "reportingContext": {
           "enumDeprecated": [
@@ -374,28 +1166,6 @@
             false,
             false
           ],
-          "enum": [
-            "REPORTING_CONTEXT_ENUM_UNSPECIFIED",
-            "SHOPPING_ADS",
-            "DISCOVERY_ADS",
-            "DEMAND_GEN_ADS",
-            "DEMAND_GEN_ADS_DISCOVER_SURFACE",
-            "VIDEO_ADS",
-            "DISPLAY_ADS",
-            "LOCAL_INVENTORY_ADS",
-            "VEHICLE_INVENTORY_ADS",
-            "FREE_LISTINGS",
-            "FREE_LISTINGS_UCP_CHECKOUT",
-            "FREE_LOCAL_LISTINGS",
-            "FREE_LOCAL_VEHICLE_LISTINGS",
-            "YOUTUBE_AFFILIATE",
-            "YOUTUBE_SHOPPING",
-            "CLOUD_RETAIL",
-            "LOCAL_CLOUD_RETAIL",
-            "PRODUCT_REVIEWS",
-            "MERCHANT_REVIEWS",
-            "YOUTUBE_CHECKOUT"
-          ],
           "enumDescriptions": [
             "Not specified.",
             "[Shopping ads](https://support.google.com/merchants/answer/6149970).",
@@ -418,111 +1188,184 @@
             "[Merchant Reviews](https://developers.google.com/merchant-review-feeds).",
             "YouTube Checkout ."
           ],
+          "description": "Reporting contexts that have the change (if applicable). Currently this field supports only (`SHOPPING_ADS`, `LOCAL_INVENTORY_ADS`, `YOUTUBE_SHOPPING`, `YOUTUBE_CHECKOUT`, `YOUTUBE_AFFILIATE`) from the enum value [ReportingContextEnum](/merchant/api/reference/rest/Shared.Types/ReportingContextEnum)",
           "type": "string",
-          "description": "Reporting context to restrict the query to. Restricts the reporting contexts returned in `status_per_reporting_context` and `item_issues`, and used to compute `aggregated_reporting_context_status`. **This field can only be used in the `WHERE` clause and cannot be selected in the `SELECT` clause.**"
+          "enum": [
+            "REPORTING_CONTEXT_ENUM_UNSPECIFIED",
+            "SHOPPING_ADS",
+            "DISCOVERY_ADS",
+            "DEMAND_GEN_ADS",
+            "DEMAND_GEN_ADS_DISCOVER_SURFACE",
+            "VIDEO_ADS",
+            "DISPLAY_ADS",
+            "LOCAL_INVENTORY_ADS",
+            "VEHICLE_INVENTORY_ADS",
+            "FREE_LISTINGS",
+            "FREE_LISTINGS_UCP_CHECKOUT",
+            "FREE_LOCAL_LISTINGS",
+            "FREE_LOCAL_VEHICLE_LISTINGS",
+            "YOUTUBE_AFFILIATE",
+            "YOUTUBE_SHOPPING",
+            "CLOUD_RETAIL",
+            "LOCAL_CLOUD_RETAIL",
+            "PRODUCT_REVIEWS",
+            "MERCHANT_REVIEWS",
+            "YOUTUBE_CHECKOUT"
+          ]
+        }
+      },
+      "description": "The change that happened to the product including old value, new value, country code as the region code and reporting context.",
+      "type": "object",
+      "id": "ProductChange"
+    },
+    "SearchRequest": {
+      "properties": {
+        "pageSize": {
+          "format": "int32",
+          "description": "Optional. Number of `ReportRows` to retrieve in a single page. Defaults to 1000. Values above 100,000 are coerced to 100,000.",
+          "type": "integer"
         },
-        "itemGroupId": {
-          "description": "Item group id provided by the merchant for grouping variants together.",
+        "query": {
+          "description": "Required. Query that defines a report to be retrieved. For details on how to construct your query, see the [Query Language guide](/merchant/api/guides/reports/query-language). For the full list of available tables and fields, see the Available fields.",
+          "type": "string"
+        },
+        "pageToken": {
+          "description": "Optional. Token of the page to retrieve. If not specified, the first page of results is returned. In order to request the next page of results, the value obtained from `next_page_token` in the previous response should be used.",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "description": "Request message for the `ReportService.Search` method.",
+      "id": "SearchRequest"
+    },
+    "ItemIssueType": {
+      "type": "object",
+      "description": "Issue type.",
+      "id": "ItemIssueType",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "Error code of the issue, equivalent to the `code` of [Product issues](https://developers.google.com/shopping-content/guides/product-issues)."
+        },
+        "canonicalAttribute": {
+          "description": "Canonical attribute name for attribute-specific issues.",
+          "type": "string"
+        }
+      }
+    },
+    "PriceInsightsProductView": {
+      "type": "object",
+      "description": "Fields available for query in `price_insights_product_view` table. [Price insights](https://support.google.com/merchants/answer/11916926) report. Values are only set for fields requested explicitly in the request's search query.",
+      "properties": {
+        "predictedClicksChangeFraction": {
+          "type": "number",
+          "format": "double",
+          "description": "Predicted change in clicks as a fraction after introducing the suggested price compared to current active price. For example, 0.05 is a 5% predicted increase in clicks."
+        },
+        "predictedImpressionsChangeFraction": {
+          "description": "Predicted change in impressions as a fraction after introducing the suggested price compared to current active price. For example, 0.05 is a 5% predicted increase in impressions.",
+          "format": "double",
+          "type": "number"
+        },
+        "productTypeL1": {
+          "type": "string",
+          "description": "Product type (1st level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
+        },
+        "productTypeL2": {
+          "type": "string",
+          "description": "Product type (2nd level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
+        },
+        "categoryL4": {
+          "description": "Product category (4th level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
+          "type": "string"
+        },
+        "predictedConversionsChangeFraction": {
+          "format": "double",
+          "description": "Predicted change in conversions as a fraction after introducing the suggested price compared to current active price. For example, 0.05 is a 5% predicted increase in conversions).",
+          "type": "number"
+        },
+        "brand": {
+          "description": "Brand of the product.",
           "type": "string"
         },
         "price": {
+          "description": "Current price of the product.",
+          "$ref": "Price"
+        },
+        "suggestedPrice": {
           "$ref": "Price",
-          "description": "Product price. Absent if the information about the price of the product is not available."
+          "description": "Latest suggested price for the product."
         },
-        "productTypeL5": {
-          "description": "Product type (5th level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406).",
-          "type": "string"
-        },
-        "creationTime": {
-          "format": "google-datetime",
-          "description": "The time the merchant created the product in timestamp seconds.",
-          "type": "string"
-        },
-        "clickPotentialRank": {
+        "effectiveness": {
           "type": "string",
-          "format": "int64",
-          "description": "Normalized click potential of the product. Values range from 1 to 1000, where 1 is the highest click potential and 1000 is the theoretical lowest."
-        },
-        "clickPotential": {
-          "type": "string",
+          "description": "The predicted effectiveness of applying the price suggestion, bucketed.",
           "enum": [
-            "CLICK_POTENTIAL_UNSPECIFIED",
+            "EFFECTIVENESS_UNSPECIFIED",
             "LOW",
             "MEDIUM",
             "HIGH"
           ],
           "enumDescriptions": [
-            "Unknown predicted clicks impact.",
-            "Potential to receive a low number of clicks compared to the highest performing products of the merchant.",
-            "Potential to receive a moderate number of clicks compared to the highest performing products of the merchant.",
-            "Potential to receive a similar number of clicks as the highest performing products of the merchant."
-          ],
-          "description": "Estimated performance potential compared to highest performing products of the merchant."
+            "Effectiveness is unknown.",
+            "Effectiveness is low.",
+            "Effectiveness is medium.",
+            "Effectiveness is high."
+          ]
         },
-        "languageCode": {
-          "description": "Language code of the product in BCP 47 format.",
+        "productTypeL4": {
+          "type": "string",
+          "description": "Product type (4th level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
+        },
+        "categoryL2": {
+          "description": "Product category (2nd level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
           "type": "string"
         },
         "categoryL5": {
           "description": "Product category (5th level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
           "type": "string"
         },
+        "id": {
+          "type": "string",
+          "description": "REST ID of the product, in the form of `channel~languageCode~feedLabel~offerId`. Can be used to join data with the `product_view` table. Required in the `SELECT` clause."
+        },
+        "categoryL1": {
+          "description": "Product category (1st level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
+          "type": "string"
+        },
+        "categoryL3": {
+          "type": "string",
+          "description": "Product category (3rd level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
+        },
+        "productTypeL3": {
+          "type": "string",
+          "description": "Product type (3rd level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
+        },
+        "productTypeL5": {
+          "description": "Product type (5th level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406).",
+          "type": "string"
+        },
         "title": {
           "description": "Title of the product.",
           "type": "string"
         },
-        "condition": {
-          "type": "string",
-          "description": "[Condition](https://support.google.com/merchants/answer/6324469) of the product."
-        },
         "offerId": {
-          "description": "Merchant-provided id of the product.",
+          "type": "string",
+          "description": "Merchant-provided id of the product."
+        }
+      },
+      "id": "PriceInsightsProductView"
+    },
+    "ProductView": {
+      "description": "Fields available for query in `product_view` table. Products in the current inventory. Products in this table are the same as a [Product resource in Products sub-API](https://developers.google.com/merchant/api/reference/rest/products_v1/accounts.products) but not all product attributes from Products sub-API are available for query in this table. In contrast to Products sub-API, this table allows to filter the returned list of products by product attributes. To retrieve a single product by `id` or list all products, Products sub-API should be used. Values are only set for fields requested explicitly in the request's search query.",
+      "id": "ProductView",
+      "properties": {
+        "condition": {
+          "description": "[Condition](https://support.google.com/merchants/answer/6324469) of the product.",
           "type": "string"
         },
-        "productTypeL2": {
-          "description": "Product type (2nd level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406).",
+        "itemGroupId": {
+          "description": "Item group id provided by the merchant for grouping variants together.",
           "type": "string"
-        },
-        "productTypeL4": {
-          "type": "string",
-          "description": "Product type (4th level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
-        },
-        "shippingLabel": {
-          "type": "string",
-          "description": "Normalized [shipping label](https://support.google.com/merchants/answer/6324504) specified in the data source."
-        },
-        "availability": {
-          "description": "[Availability](https://support.google.com/merchants/answer/6324448) of the product.",
-          "type": "string"
-        },
-        "aggregatedReportingContextStatus": {
-          "description": "Aggregated status across all reporting contexts. Reporting contexts included in the computation of the aggregated status can be restricted using a filter on the `reporting_context` field.",
-          "enumDescriptions": [
-            "Not specified.",
-            "Product is not eligible or is disapproved for all reporting contexts and countries.",
-            "Product's status is pending in all reporting contexts and countries.",
-            "Product is eligible for some (but not all) reporting contexts and countries.",
-            "Product is eligible for all reporting contexts and countries."
-          ],
-          "type": "string",
-          "enum": [
-            "AGGREGATED_REPORTING_CONTEXT_STATUS_UNSPECIFIED",
-            "NOT_ELIGIBLE_OR_DISAPPROVED",
-            "PENDING",
-            "ELIGIBLE_LIMITED",
-            "ELIGIBLE"
-          ]
-        },
-        "feedLabel": {
-          "type": "string",
-          "description": "Feed label of the product."
-        },
-        "itemIssues": {
-          "description": "List of item issues for the product. **This field cannot be used for sorting the results.** **Only selected attributes of this field (for example, `item_issues.severity.aggregated_severity`) can be used for filtering the results.**",
-          "type": "array",
-          "items": {
-            "$ref": "ItemIssue"
-          }
         },
         "channel": {
           "type": "string",
@@ -538,269 +1381,113 @@
           ],
           "description": "Channel of the product. Can be `ONLINE` or `LOCAL`."
         },
-        "categoryL2": {
-          "type": "string",
-          "description": "Product category (2nd level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
-        },
-        "gtin": {
-          "items": {
-            "type": "string"
-          },
-          "description": "List of Global Trade Item Numbers (GTINs) of the product.",
-          "type": "array"
-        },
-        "expirationDate": {
-          "description": "Expiration date for the product, specified on insertion.",
-          "$ref": "Date"
-        },
-        "productTypeL1": {
-          "type": "string",
-          "description": "Product type (1st level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
-        },
-        "id": {
-          "description": "REST ID of the product, in the form of `channel~languageCode~feedLabel~offerId`. Merchant API methods that operate on products take this as their `name` parameter. Required in the `SELECT` clause.",
-          "type": "string"
-        },
-        "categoryL3": {
-          "description": "Product category (3rd level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
-          "type": "string"
-        },
-        "categoryL4": {
-          "description": "Product category (4th level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
-          "type": "string"
-        },
-        "productTypeL3": {
-          "type": "string",
-          "description": "Product type (3rd level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
-        },
-        "brand": {
-          "type": "string",
-          "description": "Brand of the product."
-        },
-        "thumbnailLink": {
-          "type": "string",
-          "description": "Link to the processed image of the product, hosted on the Google infrastructure."
-        },
-        "categoryL1": {
-          "description": "Product category (1st level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
-          "type": "string"
-        }
-      }
-    },
-    "BestSellersBrandView": {
-      "id": "BestSellersBrandView",
-      "type": "object",
-      "description": "Fields available for query in `best_sellers_brand_view` table. [Best sellers](https://support.google.com/merchants/answer/9488679) report with top brands. Values are only set for fields requested explicitly in the request's search query.",
-      "properties": {
-        "previousRelativeDemand": {
-          "enumDescriptions": [
-            "Not specified.",
-            "Demand is 0-5% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 6-10% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 11-20% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 21-50% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 51-100% of the demand of the highest ranked product cluster or brand."
-          ],
-          "description": "Estimated demand in relation to the brand with the highest popularity rank in the same category and country in the previous week or month.",
-          "type": "string",
-          "enum": [
-            "RELATIVE_DEMAND_ENUM_UNSPECIFIED",
-            "VERY_LOW",
-            "LOW",
-            "MEDIUM",
-            "HIGH",
-            "VERY_HIGH"
-          ]
-        },
-        "reportCategoryId": {
-          "type": "string",
-          "format": "int64",
-          "description": "Google product category ID to calculate the ranking for, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436). Required in the `SELECT` clause. If a `WHERE` condition on `report_category_id` is not specified in the query, rankings for all top-level categories are returned."
-        },
-        "reportDate": {
-          "$ref": "Date",
-          "description": "Report date. The value of this field can only be one of the following: * The first day of the week (Monday) for weekly reports, * The first day of the month for monthly reports. Required in the `SELECT` clause. If a `WHERE` condition on `report_date` is not specified in the query, the latest available weekly or monthly report is returned."
-        },
-        "reportCountryCode": {
-          "description": "Country where the ranking is calculated. Represented in the ISO 3166 format. Required in the `SELECT` clause. Condition on `report_country_code` is required in the `WHERE` clause.",
-          "type": "string"
-        },
-        "rank": {
-          "description": "Popularity of the brand on Ads and organic surfaces, in the selected category and country, based on the estimated number of units sold.",
-          "type": "string",
-          "format": "int64"
-        },
-        "previousRank": {
-          "format": "int64",
-          "type": "string",
-          "description": "Popularity rank in the previous week or month."
-        },
-        "reportGranularity": {
-          "type": "string",
-          "enum": [
-            "REPORT_GRANULARITY_ENUM_UNSPECIFIED",
-            "WEEKLY",
-            "MONTHLY"
-          ],
-          "enumDescriptions": [
-            "Not specified.",
-            "Report is computed over a week timeframe.",
-            "Report is computed over a month timeframe."
-          ],
-          "description": "Granularity of the report. The ranking can be done over a week or a month timeframe. Required in the `SELECT` clause. Condition on `report_granularity` is required in the `WHERE` clause."
-        },
-        "relativeDemand": {
-          "type": "string",
-          "enum": [
-            "RELATIVE_DEMAND_ENUM_UNSPECIFIED",
-            "VERY_LOW",
-            "LOW",
-            "MEDIUM",
-            "HIGH",
-            "VERY_HIGH"
-          ],
-          "enumDescriptions": [
-            "Not specified.",
-            "Demand is 0-5% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 6-10% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 11-20% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 21-50% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 51-100% of the demand of the highest ranked product cluster or brand."
-          ],
-          "description": "Estimated demand in relation to the brand with the highest popularity rank in the same category and country."
-        },
-        "brand": {
-          "type": "string",
-          "description": "Name of the brand."
-        },
-        "relativeDemandChange": {
-          "enumDescriptions": [
-            "Not specified.",
-            "Relative demand is lower than the previous time period.",
-            "Relative demand is equal to the previous time period.",
-            "Relative demand is higher than the previous time period."
-          ],
-          "description": "Change in the estimated demand. Whether it rose, sank or remained flat.",
-          "type": "string",
-          "enum": [
-            "RELATIVE_DEMAND_CHANGE_TYPE_ENUM_UNSPECIFIED",
-            "SINKER",
-            "FLAT",
-            "RISER"
-          ]
-        }
-      }
-    },
-    "PriceCompetitivenessProductView": {
-      "id": "PriceCompetitivenessProductView",
-      "description": "Fields available for query in `price_competitiveness_product_view` table. [Price competitiveness](https://support.google.com/merchants/answer/9626903) report. Values are only set for fields requested explicitly in the request's search query.",
-      "type": "object",
-      "properties": {
-        "productTypeL5": {
-          "description": "Product type (5th level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406).",
-          "type": "string"
-        },
-        "price": {
-          "$ref": "Price",
-          "description": "Current price of the product."
-        },
         "productTypeL2": {
           "type": "string",
           "description": "Product type (2nd level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
         },
-        "productTypeL4": {
-          "type": "string",
-          "description": "Product type (4th level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
-        },
-        "categoryL5": {
-          "type": "string",
-          "description": "Product category (5th level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
-        },
-        "categoryL3": {
-          "description": "Product category (3rd level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
-          "type": "string"
-        },
-        "offerId": {
-          "type": "string",
-          "description": "Merchant-provided id of the product."
-        },
-        "title": {
-          "description": "Title of the product.",
-          "type": "string"
-        },
-        "productTypeL3": {
-          "description": "Product type (3rd level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406).",
+        "aggregatedReportingContextStatus": {
+          "description": "Aggregated status across all reporting contexts. Reporting contexts included in the computation of the aggregated status can be restricted using a filter on the `reporting_context` field.",
+          "enumDescriptions": [
+            "Not specified.",
+            "Product is not eligible or is disapproved for all reporting contexts and countries.",
+            "Product's status is pending in all reporting contexts and countries.",
+            "Product is eligible for some (but not all) reporting contexts and countries.",
+            "Product is eligible for all reporting contexts and countries."
+          ],
+          "enum": [
+            "AGGREGATED_REPORTING_CONTEXT_STATUS_UNSPECIFIED",
+            "NOT_ELIGIBLE_OR_DISAPPROVED",
+            "PENDING",
+            "ELIGIBLE_LIMITED",
+            "ELIGIBLE"
+          ],
           "type": "string"
         },
         "categoryL1": {
           "type": "string",
           "description": "Product category (1st level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
         },
+        "expirationDate": {
+          "description": "Expiration date for the product, specified on insertion.",
+          "$ref": "Date"
+        },
         "brand": {
           "description": "Brand of the product.",
           "type": "string"
         },
-        "categoryL4": {
-          "description": "Product category (4th level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
-          "type": "string"
-        },
-        "reportCountryCode": {
-          "description": "Country of the price benchmark. Represented in the ISO 3166 format. Required in the `SELECT` clause.",
+        "thumbnailLink": {
+          "description": "Link to the processed image of the product, hosted on the Google infrastructure.",
           "type": "string"
         },
         "id": {
-          "type": "string",
-          "description": "REST ID of the product, in the form of `channel~languageCode~feedLabel~offerId`. Can be used to join data with the `product_view` table. Required in the `SELECT` clause."
+          "description": "REST ID of the product, in the form of `channel~languageCode~feedLabel~offerId`. Merchant API methods that operate on products take this as their `name` parameter. Required in the `SELECT` clause.",
+          "type": "string"
         },
         "categoryL2": {
-          "type": "string",
-          "description": "Product category (2nd level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
-        },
-        "productTypeL1": {
-          "description": "Product type (1st level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406).",
+          "description": "Product category (2nd level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
           "type": "string"
         },
-        "benchmarkPrice": {
-          "$ref": "Price",
-          "description": "Latest available price benchmark for the product's catalog in the benchmark country."
-        }
-      }
-    },
-    "PriceInsightsProductView": {
-      "description": "Fields available for query in `price_insights_product_view` table. [Price insights](https://support.google.com/merchants/answer/11916926) report. Values are only set for fields requested explicitly in the request's search query.",
-      "properties": {
-        "brand": {
+        "categoryL5": {
           "type": "string",
-          "description": "Brand of the product."
+          "description": "Product category (5th level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
         },
-        "productTypeL4": {
-          "description": "Product type (4th level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406).",
-          "type": "string"
+        "gtin": {
+          "description": "List of Global Trade Item Numbers (GTINs) of the product.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         },
-        "productTypeL2": {
+        "clickPotentialRank": {
           "type": "string",
-          "description": "Product type (2nd level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
+          "description": "Normalized click potential of the product. Values range from 1 to 1000, where 1 is the highest click potential and 1000 is the theoretical lowest.",
+          "format": "int64"
         },
         "offerId": {
           "type": "string",
           "description": "Merchant-provided id of the product."
         },
-        "title": {
+        "categoryL4": {
           "type": "string",
-          "description": "Title of the product."
+          "description": "Product category (4th level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
         },
-        "productTypeL5": {
-          "description": "Product type (5th level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406).",
+        "productTypeL3": {
+          "type": "string",
+          "description": "Product type (3rd level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
+        },
+        "feedLabel": {
+          "description": "Feed label of the product.",
           "type": "string"
         },
-        "suggestedPrice": {
-          "description": "Latest suggested price for the product.",
-          "$ref": "Price"
+        "itemIssues": {
+          "type": "array",
+          "description": "List of item issues for the product. **This field cannot be used for sorting the results.** **Only selected attributes of this field (for example, `item_issues.severity.aggregated_severity`) can be used for filtering the results.**",
+          "items": {
+            "$ref": "ItemIssue"
+          }
         },
-        "predictedImpressionsChangeFraction": {
-          "description": "Predicted change in impressions as a fraction after introducing the suggested price compared to current active price. For example, 0.05 is a 5% predicted increase in impressions.",
-          "type": "number",
-          "format": "double"
+        "statusPerReportingContext": {
+          "type": "array",
+          "items": {
+            "$ref": "StatusPerReportingContext"
+          },
+          "description": "Detailed product status per reporting context. Reporting contexts included in this list can be restricted using a filter on the `reporting_context` field. Equivalent to `ProductStatus.destination_statuses` in Products API. **This field cannot be used for sorting or filtering the results.**"
+        },
+        "availability": {
+          "description": "[Availability](https://support.google.com/merchants/answer/6324448) of the product.",
+          "type": "string"
+        },
+        "languageCode": {
+          "type": "string",
+          "description": "Language code of the product in BCP 47 format."
+        },
+        "productTypeL4": {
+          "type": "string",
+          "description": "Product type (4th level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
+        },
+        "productTypeL1": {
+          "type": "string",
+          "description": "Product type (1st level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
         },
         "categoryL3": {
           "description": "Product category (3rd level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
@@ -808,712 +1495,36 @@
         },
         "price": {
           "$ref": "Price",
-          "description": "Current price of the product."
+          "description": "Product price. Absent if the information about the price of the product is not available."
         },
-        "categoryL5": {
-          "description": "Product category (5th level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
+        "title": {
+          "type": "string",
+          "description": "Title of the product."
+        },
+        "shippingLabel": {
+          "description": "Normalized [shipping label](https://support.google.com/merchants/answer/6324504) specified in the data source.",
           "type": "string"
         },
-        "productTypeL1": {
-          "type": "string",
-          "description": "Product type (1st level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406)."
-        },
-        "effectiveness": {
-          "type": "string",
+        "clickPotential": {
+          "description": "Estimated performance potential compared to highest performing products of the merchant.",
           "enum": [
-            "EFFECTIVENESS_UNSPECIFIED",
+            "CLICK_POTENTIAL_UNSPECIFIED",
             "LOW",
             "MEDIUM",
             "HIGH"
           ],
+          "type": "string",
           "enumDescriptions": [
-            "Effectiveness is unknown.",
-            "Effectiveness is low.",
-            "Effectiveness is medium.",
-            "Effectiveness is high."
-          ],
-          "description": "The predicted effectiveness of applying the price suggestion, bucketed."
-        },
-        "categoryL4": {
-          "type": "string",
-          "description": "Product category (4th level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
-        },
-        "predictedClicksChangeFraction": {
-          "description": "Predicted change in clicks as a fraction after introducing the suggested price compared to current active price. For example, 0.05 is a 5% predicted increase in clicks.",
-          "type": "number",
-          "format": "double"
-        },
-        "categoryL1": {
-          "description": "Product category (1st level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
-          "type": "string"
-        },
-        "predictedConversionsChangeFraction": {
-          "type": "number",
-          "format": "double",
-          "description": "Predicted change in conversions as a fraction after introducing the suggested price compared to current active price. For example, 0.05 is a 5% predicted increase in conversions)."
-        },
-        "categoryL2": {
-          "type": "string",
-          "description": "Product category (2nd level) in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
-        },
-        "productTypeL3": {
-          "description": "Product type (3rd level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406).",
-          "type": "string"
-        },
-        "id": {
-          "type": "string",
-          "description": "REST ID of the product, in the form of `channel~languageCode~feedLabel~offerId`. Can be used to join data with the `product_view` table. Required in the `SELECT` clause."
-        }
-      },
-      "id": "PriceInsightsProductView",
-      "type": "object"
-    },
-    "ItemIssue": {
-      "description": "Item issue associated with the product.",
-      "id": "ItemIssue",
-      "properties": {
-        "resolution": {
-          "enumDescriptions": [
-            "Not specified.",
-            "The merchant has to fix the issue.",
-            "The issue will be resolved automatically (for example, image crawl) or through a Google review. No merchant action is required now. Resolution might lead to another issue (for example, if crawl fails)."
-          ],
-          "type": "string",
-          "enum": [
-            "ITEM_ISSUE_RESOLUTION_UNSPECIFIED",
-            "MERCHANT_ACTION",
-            "PENDING_PROCESSING"
-          ],
-          "description": "Item issue resolution."
-        },
-        "type": {
-          "description": "Item issue type.",
-          "$ref": "ItemIssueType"
-        },
-        "severity": {
-          "$ref": "ItemIssueSeverity",
-          "description": "Item issue severity."
-        }
-      },
-      "type": "object"
-    },
-    "BestSellersProductClusterView": {
-      "properties": {
-        "previousRelativeDemand": {
-          "description": "Estimated demand in relation to the product cluster with the highest popularity rank in the same category and country in the previous week or month.",
-          "enumDescriptions": [
-            "Not specified.",
-            "Demand is 0-5% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 6-10% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 11-20% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 21-50% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 51-100% of the demand of the highest ranked product cluster or brand."
-          ],
-          "type": "string",
-          "enum": [
-            "RELATIVE_DEMAND_ENUM_UNSPECIFIED",
-            "VERY_LOW",
-            "LOW",
-            "MEDIUM",
-            "HIGH",
-            "VERY_HIGH"
+            "Unknown predicted clicks impact.",
+            "Potential to receive a low number of clicks compared to the highest performing products of the merchant.",
+            "Potential to receive a moderate number of clicks compared to the highest performing products of the merchant.",
+            "Potential to receive a similar number of clicks as the highest performing products of the merchant."
           ]
         },
-        "relativeDemand": {
-          "enumDescriptions": [
-            "Not specified.",
-            "Demand is 0-5% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 6-10% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 11-20% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 21-50% of the demand of the highest ranked product cluster or brand.",
-            "Demand is 51-100% of the demand of the highest ranked product cluster or brand."
-          ],
-          "description": "Estimated demand in relation to the product cluster with the highest popularity rank in the same category and country.",
+        "creationTime": {
+          "description": "The time the merchant created the product in timestamp seconds.",
           "type": "string",
-          "enum": [
-            "RELATIVE_DEMAND_ENUM_UNSPECIFIED",
-            "VERY_LOW",
-            "LOW",
-            "MEDIUM",
-            "HIGH",
-            "VERY_HIGH"
-          ]
-        },
-        "reportDate": {
-          "$ref": "Date",
-          "description": "Report date. The value of this field can only be one of the following: * The first day of the week (Monday) for weekly reports, * The first day of the month for monthly reports. Required in the `SELECT` clause. If a `WHERE` condition on `report_date` is not specified in the query, the latest available weekly or monthly report is returned."
-        },
-        "brandInventoryStatus": {
-          "enumDescriptions": [
-            "Not specified.",
-            "You have a product for this product cluster or brand in stock.",
-            "You have a product for this product cluster or brand in inventory but it is currently out of stock.",
-            "You do not have a product for this product cluster or brand in inventory."
-          ],
-          "description": "Whether there is at least one product of the brand currently `IN_STOCK` in your product data source in at least one of the countries, all products are `OUT_OF_STOCK` in your product data source in all countries, or `NOT_IN_INVENTORY`. The field doesn't take the Best sellers report country filter into account.",
-          "type": "string",
-          "enum": [
-            "INVENTORY_STATUS_UNSPECIFIED",
-            "IN_STOCK",
-            "OUT_OF_STOCK",
-            "NOT_IN_INVENTORY"
-          ]
-        },
-        "brand": {
-          "type": "string",
-          "description": "Brand of the product cluster."
-        },
-        "reportCountryCode": {
-          "type": "string",
-          "description": "Country where the ranking is calculated. Represented in the ISO 3166 format. Required in the `SELECT` clause. Condition on `report_country_code` is required in the `WHERE` clause."
-        },
-        "rank": {
-          "type": "string",
-          "format": "int64",
-          "description": "Popularity of the product cluster on Ads and organic surfaces, in the selected category and country, based on the estimated number of units sold."
-        },
-        "title": {
-          "description": "Title of the product cluster.",
-          "type": "string"
-        },
-        "categoryL2": {
-          "description": "Product category (2nd level) of the product cluster, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
-          "type": "string"
-        },
-        "relativeDemandChange": {
-          "description": "Change in the estimated demand. Whether it rose, sank or remained flat.",
-          "type": "string",
-          "enum": [
-            "RELATIVE_DEMAND_CHANGE_TYPE_ENUM_UNSPECIFIED",
-            "SINKER",
-            "FLAT",
-            "RISER"
-          ],
-          "enumDescriptions": [
-            "Not specified.",
-            "Relative demand is lower than the previous time period.",
-            "Relative demand is equal to the previous time period.",
-            "Relative demand is higher than the previous time period."
-          ]
-        },
-        "inventoryStatus": {
-          "type": "string",
-          "enum": [
-            "INVENTORY_STATUS_UNSPECIFIED",
-            "IN_STOCK",
-            "OUT_OF_STOCK",
-            "NOT_IN_INVENTORY"
-          ],
-          "description": "Whether the product cluster is `IN_STOCK` in your product data source in at least one of the countries, `OUT_OF_STOCK` in your product data source in all countries, or `NOT_IN_INVENTORY` at all. The field doesn't take the Best sellers report country filter into account.",
-          "enumDescriptions": [
-            "Not specified.",
-            "You have a product for this product cluster or brand in stock.",
-            "You have a product for this product cluster or brand in inventory but it is currently out of stock.",
-            "You do not have a product for this product cluster or brand in inventory."
-          ]
-        },
-        "categoryL1": {
-          "description": "Product category (1st level) of the product cluster, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
-          "type": "string"
-        },
-        "reportCategoryId": {
-          "type": "string",
-          "format": "int64",
-          "description": "Google product category ID to calculate the ranking for, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436). Required in the `SELECT` clause. If a `WHERE` condition on `report_category_id` is not specified in the query, rankings for all top-level categories are returned."
-        },
-        "reportGranularity": {
-          "description": "Granularity of the report. The ranking can be done over a week or a month timeframe. Required in the `SELECT` clause. Condition on `report_granularity` is required in the `WHERE` clause.",
-          "enumDescriptions": [
-            "Not specified.",
-            "Report is computed over a week timeframe.",
-            "Report is computed over a month timeframe."
-          ],
-          "type": "string",
-          "enum": [
-            "REPORT_GRANULARITY_ENUM_UNSPECIFIED",
-            "WEEKLY",
-            "MONTHLY"
-          ]
-        },
-        "previousRank": {
-          "format": "int64",
-          "description": "Popularity rank in the previous week or month.",
-          "type": "string"
-        },
-        "categoryL4": {
-          "description": "Product category (4th level) of the product cluster, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
-          "type": "string"
-        },
-        "variantGtins": {
-          "type": "array",
-          "description": "GTINs of example variants of the product cluster.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "categoryL5": {
-          "description": "Product category (5th level) of the product cluster, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436).",
-          "type": "string"
-        },
-        "categoryL3": {
-          "type": "string",
-          "description": "Product category (3rd level) of the product cluster, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436)."
-        }
-      },
-      "description": "Fields available for query in `best_sellers_product_cluster_view` table. [Best sellers](https://support.google.com/merchants/answer/9488679) report with top product clusters. A product cluster is a grouping for different offers and variants that represent the same product, for example, Google Pixel 7. Values are only set for fields requested explicitly in the request's search query.",
-      "type": "object",
-      "id": "BestSellersProductClusterView"
-    },
-    "StatusPerReportingContext": {
-      "type": "object",
-      "description": "Status of the product for a specific reporting context. Equivalent to `DestinationStatus` in Products API.",
-      "id": "StatusPerReportingContext",
-      "properties": {
-        "approvedCountries": {
-          "type": "array",
-          "description": "List of approved countries in the reporting context, represented in [ISO 3166](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) format, for example, `US`.",
-          "items": {
-            "type": "string"
-          }
-        },
-        "pendingCountries": {
-          "description": "List of pending countries in the reporting context, represented in [ISO 3166](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) format, for example, `US`.",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "disapprovedCountries": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "List of disapproved countries in the reporting context, represented in [ISO 3166](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) format, for example, `US`."
-        },
-        "reportingContext": {
-          "enum": [
-            "REPORTING_CONTEXT_ENUM_UNSPECIFIED",
-            "SHOPPING_ADS",
-            "DISCOVERY_ADS",
-            "DEMAND_GEN_ADS",
-            "DEMAND_GEN_ADS_DISCOVER_SURFACE",
-            "VIDEO_ADS",
-            "DISPLAY_ADS",
-            "LOCAL_INVENTORY_ADS",
-            "VEHICLE_INVENTORY_ADS",
-            "FREE_LISTINGS",
-            "FREE_LISTINGS_UCP_CHECKOUT",
-            "FREE_LOCAL_LISTINGS",
-            "FREE_LOCAL_VEHICLE_LISTINGS",
-            "YOUTUBE_AFFILIATE",
-            "YOUTUBE_SHOPPING",
-            "CLOUD_RETAIL",
-            "LOCAL_CLOUD_RETAIL",
-            "PRODUCT_REVIEWS",
-            "MERCHANT_REVIEWS",
-            "YOUTUBE_CHECKOUT"
-          ],
-          "enumDescriptions": [
-            "Not specified.",
-            "[Shopping ads](https://support.google.com/merchants/answer/6149970).",
-            "Deprecated: Use `DEMAND_GEN_ADS` instead. [Discovery and Demand Gen ads](https://support.google.com/merchants/answer/13389785).",
-            "[Demand Gen ads](https://support.google.com/merchants/answer/13389785).",
-            "[Demand Gen ads on Discover surface](https://support.google.com/merchants/answer/13389785).",
-            "[Video ads](https://support.google.com/google-ads/answer/6340491).",
-            "[Display ads](https://support.google.com/merchants/answer/6069387).",
-            "[Local inventory ads](https://support.google.com/merchants/answer/3271956).",
-            "[Vehicle inventory ads](https://support.google.com/merchants/answer/11544533).",
-            "[Free product listings](https://support.google.com/merchants/answer/9199328).",
-            "[Free product listings on UCP checkout](https://developers.google.com/merchant/ucp).",
-            "[Free local product listings](https://support.google.com/merchants/answer/9825611).",
-            "[Free local vehicle listings](https://support.google.com/merchants/answer/11544533).",
-            "[Youtube Affiliate](https://support.google.com/youtube/answer/13376398).",
-            "[YouTube Shopping](https://support.google.com/merchants/answer/13478370).",
-            "[Cloud retail](https://cloud.google.com/solutions/retail).",
-            "[Local cloud retail](https://cloud.google.com/solutions/retail).",
-            "[Product Reviews](https://support.google.com/merchants/answer/14620732).",
-            "[Merchant Reviews](https://developers.google.com/merchant-review-feeds).",
-            "YouTube Checkout ."
-          ],
-          "type": "string",
-          "enumDeprecated": [
-            false,
-            false,
-            true,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-          ],
-          "description": "Reporting context the status applies to."
-        }
-      }
-    },
-    "IssueSeverityPerReportingContext": {
-      "type": "object",
-      "description": "Issue severity per reporting context.",
-      "properties": {
-        "reportingContext": {
-          "enumDescriptions": [
-            "Not specified.",
-            "[Shopping ads](https://support.google.com/merchants/answer/6149970).",
-            "Deprecated: Use `DEMAND_GEN_ADS` instead. [Discovery and Demand Gen ads](https://support.google.com/merchants/answer/13389785).",
-            "[Demand Gen ads](https://support.google.com/merchants/answer/13389785).",
-            "[Demand Gen ads on Discover surface](https://support.google.com/merchants/answer/13389785).",
-            "[Video ads](https://support.google.com/google-ads/answer/6340491).",
-            "[Display ads](https://support.google.com/merchants/answer/6069387).",
-            "[Local inventory ads](https://support.google.com/merchants/answer/3271956).",
-            "[Vehicle inventory ads](https://support.google.com/merchants/answer/11544533).",
-            "[Free product listings](https://support.google.com/merchants/answer/9199328).",
-            "[Free product listings on UCP checkout](https://developers.google.com/merchant/ucp).",
-            "[Free local product listings](https://support.google.com/merchants/answer/9825611).",
-            "[Free local vehicle listings](https://support.google.com/merchants/answer/11544533).",
-            "[Youtube Affiliate](https://support.google.com/youtube/answer/13376398).",
-            "[YouTube Shopping](https://support.google.com/merchants/answer/13478370).",
-            "[Cloud retail](https://cloud.google.com/solutions/retail).",
-            "[Local cloud retail](https://cloud.google.com/solutions/retail).",
-            "[Product Reviews](https://support.google.com/merchants/answer/14620732).",
-            "[Merchant Reviews](https://developers.google.com/merchant-review-feeds).",
-            "YouTube Checkout ."
-          ],
-          "type": "string",
-          "description": "Reporting context the issue applies to.",
-          "enumDeprecated": [
-            false,
-            false,
-            true,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false,
-            false
-          ],
-          "enum": [
-            "REPORTING_CONTEXT_ENUM_UNSPECIFIED",
-            "SHOPPING_ADS",
-            "DISCOVERY_ADS",
-            "DEMAND_GEN_ADS",
-            "DEMAND_GEN_ADS_DISCOVER_SURFACE",
-            "VIDEO_ADS",
-            "DISPLAY_ADS",
-            "LOCAL_INVENTORY_ADS",
-            "VEHICLE_INVENTORY_ADS",
-            "FREE_LISTINGS",
-            "FREE_LISTINGS_UCP_CHECKOUT",
-            "FREE_LOCAL_LISTINGS",
-            "FREE_LOCAL_VEHICLE_LISTINGS",
-            "YOUTUBE_AFFILIATE",
-            "YOUTUBE_SHOPPING",
-            "CLOUD_RETAIL",
-            "LOCAL_CLOUD_RETAIL",
-            "PRODUCT_REVIEWS",
-            "MERCHANT_REVIEWS",
-            "YOUTUBE_CHECKOUT"
-          ]
-        },
-        "demotedCountries": {
-          "description": "List of demoted countries in the reporting context, represented in ISO 3166 format.",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
-        },
-        "disapprovedCountries": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array",
-          "description": "List of disapproved countries in the reporting context, represented in ISO 3166 format."
-        }
-      },
-      "id": "IssueSeverityPerReportingContext"
-    },
-    "CompetitiveVisibilityCompetitorView": {
-      "properties": {
-        "reportCountryCode": {
-          "description": "Country where impressions appeared. Required in the `SELECT` clause. A condition on `report_country_code` is required in the `WHERE` clause.",
-          "type": "string"
-        },
-        "rank": {
-          "description": "Position of the domain in the similar businesses ranking for the selected keys (`date`, `report_category_id`, `report_country_code`, `traffic_source`) based on impressions. 1 is the highest. Cannot be filtered on in the 'WHERE' clause.",
-          "format": "int64",
-          "type": "string"
-        },
-        "adsOrganicRatio": {
-          "format": "double",
-          "type": "number",
-          "description": "[Ads / organic ratio] (https://support.google.com/merchants/answer/11366442#zippy=%2Cads-free-ratio) shows how often the domain receives impressions from Shopping ads compared to organic traffic. The number is rounded and bucketed. Cannot be filtered on in the 'WHERE' clause."
-        },
-        "isYourDomain": {
-          "description": "True if this row contains data for your domain. Cannot be filtered on in the 'WHERE' clause.",
-          "type": "boolean"
-        },
-        "domain": {
-          "type": "string",
-          "description": "Domain of your competitor or your domain, if 'is_your_domain' is true. Required in the `SELECT` clause. Cannot be filtered on in the 'WHERE' clause."
-        },
-        "trafficSource": {
-          "type": "string",
-          "enum": [
-            "TRAFFIC_SOURCE_ENUM_UNSPECIFIED",
-            "ORGANIC",
-            "ADS",
-            "ALL"
-          ],
-          "enumDescriptions": [
-            "Not specified.",
-            "Organic traffic.",
-            "Traffic from ads.",
-            "Organic and ads traffic."
-          ],
-          "description": "Traffic source of impressions. Required in the `SELECT` clause."
-        },
-        "higherPositionRate": {
-          "type": "number",
-          "description": "[Higher position rate] (https://support.google.com/merchants/answer/11366442#zippy=%2Chigher-position-rate) shows how often a competitor’s offer got placed in a higher position on the page than your offer. Cannot be filtered on in the 'WHERE' clause.",
-          "format": "double"
-        },
-        "relativeVisibility": {
-          "type": "number",
-          "description": "[Relative visibility] (https://support.google.com/merchants/answer/11366442#zippy=%2Crelative-visibility) shows how often your competitors’ offers are shown compared to your offers. In other words, this is the number of displayed impressions of a competitor retailer divided by the number of your displayed impressions during a selected time range for a selected product category and country. Cannot be filtered on in the 'WHERE' clause.",
-          "format": "double"
-        },
-        "pageOverlapRate": {
-          "type": "number",
-          "description": "[Page overlap rate] (https://support.google.com/merchants/answer/11366442#zippy=%2Cpage-overlap-rate) shows how frequently competing retailers’ offers are shown together with your offers on the same page. Cannot be filtered on in the 'WHERE' clause.",
-          "format": "double"
-        },
-        "date": {
-          "description": "Date of this row. A condition on `date` is required in the `WHERE` clause.",
-          "$ref": "Date"
-        },
-        "reportCategoryId": {
-          "description": "Google product category ID to calculate the report for, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436). Required in the `SELECT` clause. A condition on `report_category_id` is required in the `WHERE` clause.",
-          "format": "int64",
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "id": "CompetitiveVisibilityCompetitorView",
-      "description": "Fields available for query in `competitive_visibility_competitor_view` table. [Competitive visibility](https://support.google.com/merchants/answer/11366442) report with businesses with similar visibility. Values are only set for fields requested explicitly in the request's search query."
-    },
-    "ReportRow": {
-      "type": "object",
-      "description": "Result row returned from the search query. Only the message corresponding to the queried table is populated in the response. Within the populated message, only the fields requested explicitly in the query are populated.",
-      "id": "ReportRow",
-      "properties": {
-        "productView": {
-          "$ref": "ProductView",
-          "description": "Fields available for query in `product_view` table."
-        },
-        "priceInsightsProductView": {
-          "$ref": "PriceInsightsProductView",
-          "description": "Fields available for query in `price_insights_product_view` table."
-        },
-        "nonProductPerformanceView": {
-          "$ref": "NonProductPerformanceView",
-          "description": "Fields available for query in `non_product_performance_view` table."
-        },
-        "bestSellersBrandView": {
-          "$ref": "BestSellersBrandView",
-          "description": "Fields available for query in `best_sellers_brand_view` table."
-        },
-        "priceCompetitivenessProductView": {
-          "description": "Fields available for query in `price_competitiveness_product_view` table.",
-          "$ref": "PriceCompetitivenessProductView"
-        },
-        "competitiveVisibilityBenchmarkView": {
-          "$ref": "CompetitiveVisibilityBenchmarkView",
-          "description": "Fields available for query in `competitive_visibility_benchmark_view` table."
-        },
-        "competitiveVisibilityTopMerchantView": {
-          "$ref": "CompetitiveVisibilityTopMerchantView",
-          "description": "Fields available for query in `competitive_visibility_top_merchant_view` table."
-        },
-        "productPerformanceView": {
-          "description": "Fields available for query in `product_performance_view` table.",
-          "$ref": "ProductPerformanceView"
-        },
-        "competitiveVisibilityCompetitorView": {
-          "description": "Fields available for query in `competitive_visibility_competitor_view` table.",
-          "$ref": "CompetitiveVisibilityCompetitorView"
-        },
-        "bestSellersProductClusterView": {
-          "description": "Fields available for query in `best_sellers_product_cluster_view` table.",
-          "$ref": "BestSellersProductClusterView"
-        }
-      }
-    },
-    "CompetitiveVisibilityBenchmarkView": {
-      "description": "Fields available for query in `competitive_visibility_benchmark_view` table. [Competitive visibility](https://support.google.com/merchants/answer/11366442) report with the category benchmark. Values are only set for fields requested explicitly in the request's search query.",
-      "type": "object",
-      "properties": {
-        "trafficSource": {
-          "enumDescriptions": [
-            "Not specified.",
-            "Organic traffic.",
-            "Traffic from ads.",
-            "Organic and ads traffic."
-          ],
-          "type": "string",
-          "enum": [
-            "TRAFFIC_SOURCE_ENUM_UNSPECIFIED",
-            "ORGANIC",
-            "ADS",
-            "ALL"
-          ],
-          "description": "Traffic source of impressions. Required in the `SELECT` clause."
-        },
-        "date": {
-          "$ref": "Date",
-          "description": "Date of this row. Required in the `SELECT` clause. A condition on `date` is required in the `WHERE` clause."
-        },
-        "reportCategoryId": {
-          "description": "Google product category ID to calculate the report for, represented in [Google's product taxonomy](https://support.google.com/merchants/answer/6324436). Required in the `SELECT` clause. A condition on `report_category_id` is required in the `WHERE` clause.",
-          "type": "string",
-          "format": "int64"
-        },
-        "categoryBenchmarkVisibilityTrend": {
-          "type": "number",
-          "description": "Change in visibility based on impressions with respect to the start of the selected time range (or first day with non-zero impressions) for a combined set of merchants with highest visibility approximating the market. Cannot be filtered on in the 'WHERE' clause.",
-          "format": "double"
-        },
-        "reportCountryCode": {
-          "type": "string",
-          "description": "Country where impressions appeared. Required in the `SELECT` clause. A condition on `report_country_code` is required in the `WHERE` clause."
-        },
-        "yourDomainVisibilityTrend": {
-          "format": "double",
-          "type": "number",
-          "description": "Change in visibility based on impressions for your domain with respect to the start of the selected time range (or first day with non-zero impressions). Cannot be filtered on in the 'WHERE' clause."
-        }
-      },
-      "id": "CompetitiveVisibilityBenchmarkView"
-    },
-    "Date": {
-      "type": "object",
-      "id": "Date",
-      "description": "Represents a whole or partial calendar date, such as a birthday. The time of day and time zone are either specified elsewhere or are insignificant. The date is relative to the Gregorian Calendar. This can represent one of the following: * A full date, with non-zero year, month, and day values. * A month and day, with a zero year (for example, an anniversary). * A year on its own, with a zero month and a zero day. * A year and month, with a zero day (for example, a credit card expiration date). Related types: * google.type.TimeOfDay * google.type.DateTime * google.protobuf.Timestamp",
-      "properties": {
-        "month": {
-          "format": "int32",
-          "type": "integer",
-          "description": "Month of a year. Must be from 1 to 12, or 0 to specify a year without a month and day."
-        },
-        "year": {
-          "description": "Year of the date. Must be from 1 to 9999, or 0 to specify a date without a year.",
-          "type": "integer",
-          "format": "int32"
-        },
-        "day": {
-          "format": "int32",
-          "description": "Day of a month. Must be from 1 to 31 and valid for the year and month, or 0 to specify a year by itself or a year and month where the day isn't significant.",
-          "type": "integer"
-        }
-      }
-    },
-    "Price": {
-      "properties": {
-        "amountMicros": {
-          "type": "string",
-          "description": "The price represented as a number in micros (1 million micros is an equivalent to one's currency standard unit, for example, 1 USD = 1000000 micros).",
-          "format": "int64"
-        },
-        "currencyCode": {
-          "description": "The currency of the price using three-letter acronyms according to [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217).",
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "description": "The price represented as a number and currency.",
-      "id": "Price"
-    },
-    "SearchRequest": {
-      "properties": {
-        "pageToken": {
-          "description": "Optional. Token of the page to retrieve. If not specified, the first page of results is returned. In order to request the next page of results, the value obtained from `next_page_token` in the previous response should be used.",
-          "type": "string"
-        },
-        "pageSize": {
-          "type": "integer",
-          "description": "Optional. Number of `ReportRows` to retrieve in a single page. Defaults to 1000. Values above 100,000 are coerced to 100,000.",
-          "format": "int32"
-        },
-        "query": {
-          "type": "string",
-          "description": "Required. Query that defines a report to be retrieved. For details on how to construct your query, see the [Query Language guide](/merchant/api/guides/reports/query-language). For the full list of available tables and fields, see the Available fields."
-        }
-      },
-      "id": "SearchRequest",
-      "description": "Request message for the `ReportService.Search` method.",
-      "type": "object"
-    },
-    "SearchResponse": {
-      "properties": {
-        "results": {
-          "type": "array",
-          "description": "Rows that matched the search query.",
-          "items": {
-            "$ref": "ReportRow"
-          }
-        },
-        "nextPageToken": {
-          "type": "string",
-          "description": "Token which can be sent as `page_token` to retrieve the next page. If omitted, there are no subsequent pages."
-        }
-      },
-      "type": "object",
-      "description": "Response message for the `ReportService.Search` method.",
-      "id": "SearchResponse"
-    },
-    "ItemIssueType": {
-      "id": "ItemIssueType",
-      "properties": {
-        "canonicalAttribute": {
-          "type": "string",
-          "description": "Canonical attribute name for attribute-specific issues."
-        },
-        "code": {
-          "type": "string",
-          "description": "Error code of the issue, equivalent to the `code` of [Product issues](https://developers.google.com/shopping-content/guides/product-issues)."
-        }
-      },
-      "type": "object",
-      "description": "Issue type."
-    },
-    "ProductChange": {
-      "description": "The change that happened to the product including old value, new value, country code as the region code and reporting context.",
-      "type": "object",
-      "id": "ProductChange",
-      "properties": {
-        "oldValue": {
-          "description": "The old value of the changed resource or attribute. If empty, it means that the product was created. Will have one of these values : (`approved`, `pending`, `disapproved`, ``)",
-          "type": "string"
+          "format": "google-datetime"
         },
         "reportingContext": {
           "enumDescriptions": [
@@ -1560,8 +1571,6 @@
             false,
             false
           ],
-          "type": "string",
-          "description": "Reporting contexts that have the change (if applicable). Currently this field supports only (`SHOPPING_ADS`, `LOCAL_INVENTORY_ADS`, `YOUTUBE_SHOPPING`, `YOUTUBE_CHECKOUT`, `YOUTUBE_AFFILIATE`) from the enum value [ReportingContextEnum](/merchant/api/reference/rest/Shared.Types/ReportingContextEnum)",
           "enum": [
             "REPORTING_CONTEXT_ENUM_UNSPECIFIED",
             "SHOPPING_ADS",
@@ -1583,29 +1592,18 @@
             "PRODUCT_REVIEWS",
             "MERCHANT_REVIEWS",
             "YOUTUBE_CHECKOUT"
-          ]
-        },
-        "regionCode": {
-          "description": "Countries that have the change (if applicable). Represented in the ISO 3166 format.",
-          "type": "string"
-        },
-        "newValue": {
+          ],
           "type": "string",
-          "description": "The new value of the changed resource or attribute. If empty, it means that the product was deleted. Will have one of these values : (`approved`, `pending`, `disapproved`, ``)"
+          "description": "Reporting context to restrict the query to. Restricts the reporting contexts returned in `status_per_reporting_context` and `item_issues`, and used to compute `aggregated_reporting_context_status`. **This field can only be used in the `WHERE` clause and cannot be selected in the `SELECT` clause.**"
+        },
+        "productTypeL5": {
+          "description": "Product type (5th level) in merchant's own [product taxonomy](https://support.google.com/merchants/answer/6324406).",
+          "type": "string"
         }
-      }
+      },
+      "type": "object"
     }
   },
-  "canonicalName": "Merchant",
-  "icons": {
-    "x16": "http://www.google.com/images/icons/product/search-16.gif",
-    "x32": "http://www.google.com/images/icons/product/search-32.gif"
-  },
-  "kind": "discovery#restDescription",
-  "discoveryVersion": "v1",
-  "title": "Merchant API",
-  "fullyEncodeReservedExpansion": true,
-  "mtlsRootUrl": "https://merchantapi.mtls.googleapis.com/",
   "auth": {
     "oauth2": {
       "scopes": {
@@ -1615,76 +1613,60 @@
       }
     }
   },
-  "name": "merchantapi",
+  "baseUrl": "https://merchantapi.googleapis.com/",
+  "version": "reports_v1",
+  "mtlsRootUrl": "https://merchantapi.mtls.googleapis.com/",
+  "protocol": "rest",
+  "canonicalName": "Merchant",
+  "resources": {
+    "accounts": {
+      "resources": {
+        "reports": {
+          "methods": {
+            "search": {
+              "parameterOrder": [
+                "parent"
+              ],
+              "path": "reports/v1/{+parent}/reports:search",
+              "id": "merchantapi.accounts.reports.search",
+              "parameters": {
+                "parent": {
+                  "type": "string",
+                  "location": "path",
+                  "description": "Required. Id of the account making the call. Must be a standalone account or a subaccount of an advanced account. Format: accounts/{account}",
+                  "required": true,
+                  "pattern": "^accounts/[^/]+$"
+                }
+              },
+              "flatPath": "reports/v1/accounts/{accountsId}/reports:search",
+              "scopes": [
+                "https://www.googleapis.com/auth/content"
+              ],
+              "httpMethod": "POST",
+              "response": {
+                "$ref": "SearchResponse"
+              },
+              "description": "Retrieves a report defined by a search query. The response might contain fewer rows than specified by `page_size`. Rely on `next_page_token` to determine if there are more rows to be requested.",
+              "request": {
+                "$ref": "SearchRequest"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "basePath": "",
+  "icons": {
+    "x16": "http://www.google.com/images/icons/product/search-16.gif",
+    "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  },
   "id": "merchantapi:reports_v1",
-  "ownerDomain": "google.com",
-  "revision": "20260826",
-  "documentationLink": "https://developers.google.com/merchant/api",
-  "ownerName": "Google",
+  "description": "Programmatically manage your Merchant Center Accounts.",
   "parameters": {
-    "alt": {
-      "description": "Data format for response.",
-      "enumDescriptions": [
-        "Responses with Content-Type of application/json",
-        "Media download with context-dependent Content-Type",
-        "Responses with Content-Type of application/x-protobuf"
-      ],
-      "type": "string",
-      "default": "json",
-      "enum": [
-        "json",
-        "media",
-        "proto"
-      ],
-      "location": "query"
-    },
-    "fields": {
-      "description": "Selector specifying which fields to include in a partial response.",
-      "type": "string",
-      "location": "query"
-    },
-    "upload_protocol": {
-      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").",
-      "location": "query",
-      "type": "string"
-    },
-    "key": {
-      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
-      "type": "string",
-      "location": "query"
-    },
     "access_token": {
       "description": "OAuth access token.",
-      "location": "query",
-      "type": "string"
-    },
-    "$.xgafv": {
-      "enumDescriptions": [
-        "v1 error format",
-        "v2 error format"
-      ],
-      "location": "query",
-      "enum": [
-        "1",
-        "2"
-      ],
-      "description": "V1 error format.",
-      "type": "string"
-    },
-    "uploadType": {
-      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
-      "location": "query",
-      "type": "string"
-    },
-    "oauth_token": {
-      "description": "OAuth 2.0 token for the current user.",
       "type": "string",
-      "location": "query"
-    },
-    "prettyPrint": {
-      "description": "Returns response with indentations and line breaks.",
-      "default": "true",
-      "type": "boolean",
       "location": "query"
     },
     "quotaUser": {
@@ -1692,56 +1674,74 @@
       "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
       "type": "string"
     },
-    "callback": {
+    "uploadType": {
+      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
       "type": "string",
-      "description": "JSONP",
       "location": "query"
+    },
+    "callback": {
+      "location": "query",
+      "description": "JSONP",
+      "type": "string"
+    },
+    "upload_protocol": {
+      "type": "string",
+      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").",
+      "location": "query"
+    },
+    "key": {
+      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
+      "location": "query",
+      "type": "string"
+    },
+    "fields": {
+      "description": "Selector specifying which fields to include in a partial response.",
+      "type": "string",
+      "location": "query"
+    },
+    "oauth_token": {
+      "description": "OAuth 2.0 token for the current user.",
+      "location": "query",
+      "type": "string"
+    },
+    "prettyPrint": {
+      "location": "query",
+      "description": "Returns response with indentations and line breaks.",
+      "default": "true",
+      "type": "boolean"
+    },
+    "$.xgafv": {
+      "type": "string",
+      "enum": [
+        "1",
+        "2"
+      ],
+      "location": "query",
+      "description": "V1 error format.",
+      "enumDescriptions": [
+        "v1 error format",
+        "v2 error format"
+      ]
+    },
+    "alt": {
+      "enumDescriptions": [
+        "Responses with Content-Type of application/json",
+        "Media download with context-dependent Content-Type",
+        "Responses with Content-Type of application/x-protobuf"
+      ],
+      "location": "query",
+      "type": "string",
+      "enum": [
+        "json",
+        "media",
+        "proto"
+      ],
+      "default": "json",
+      "description": "Data format for response."
     }
   },
-  "servicePath": "",
-  "protocol": "rest",
+  "documentationLink": "https://developers.google.com/merchant/api",
   "version_module": true,
-  "batchPath": "batch",
-  "basePath": "",
-  "description": "Programmatically manage your Merchant Center Accounts.",
-  "baseUrl": "https://merchantapi.googleapis.com/",
-  "resources": {
-    "accounts": {
-      "resources": {
-        "reports": {
-          "methods": {
-            "search": {
-              "scopes": [
-                "https://www.googleapis.com/auth/content"
-              ],
-              "id": "merchantapi.accounts.reports.search",
-              "parameters": {
-                "parent": {
-                  "pattern": "^accounts/[^/]+$",
-                  "description": "Required. Id of the account making the call. Must be a standalone account or a subaccount of an advanced account. Format: accounts/{account}",
-                  "type": "string",
-                  "location": "path",
-                  "required": true
-                }
-              },
-              "description": "Retrieves a report defined by a search query. The response might contain fewer rows than specified by `page_size`. Rely on `next_page_token` to determine if there are more rows to be requested.",
-              "parameterOrder": [
-                "parent"
-              ],
-              "path": "reports/v1/{+parent}/reports:search",
-              "request": {
-                "$ref": "SearchRequest"
-              },
-              "flatPath": "reports/v1/accounts/{accountsId}/reports:search",
-              "response": {
-                "$ref": "SearchResponse"
-              },
-              "httpMethod": "POST"
-            }
-          }
-        }
-      }
-    }
-  },
-  "rootUrl": "https://merchantapi.googleapis.com/"
+  "ownerName": "Google",
+  "revision": "20260826"
 }
