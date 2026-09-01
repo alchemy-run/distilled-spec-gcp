@@ -1,135 +1,606 @@
 {
-  "schemas": {
-    "UpdateLoginNode": {
-      "properties": {},
-      "description": "When set in OperationStep, indicates that a login node should be updated.",
-      "type": "object",
-      "id": "UpdateLoginNode"
-    },
-    "Orchestrator": {
-      "description": "The component responsible for scheduling and running workloads on the cluster as well as providing the user interface for interacting with the cluster at runtime.",
-      "id": "Orchestrator",
-      "properties": {
-        "slurm": {
-          "description": "Optional. If set, indicates that the cluster should use Slurm as the orchestrator.",
-          "$ref": "SlurmOrchestrator"
+  "version_module": true,
+  "discoveryVersion": "v1",
+  "basePath": "",
+  "auth": {
+    "oauth2": {
+      "scopes": {
+        "https://www.googleapis.com/auth/cloud-platform": {
+          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
         }
-      },
-      "type": "object"
-    },
-    "DeleteNetwork": {
+      }
+    }
+  },
+  "id": "hypercomputecluster:v1",
+  "revision": "20260820",
+  "name": "hypercomputecluster",
+  "schemas": {
+    "ExistingLustreConfig": {
+      "description": "When set in a StorageResourceConfig, indicates that an existing [Managed Lustre](https://cloud.google.com/products/managed-lustre) instance should be imported.",
+      "type": "object",
+      "id": "ExistingLustreConfig",
       "properties": {
-        "network": {
+        "lustre": {
+          "description": "Required. Immutable. Name of the Managed Lustre instance to import, in the format `projects/{project}/locations/{location}/instances/{instance}`",
+          "type": "string"
+        }
+      }
+    },
+    "BucketReference": {
+      "properties": {
+        "bucket": {
+          "description": "Output only. Name of the bucket.",
           "type": "string",
-          "description": "Output only. Name of the network to delete, in the format `projects/{project}/global/networks/{network}`.",
           "readOnly": true
         }
       },
-      "id": "DeleteNetwork",
-      "type": "object",
-      "description": "When set in OperationStep, indicates network deletion step with the resource name."
+      "id": "BucketReference",
+      "description": "A reference to a [Google Cloud Storage](https://cloud.google.com/storage) bucket.",
+      "type": "object"
     },
-    "GcsAutoclassConfig": {
-      "id": "GcsAutoclassConfig",
-      "description": "Message describing Google Cloud Storage autoclass configuration",
+    "DeleteLustreInstance": {
+      "type": "object",
       "properties": {
-        "enabled": {
-          "description": "Required. Enables Auto-class feature.",
-          "type": "boolean"
-        },
-        "terminalStorageClass": {
-          "enumDescriptions": [
-            "Unspecified terminal storage class",
-            "Nearline terminal storage class",
-            "Archive terminal storage class"
-          ],
-          "description": "Optional. Terminal storage class of the autoclass bucket",
+        "lustre": {
+          "description": "Output only. Name of the Managed Lustre instance, in the format `projects/{project}/locations/{location}/instances/{instance}`",
           "type": "string",
-          "enum": [
-            "TERMINAL_STORAGE_CLASS_UNSPECIFIED",
-            "NEARLINE",
-            "ARCHIVE"
-          ]
+          "readOnly": true
+        }
+      },
+      "id": "DeleteLustreInstance",
+      "description": "When set in OperationStep, indicates that a Lustre instance should be deleted."
+    },
+    "DeleteLoginNode": {
+      "description": "When set in OperationStep, indicates that a login node should be deleted.",
+      "properties": {},
+      "type": "object",
+      "id": "DeleteLoginNode"
+    },
+    "NewLustreConfig": {
+      "properties": {
+        "lustre": {
+          "description": "Required. Immutable. Name of the Managed Lustre instance to create, in the format `projects/{project}/locations/{location}/instances/{instance}`",
+          "type": "string"
+        },
+        "capacityGb": {
+          "type": "string",
+          "description": "Required. Immutable. Storage capacity of the instance in gibibytes (GiB). Allowed values are between 18000 and 7632000.",
+          "format": "int64"
+        },
+        "description": {
+          "description": "Optional. Immutable. Description of the Managed Lustre instance. Maximum of 2048 characters.",
+          "type": "string"
+        },
+        "perUnitStorageThroughput": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optional. Immutable. Throughput of the instance in MB/s/TiB. Valid values are 125, 250, 500, 1000. See [Performance tiers and maximum storage capacities](https://cloud.google.com/managed-lustre/docs/create-instance#performance-tiers) for more information."
+        },
+        "filesystem": {
+          "description": "Required. Immutable. Filesystem name for this instance. This name is used by client-side tools, including when mounting the instance. Must be 8 characters or less and can only contain letters and numbers.",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "id": "NewLustreConfig",
+      "description": "When set in a StorageResourceConfig, indicates that a new [Managed Lustre](https://cloud.google.com/products/managed-lustre) instance should be created."
+    },
+    "CancelOperationRequest": {
+      "type": "object",
+      "description": "The request message for Operations.CancelOperation.",
+      "id": "CancelOperationRequest",
+      "properties": {}
+    },
+    "Location": {
+      "id": "Location",
+      "type": "object",
+      "description": "A resource that represents a Google Cloud location.",
+      "properties": {
+        "metadata": {
+          "description": "Service-specific metadata. For example the available capacity at the given location.",
+          "additionalProperties": {
+            "type": "any",
+            "description": "Properties of the object. Contains field @type with type URL."
+          },
+          "type": "object"
+        },
+        "labels": {
+          "description": "Cross-service attributes for the location. For example {\"cloud.googleapis.com/region\": \"us-east1\"}",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "locationId": {
+          "type": "string",
+          "description": "The canonical id for this location. For example: `\"us-east1\"`."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The friendly name for this location, typically a nearby city name. For example, \"Tokyo\"."
+        },
+        "name": {
+          "description": "Resource name for the location, which may vary between implementations. For example: `\"projects/example-project/locations/us-east1\"`",
+          "type": "string"
+        }
+      }
+    },
+    "CreateFilestoreInstance": {
+      "properties": {
+        "filestore": {
+          "description": "Output only. Name of the Filestore instance, in the format `projects/{project}/locations/{location}/instances/{instance}`",
+          "readOnly": true,
+          "type": "string"
+        }
+      },
+      "description": "When set in OperationStep, indicates that a new filestore instance should be created.",
+      "id": "CreateFilestoreInstance",
+      "type": "object"
+    },
+    "CreateNetwork": {
+      "description": "When set in OperationStep, indicates that a new network should be created.",
+      "type": "object",
+      "id": "CreateNetwork",
+      "properties": {
+        "network": {
+          "readOnly": true,
+          "description": "Output only. Name of the network to create, in the format `projects/{project}/global/networks/{network}`.",
+          "type": "string"
+        }
+      }
+    },
+    "ComputeResourceConfig": {
+      "properties": {
+        "newSpotInstances": {
+          "$ref": "NewSpotInstancesConfig",
+          "description": "Optional. Immutable. If set, indicates that this resource should use spot VMs."
+        },
+        "newReservedInstances": {
+          "$ref": "NewReservedInstancesConfig",
+          "description": "Optional. Immutable. If set, indicates that this resource should use reserved VMs."
+        },
+        "newFlexStartInstances": {
+          "description": "Optional. Immutable. If set, indicates that this resource should use flex-start VMs.",
+          "$ref": "NewFlexStartInstancesConfig"
+        },
+        "newOnDemandInstances": {
+          "description": "Optional. Immutable. If set, indicates that this resource should use on-demand VMs.",
+          "$ref": "NewOnDemandInstancesConfig"
+        }
+      },
+      "description": "Describes how a compute resource should be created at runtime.",
+      "type": "object",
+      "id": "ComputeResourceConfig"
+    },
+    "CreateStorageBucket": {
+      "description": "When set in OperationStep, indicates that a new storage bucket should be created.",
+      "type": "object",
+      "id": "CreateStorageBucket",
+      "properties": {
+        "bucket": {
+          "description": "Output only. Name of the bucket.",
+          "readOnly": true,
+          "type": "string"
+        }
+      }
+    },
+    "DeleteNodeset": {
+      "type": "object",
+      "description": "When set in OperationStep, indicates that a nodeset should be deleted.",
+      "id": "DeleteNodeset",
+      "properties": {
+        "nodesets": {
+          "description": "Output only. Name of the nodeset to delete",
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "readOnly": true
+        }
+      }
+    },
+    "ExistingNetworkConfig": {
+      "properties": {
+        "subnetwork": {
+          "type": "string",
+          "description": "Required. Immutable. Particular subnetwork to use, in the format `projects/{project}/regions/{region}/subnetworks/{subnetwork}`."
+        },
+        "network": {
+          "type": "string",
+          "description": "Required. Immutable. Name of the network to import, in the format `projects/{project}/global/networks/{network}`."
+        }
+      },
+      "type": "object",
+      "id": "ExistingNetworkConfig",
+      "description": "When set in a NetworkResourceConfig, indicates that an existing network should be imported."
+    },
+    "UpdateLoginNode": {
+      "properties": {},
+      "type": "object",
+      "id": "UpdateLoginNode",
+      "description": "When set in OperationStep, indicates that a login node should be updated."
+    },
+    "NetworkResourceConfig": {
+      "id": "NetworkResourceConfig",
+      "type": "object",
+      "description": "Describes how a network resource should be initialized. Each network resource can either be imported from an existing Google Cloud resource or initialized when the cluster is created.",
+      "properties": {
+        "newNetwork": {
+          "description": "Optional. Immutable. If set, indicates that a new network should be created.",
+          "$ref": "NewNetworkConfig"
+        },
+        "existingNetwork": {
+          "description": "Optional. Immutable. If set, indicates that an existing network should be imported.",
+          "$ref": "ExistingNetworkConfig"
+        }
+      }
+    },
+    "SlurmOrchestrator": {
+      "id": "SlurmOrchestrator",
+      "type": "object",
+      "description": "When set in Orchestrator, indicates that the cluster should use [Slurm](https://slurm.schedmd.com/) as the orchestrator.",
+      "properties": {
+        "prologBashScripts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional. Slurm [prolog scripts](https://slurm.schedmd.com/prolog_epilog.html), which will be executed by compute nodes before a node begins running a new job. Values must not be empty."
+        },
+        "nodeSets": {
+          "type": "array",
+          "items": {
+            "$ref": "SlurmNodeSet"
+          },
+          "description": "Optional. Compute resource configuration for the Slurm nodesets in your cluster. If not specified, the cluster won't create any nodes."
+        },
+        "partitions": {
+          "items": {
+            "$ref": "SlurmPartition"
+          },
+          "description": "Optional. Configuration for the Slurm partitions in your cluster. Each partition can contain one or more nodesets, and you can submit separate jobs on each partition. If you don't specify at least one partition in your cluster, you can't submit jobs to the cluster.",
+          "type": "array"
+        },
+        "defaultPartition": {
+          "description": "Optional. Default partition to use for submitted jobs that do not explicitly specify a partition. Required if and only if there is more than one partition, in which case it must match the id of one of the partitions.",
+          "type": "string"
+        },
+        "epilogBashScripts": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Optional. Slurm [epilog scripts](https://slurm.schedmd.com/prolog_epilog.html), which will be executed by compute nodes whenever a node finishes running a job. Values must not be empty."
+        },
+        "loginNodes": {
+          "$ref": "SlurmLoginNodes",
+          "description": "Required. Configuration for login nodes, which allow users to access the cluster over SSH."
+        }
+      }
+    },
+    "ExistingFilestoreConfig": {
+      "description": "When set in a StorageResourceConfig, indicates that an existing [Filestore](https://cloud.google.com/filestore) instance should be imported.",
+      "type": "object",
+      "id": "ExistingFilestoreConfig",
+      "properties": {
+        "filestore": {
+          "type": "string",
+          "description": "Required. Immutable. Name of the Filestore instance to import, in the format `projects/{project}/locations/{location}/instances/{instance}`"
+        }
+      }
+    },
+    "ListOperationsResponse": {
+      "type": "object",
+      "description": "The response message for Operations.ListOperations.",
+      "id": "ListOperationsResponse",
+      "properties": {
+        "operations": {
+          "description": "A list of operations that matches the specified filter in the request.",
+          "items": {
+            "$ref": "Operation"
+          },
+          "type": "array"
+        },
+        "nextPageToken": {
+          "type": "string",
+          "description": "The standard List next-page token."
+        },
+        "unreachable": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations."
+        }
+      }
+    },
+    "DeleteStorageBucket": {
+      "description": "When set in OperationStep, indicates that Cloud Storage bucket should be deleted.",
+      "type": "object",
+      "id": "DeleteStorageBucket",
+      "properties": {
+        "bucket": {
+          "description": "Output only. Name of the bucket.",
+          "readOnly": true,
+          "type": "string"
+        }
+      }
+    },
+    "Empty": {
+      "properties": {},
+      "id": "Empty",
+      "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
+      "type": "object"
+    },
+    "UpdateNodeset": {
+      "description": "When set in OperationStep, indicates that a nodeset should be updated.",
+      "id": "UpdateNodeset",
+      "type": "object",
+      "properties": {
+        "nodesets": {
+          "readOnly": true,
+          "type": "array",
+          "description": "Output only. Name of the nodeset to update",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "FileShareConfig": {
+      "description": "Message describing filestore configuration",
+      "id": "FileShareConfig",
+      "type": "object",
+      "properties": {
+        "capacityGb": {
+          "description": "Required. Size of the filestore in GB. Must be between 1024 and 102400, and must meet scalability requirements described at https://cloud.google.com/filestore/docs/service-tiers.",
+          "format": "int64",
+          "type": "string"
+        },
+        "fileShare": {
+          "description": "Required. Filestore share location",
+          "type": "string"
+        }
+      }
+    },
+    "NewFlexStartInstancesConfig": {
+      "id": "NewFlexStartInstancesConfig",
+      "description": "When set in a ComputeResourceConfig, indicates that VM instances should be created using [Flex Start](https://cloud.google.com/compute/docs/instances/provisioning-models).",
+      "properties": {
+        "zone": {
+          "type": "string",
+          "description": "Required. Immutable. Name of the zone in which VM instances should run, e.g., `us-central1-a`. Must be in the same region as the cluster, and must match the zone of any other resources specified in the cluster."
+        },
+        "machineType": {
+          "type": "string",
+          "description": "Required. Immutable. Name of the Compute Engine [machine type](https://cloud.google.com/compute/docs/machine-resource) to use, e.g. `n2-standard-2`."
+        },
+        "maxDuration": {
+          "description": "Required. Immutable. Specifies the time limit for created instances. Instances will be terminated at the end of this duration.",
+          "type": "string",
+          "format": "google-duration"
         }
       },
       "type": "object"
     },
-    "GcsHierarchicalNamespaceConfig": {
+    "ComputeResource": {
+      "id": "ComputeResource",
       "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Required. Enables hierarchical namespace setup for the bucket."
+        "config": {
+          "$ref": "ComputeResourceConfig",
+          "description": "Required. Immutable. Configuration for this compute resource, which describes how it should be created at runtime."
         }
       },
-      "id": "GcsHierarchicalNamespaceConfig",
       "type": "object",
-      "description": "Message describing Google Cloud Storage hierarchical namespace configuration"
+      "description": "A resource defining how virtual machines and accelerators should be provisioned for the cluster."
     },
-    "FilestoreReference": {
-      "type": "object",
-      "id": "FilestoreReference",
-      "description": "A reference to a [Filestore](https://cloud.google.com/filestore) instance.",
+    "LustreReference": {
       "properties": {
+        "lustre": {
+          "readOnly": true,
+          "type": "string",
+          "description": "Output only. Name of the Managed Lustre instance, in the format `projects/{project}/locations/{location}/instances/{instance}`"
+        }
+      },
+      "id": "LustreReference",
+      "description": "A reference to a [Managed Lustre](https://cloud.google.com/products/managed-lustre) instance.",
+      "type": "object"
+    },
+    "StorageResource": {
+      "type": "object",
+      "id": "StorageResource",
+      "properties": {
+        "bucket": {
+          "description": "Output only. A reference to a Google Cloud Storage bucket. Populated if and only if the storage resource was configured to use Google Cloud Storage.",
+          "readOnly": true,
+          "$ref": "BucketReference"
+        },
+        "config": {
+          "description": "Required. Immutable. Configuration for this storage resource, which describes how it should be created or imported. This field only controls how the storage resource is initially created or imported. Subsequent changes to the storage resource should be made via the resource's API and will not be reflected in the configuration.",
+          "$ref": "StorageResourceConfig"
+        },
         "filestore": {
+          "readOnly": true,
+          "$ref": "FilestoreReference",
+          "description": "Output only. A reference to a Filestore instance. Populated if and only if the storage resource was configured to use Filestore."
+        },
+        "lustre": {
+          "readOnly": true,
+          "description": "Output only. A reference to a Managed Lustre instance. Populated if and only if the storage resource was configured to use Managed Lustre.",
+          "$ref": "LustreReference"
+        }
+      },
+      "description": "Represents a form of persistent storage that you can mount onto compute resources in the cluster."
+    },
+    "DeleteNetwork": {
+      "id": "DeleteNetwork",
+      "properties": {
+        "network": {
+          "description": "Output only. Name of the network to delete, in the format `projects/{project}/global/networks/{network}`.",
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "description": "When set in OperationStep, indicates network deletion step with the resource name.",
+      "type": "object"
+    },
+    "OperationMetadata": {
+      "id": "OperationMetadata",
+      "description": "Represents the metadata of the long-running operation.",
+      "type": "object",
+      "properties": {
+        "verb": {
+          "type": "string",
+          "description": "Output only. Name of the verb executed by the operation.",
+          "readOnly": true
+        },
+        "target": {
           "type": "string",
           "readOnly": true,
-          "description": "Output only. Name of the Filestore instance, in the format `projects/{project}/locations/{location}/instances/{instance}`"
+          "description": "Output only. Server-defined resource path for the target of the operation."
+        },
+        "apiVersion": {
+          "readOnly": true,
+          "type": "string",
+          "description": "Output only. API version used to start the operation."
+        },
+        "requestedCancellation": {
+          "readOnly": true,
+          "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have been cancelled successfully have google.longrunning.Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
+          "type": "boolean"
+        },
+        "progress": {
+          "readOnly": true,
+          "$ref": "OperationProgress",
+          "description": "Output only. Progress of the operation."
+        },
+        "createTime": {
+          "readOnly": true,
+          "format": "google-datetime",
+          "description": "Output only. The time the operation was created.",
+          "type": "string"
+        },
+        "endTime": {
+          "description": "Output only. The time the operation finished running.",
+          "readOnly": true,
+          "format": "google-datetime",
+          "type": "string"
         }
       }
     },
     "UpdateOrchestrator": {
       "description": "When set in OperationStep, indicates that an orchestrator should be updated.",
-      "properties": {},
+      "id": "UpdateOrchestrator",
       "type": "object",
-      "id": "UpdateOrchestrator"
+      "properties": {}
     },
-    "ListLocationsResponse": {
-      "id": "ListLocationsResponse",
+    "CreateLoginNode": {
+      "properties": {},
+      "description": "When set in OperationStep, indicates that a login node should be created.",
+      "id": "CreateLoginNode",
+      "type": "object"
+    },
+    "FilestoreReference": {
       "type": "object",
+      "description": "A reference to a [Filestore](https://cloud.google.com/filestore) instance.",
+      "id": "FilestoreReference",
       "properties": {
-        "nextPageToken": {
-          "description": "The standard List next-page token.",
+        "filestore": {
+          "description": "Output only. Name of the Filestore instance, in the format `projects/{project}/locations/{location}/instances/{instance}`",
+          "type": "string",
+          "readOnly": true
+        }
+      }
+    },
+    "CreatePrivateServiceAccess": {
+      "type": "object",
+      "description": "When set in OperationStep, indicates that a new private service access should be created.",
+      "properties": {},
+      "id": "CreatePrivateServiceAccess"
+    },
+    "Cluster": {
+      "properties": {
+        "storageResources": {
+          "type": "object",
+          "description": "Optional. Storage resources available to the cluster. Keys specify the ID of the storage resource by which it can be referenced elsewhere, and must conform to [RFC-1034](https://datatracker.ietf.org/doc/html/rfc1034) (lower-case, alphanumeric, and at most 63 characters).",
+          "additionalProperties": {
+            "$ref": "StorageResource"
+          }
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional. A description for your cluster. You can use up to 2,048 characters."
+        },
+        "networkResources": {
+          "additionalProperties": {
+            "$ref": "NetworkResource"
+          },
+          "description": "Optional. Network resources available to the cluster. Must contain exactly one value. Keys specify the ID of the network resource by which it can be referenced elsewhere, and must conform to [RFC-1034](https://datatracker.ietf.org/doc/html/rfc1034) (lower-case, alphanumeric, and at most 63 characters).",
+          "type": "object"
+        },
+        "orchestrator": {
+          "$ref": "Orchestrator",
+          "description": "Optional. Orchestrator that is responsible for scheduling and running jobs on the cluster."
+        },
+        "uid": {
+          "description": "Output only. The globally unique identifier for this Cluster.",
+          "type": "string",
+          "readOnly": true
+        },
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Optional. [Labels](https://cloud.google.com/compute/docs/labeling-resources) applied to the cluster. Labels can be used to organize clusters and to filter them in queries.",
+          "type": "object"
+        },
+        "createTime": {
+          "type": "string",
+          "description": "Output only. Time that the cluster was originally created.",
+          "format": "google-datetime",
+          "readOnly": true
+        },
+        "name": {
+          "description": "Identifier. [Relative resource name](https://google.aip.dev/122) of the cluster, in the format `projects/{project}/locations/{location}/clusters/{cluster}`.",
           "type": "string"
         },
-        "locations": {
-          "description": "A list of locations that matches the specified filter in the request.",
-          "items": {
-            "$ref": "Location"
+        "reconciling": {
+          "description": "Output only. Indicates whether changes to the cluster are currently in flight. If this is `true`, then the current state might not match the cluster's intended state.",
+          "readOnly": true,
+          "type": "boolean"
+        },
+        "computeResources": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "ComputeResource"
           },
-          "type": "array"
+          "description": "Optional. Compute resources available to the cluster. Keys specify the ID of the compute resource by which it can be referenced elsewhere, and must conform to [RFC-1034](https://datatracker.ietf.org/doc/html/rfc1034) (lower-case, alphanumeric, and at most 63 characters)."
+        },
+        "updateTime": {
+          "format": "google-datetime",
+          "readOnly": true,
+          "type": "string",
+          "description": "Output only. Time that the cluster was most recently updated."
         }
       },
-      "description": "The response message for Locations.ListLocations."
-    },
-    "UpdateNodeset": {
-      "description": "When set in OperationStep, indicates that a nodeset should be updated.",
+      "id": "Cluster",
       "type": "object",
-      "id": "UpdateNodeset",
-      "properties": {
-        "nodesets": {
-          "type": "array",
-          "description": "Output only. Name of the nodeset to update",
-          "readOnly": true,
-          "items": {
-            "type": "string"
-          }
-        }
-      }
+      "description": "A collection of virtual machines and connected resources forming a high-performance computing cluster capable of running large-scale, tightly coupled workloads. A cluster combines a set a compute resources that perform computations, storage resources that contain inputs and store outputs, an orchestrator that is responsible for assigning jobs to compute resources, and network resources that connect everything together."
     },
-    "UpdatePartition": {
-      "id": "UpdatePartition",
-      "description": "When set in OperationStep, indicates that a partition should be updated.",
-      "type": "object",
+    "DeletePartition": {
       "properties": {
         "partitions": {
-          "readOnly": true,
           "type": "array",
-          "description": "Output only. Name of the partition to update",
           "items": {
             "type": "string"
-          }
+          },
+          "readOnly": true,
+          "description": "Output only. Name of the partition to delete"
         }
-      }
+      },
+      "type": "object",
+      "description": "When set in OperationStep, indicates that a partition should be deleted.",
+      "id": "DeletePartition"
     },
     "NewOnDemandInstancesConfig": {
       "properties": {
@@ -138,298 +609,407 @@
           "type": "string"
         },
         "machineType": {
-          "description": "Required. Immutable. Name of the Compute Engine [machine type](https://cloud.google.com/compute/docs/machine-resource) to use, e.g. `n2-standard-2`.",
-          "type": "string"
+          "type": "string",
+          "description": "Required. Immutable. Name of the Compute Engine [machine type](https://cloud.google.com/compute/docs/machine-resource) to use, e.g. `n2-standard-2`."
         }
       },
       "type": "object",
       "id": "NewOnDemandInstancesConfig",
       "description": "When set in a ComputeResourceConfig, indicates that on-demand (i.e., using the standard provisioning model) VM instances should be created."
     },
-    "CreateLoginNode": {
-      "properties": {},
-      "type": "object",
-      "description": "When set in OperationStep, indicates that a login node should be created.",
-      "id": "CreateLoginNode"
-    },
-    "Cluster": {
-      "type": "object",
-      "id": "Cluster",
-      "description": "A collection of virtual machines and connected resources forming a high-performance computing cluster capable of running large-scale, tightly coupled workloads. A cluster combines a set a compute resources that perform computations, storage resources that contain inputs and store outputs, an orchestrator that is responsible for assigning jobs to compute resources, and network resources that connect everything together.",
-      "properties": {
-        "updateTime": {
-          "description": "Output only. Time that the cluster was most recently updated.",
-          "type": "string",
-          "format": "google-datetime",
-          "readOnly": true
-        },
-        "networkResources": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "NetworkResource"
-          },
-          "description": "Optional. Network resources available to the cluster. Must contain exactly one value. Keys specify the ID of the network resource by which it can be referenced elsewhere, and must conform to [RFC-1034](https://datatracker.ietf.org/doc/html/rfc1034) (lower-case, alphanumeric, and at most 63 characters)."
-        },
-        "computeResources": {
-          "type": "object",
-          "description": "Optional. Compute resources available to the cluster. Keys specify the ID of the compute resource by which it can be referenced elsewhere, and must conform to [RFC-1034](https://datatracker.ietf.org/doc/html/rfc1034) (lower-case, alphanumeric, and at most 63 characters).",
-          "additionalProperties": {
-            "$ref": "ComputeResource"
-          }
-        },
-        "storageResources": {
-          "additionalProperties": {
-            "$ref": "StorageResource"
-          },
-          "description": "Optional. Storage resources available to the cluster. Keys specify the ID of the storage resource by which it can be referenced elsewhere, and must conform to [RFC-1034](https://datatracker.ietf.org/doc/html/rfc1034) (lower-case, alphanumeric, and at most 63 characters).",
-          "type": "object"
-        },
-        "name": {
-          "type": "string",
-          "description": "Identifier. [Relative resource name](https://google.aip.dev/122) of the cluster, in the format `projects/{project}/locations/{location}/clusters/{cluster}`."
-        },
-        "labels": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Optional. [Labels](https://cloud.google.com/compute/docs/labeling-resources) applied to the cluster. Labels can be used to organize clusters and to filter them in queries."
-        },
-        "reconciling": {
-          "readOnly": true,
-          "type": "boolean",
-          "description": "Output only. Indicates whether changes to the cluster are currently in flight. If this is `true`, then the current state might not match the cluster's intended state."
-        },
-        "createTime": {
-          "description": "Output only. Time that the cluster was originally created.",
-          "type": "string",
-          "readOnly": true,
-          "format": "google-datetime"
-        },
-        "orchestrator": {
-          "description": "Optional. Orchestrator that is responsible for scheduling and running jobs on the cluster.",
-          "$ref": "Orchestrator"
-        },
-        "description": {
-          "description": "Optional. A description for your cluster. You can use up to 2,048 characters.",
-          "type": "string"
-        },
-        "uid": {
-          "description": "Output only. The globally unique identifier for this Cluster.",
-          "type": "string",
-          "readOnly": true
-        }
-      }
-    },
-    "DeletePrivateServiceAccess": {
-      "properties": {},
-      "description": "When set in OperationStep, indicates private service access deletion step.",
-      "type": "object",
-      "id": "DeletePrivateServiceAccess"
-    },
-    "DeleteLustreInstance": {
-      "properties": {
-        "lustre": {
-          "description": "Output only. Name of the Managed Lustre instance, in the format `projects/{project}/locations/{location}/instances/{instance}`",
-          "readOnly": true,
-          "type": "string"
-        }
-      },
-      "description": "When set in OperationStep, indicates that a Lustre instance should be deleted.",
-      "type": "object",
-      "id": "DeleteLustreInstance"
-    },
-    "NewSpotInstancesConfig": {
-      "type": "object",
-      "description": "When set in a ComputeResourceConfig, indicates that [spot VM](https://cloud.google.com/compute/docs/instances/spot) instances should be created.",
-      "properties": {
-        "machineType": {
-          "description": "Required. Immutable. Name of the Compute Engine [machine type](https://cloud.google.com/compute/docs/machine-resource) to use, e.g. `n2-standard-2`.",
-          "type": "string"
-        },
-        "terminationAction": {
-          "type": "string",
-          "description": "Optional. Termination action for the instance. If not specified, Compute Engine sets the termination action to DELETE.",
-          "enum": [
-            "TERMINATION_ACTION_UNSPECIFIED",
-            "STOP",
-            "DELETE"
-          ],
-          "enumDescriptions": [
-            "Not set.",
-            "Compute Engine stops the Spot VM on preemption.",
-            "Compute Engine deletes the Spot VM on preemption."
-          ]
-        },
-        "zone": {
-          "type": "string",
-          "description": "Required. Immutable. Name of the zone in which VM instances should run, e.g., `us-central1-a`. Must be in the same region as the cluster, and must match the zone of any other resources specified in the cluster."
-        }
-      },
-      "id": "NewSpotInstancesConfig"
-    },
-    "ComputeInstance": {
-      "description": "Details about a Compute Engine [instance](https://cloud.google.com/compute/docs/instances).",
-      "id": "ComputeInstance",
-      "properties": {
-        "instance": {
-          "type": "string",
-          "description": "Output only. Name of the VM instance, in the format `projects/{project}/zones/{zone}/instances/{instance}`.",
-          "readOnly": true
-        }
-      },
-      "type": "object"
-    },
-    "BucketReference": {
-      "description": "A reference to a [Google Cloud Storage](https://cloud.google.com/storage) bucket.",
-      "type": "object",
-      "properties": {
-        "bucket": {
-          "readOnly": true,
-          "type": "string",
-          "description": "Output only. Name of the bucket."
-        }
-      },
-      "id": "BucketReference"
-    },
-    "CheckClusterHealth": {
-      "properties": {},
-      "id": "CheckClusterHealth",
-      "description": "When set in OperationStep, indicates that cluster health check should be performed.",
-      "type": "object"
-    },
-    "NetworkReference": {
-      "type": "object",
-      "properties": {
-        "subnetwork": {
-          "type": "string",
-          "description": "Output only. Name of the particular subnetwork being used by the cluster, in the format `projects/{project}/regions/{region}/subnetworks/{subnetwork}`.",
-          "readOnly": true
-        },
-        "network": {
-          "description": "Output only. Name of the network, in the format `projects/{project}/global/networks/{network}`.",
-          "readOnly": true,
-          "type": "string"
-        }
-      },
-      "description": "A reference to a [VPC network](https://cloud.google.com/vpc/docs/vpc) in Google Compute Engine.",
-      "id": "NetworkReference"
-    },
-    "ExistingNetworkConfig": {
-      "type": "object",
-      "description": "When set in a NetworkResourceConfig, indicates that an existing network should be imported.",
-      "id": "ExistingNetworkConfig",
-      "properties": {
-        "subnetwork": {
-          "description": "Required. Immutable. Particular subnetwork to use, in the format `projects/{project}/regions/{region}/subnetworks/{subnetwork}`.",
-          "type": "string"
-        },
-        "network": {
-          "description": "Required. Immutable. Name of the network to import, in the format `projects/{project}/global/networks/{network}`.",
-          "type": "string"
-        }
-      }
-    },
-    "ComputeInstanceSlurmNodeSet": {
-      "description": "When set in a SlurmNodeSet, indicates that the nodeset should be backed by Compute Engine VM instances.",
-      "properties": {
-        "bootDisk": {
-          "description": "Optional. Boot disk for the compute instance",
-          "$ref": "BootDisk"
-        },
-        "startupScript": {
-          "description": "Optional. [Startup script](https://cloud.google.com/compute/docs/instances/startup-scripts/linux) to be run on each VM instance in the nodeset. Max 256KB.",
-          "type": "string"
-        },
-        "labels": {
-          "type": "object",
-          "description": "Optional. [Labels](https://cloud.google.com/compute/docs/labeling-resources) that should be applied to each VM instance in the nodeset.",
-          "additionalProperties": {
-            "type": "string"
-          }
-        }
-      },
-      "type": "object",
-      "id": "ComputeInstanceSlurmNodeSet"
-    },
     "SlurmPartition": {
       "type": "object",
       "id": "SlurmPartition",
+      "description": "Configuration for Slurm partitions in the cluster. Partitions are groups of nodesets, and are how clients specify where their workloads should be run.",
       "properties": {
-        "id": {
-          "type": "string",
-          "description": "Required. ID of the partition, which is how users will identify it. Must conform to [RFC-1034](https://datatracker.ietf.org/doc/html/rfc1034) (lower-case, alphanumeric, and at most 63 characters)."
-        },
         "nodeSetIds": {
+          "description": "Required. IDs of the nodesets that make up this partition. Values must match SlurmNodeSet.id.",
           "type": "array",
           "items": {
             "type": "string"
-          },
-          "description": "Required. IDs of the nodesets that make up this partition. Values must match SlurmNodeSet.id."
-        }
-      },
-      "description": "Configuration for Slurm partitions in the cluster. Partitions are groups of nodesets, and are how clients specify where their workloads should be run."
-    },
-    "CreateFilestoreInstance": {
-      "id": "CreateFilestoreInstance",
-      "type": "object",
-      "description": "When set in OperationStep, indicates that a new filestore instance should be created.",
-      "properties": {
-        "filestore": {
-          "readOnly": true,
-          "description": "Output only. Name of the Filestore instance, in the format `projects/{project}/locations/{location}/instances/{instance}`",
+          }
+        },
+        "id": {
+          "description": "Required. ID of the partition, which is how users will identify it. Must conform to [RFC-1034](https://datatracker.ietf.org/doc/html/rfc1034) (lower-case, alphanumeric, and at most 63 characters).",
           "type": "string"
         }
       }
     },
-    "CreatePrivateServiceAccess": {
+    "Operation": {
+      "id": "Operation",
+      "description": "This resource represents a long-running operation that is the result of a network API call.",
       "type": "object",
-      "description": "When set in OperationStep, indicates that a new private service access should be created.",
-      "id": "CreatePrivateServiceAccess",
-      "properties": {}
+      "properties": {
+        "name": {
+          "description": "The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`.",
+          "type": "string"
+        },
+        "response": {
+          "type": "object",
+          "additionalProperties": {
+            "description": "Properties of the object. Contains field @type with type URL.",
+            "type": "any"
+          },
+          "description": "The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`."
+        },
+        "error": {
+          "$ref": "Status",
+          "description": "The error result of the operation in case of failure or cancellation."
+        },
+        "metadata": {
+          "additionalProperties": {
+            "type": "any",
+            "description": "Properties of the object. Contains field @type with type URL."
+          },
+          "description": "Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.",
+          "type": "object"
+        },
+        "done": {
+          "description": "If the value is `false`, it means the operation is still in progress. If `true`, the operation is completed, and either `error` or `response` is available.",
+          "type": "boolean"
+        }
+      }
+    },
+    "CreatePartition": {
+      "properties": {
+        "partitions": {
+          "description": "Output only. Name of the partition to create",
+          "items": {
+            "type": "string"
+          },
+          "readOnly": true,
+          "type": "array"
+        }
+      },
+      "description": "When set in OperationStep, indicates that a partition should be created.",
+      "id": "CreatePartition",
+      "type": "object"
+    },
+    "NewFilestoreConfig": {
+      "type": "object",
+      "id": "NewFilestoreConfig",
+      "description": "When set in a StorageResourceConfig, indicates that a new [Filestore](https://cloud.google.com/filestore) instance should be created.",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Optional. Immutable. Description of the instance. Maximum of 2048 characters."
+        },
+        "fileShares": {
+          "type": "array",
+          "description": "Required. Immutable. File system shares on the instance. Exactly one file share must be specified.",
+          "items": {
+            "$ref": "FileShareConfig"
+          }
+        },
+        "filestore": {
+          "type": "string",
+          "description": "Required. Immutable. Name of the Filestore instance to create, in the format `projects/{project}/locations/{location}/instances/{instance}`."
+        },
+        "protocol": {
+          "description": "Optional. Immutable. Access protocol to use for all file shares in the instance. Defaults to NFS V3 if not set.",
+          "enum": [
+            "PROTOCOL_UNSPECIFIED",
+            "NFSV3",
+            "NFSV41"
+          ],
+          "type": "string",
+          "enumDescriptions": [
+            "Not set.",
+            "NFS 3.0.",
+            "NFS 4.1."
+          ]
+        },
+        "tier": {
+          "description": "Required. Immutable. Service tier to use for the instance.",
+          "enum": [
+            "TIER_UNSPECIFIED",
+            "ZONAL",
+            "REGIONAL"
+          ],
+          "type": "string",
+          "enumDescriptions": [
+            "Not set.",
+            "Offers expanded capacity and performance scaling capabilities suitable for high-performance computing application requirements.",
+            "Offers features and availability needed for mission-critical, high-performance computing workloads."
+          ]
+        }
+      }
+    },
+    "ExistingBucketConfig": {
+      "description": "When set in a StorageResourceConfig, indicates that an existing [Google Cloud Storage](https://cloud.google.com/storage) bucket should be imported.",
+      "properties": {
+        "bucket": {
+          "description": "Required. Immutable. Name of the Cloud Storage bucket to import.",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "id": "ExistingBucketConfig"
+    },
+    "ComputeInstance": {
+      "type": "object",
+      "properties": {
+        "instance": {
+          "description": "Output only. Name of the VM instance, in the format `projects/{project}/zones/{zone}/instances/{instance}`.",
+          "type": "string",
+          "readOnly": true
+        }
+      },
+      "id": "ComputeInstance",
+      "description": "Details about a Compute Engine [instance](https://cloud.google.com/compute/docs/instances)."
+    },
+    "SlurmLoginNodes": {
+      "id": "SlurmLoginNodes",
+      "type": "object",
+      "description": "Configuration for Slurm [login nodes](https://slurm.schedmd.com/quickstart_admin.html#login) in the cluster. Login nodes are Compute Engine VM instances that allow users to access the cluster over SSH.",
+      "properties": {
+        "enablePublicIps": {
+          "description": "Optional. Whether login node instances should be assigned [external IP addresses](https://cloud.google.com/compute/docs/ip-addresses#externaladdresses).",
+          "type": "boolean"
+        },
+        "enableOsLogin": {
+          "description": "Optional. Whether [OS Login](https://cloud.google.com/compute/docs/oslogin) should be enabled on login node instances.",
+          "type": "boolean"
+        },
+        "bootDisk": {
+          "description": "Optional. Boot disk for the login node.",
+          "$ref": "BootDisk"
+        },
+        "storageConfigs": {
+          "items": {
+            "$ref": "StorageConfig"
+          },
+          "description": "Optional. How storage resources should be mounted on each login node.",
+          "type": "array"
+        },
+        "count": {
+          "type": "string",
+          "format": "int64",
+          "description": "Required. Number of login node instances to create."
+        },
+        "instances": {
+          "type": "array",
+          "description": "Output only. Information about the login node instances that were created in Compute Engine.",
+          "items": {
+            "$ref": "ComputeInstance"
+          },
+          "readOnly": true
+        },
+        "startupScript": {
+          "type": "string",
+          "description": "Optional. [Startup script](https://cloud.google.com/compute/docs/instances/startup-scripts/linux) to be run on each login node instance. Max 256KB. The script must complete within the system-defined default timeout of 5 minutes. For tasks that require more time, consider running them in the background using methods such as `&` or `nohup`."
+        },
+        "zone": {
+          "type": "string",
+          "description": "Required. Name of the zone in which login nodes should run, e.g., `us-central1-a`. Must be in the same region as the cluster, and must match the zone of any other resources specified in the cluster."
+        },
+        "machineType": {
+          "description": "Required. Name of the Compute Engine [machine type](https://cloud.google.com/compute/docs/machine-resource) to use for login nodes, e.g. `n2-standard-2`.",
+          "type": "string"
+        },
+        "labels": {
+          "description": "Optional. [Labels](https://cloud.google.com/compute/docs/labeling-resources) that should be applied to each login node instance.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "GcsHierarchicalNamespaceConfig": {
+      "id": "GcsHierarchicalNamespaceConfig",
+      "type": "object",
+      "description": "Message describing Google Cloud Storage hierarchical namespace configuration",
+      "properties": {
+        "enabled": {
+          "description": "Required. Enables hierarchical namespace setup for the bucket.",
+          "type": "boolean"
+        }
+      }
+    },
+    "StorageResourceConfig": {
+      "type": "object",
+      "id": "StorageResourceConfig",
+      "properties": {
+        "newBucket": {
+          "$ref": "NewBucketConfig",
+          "description": "Optional. Immutable. If set, indicates that a new Cloud Storage bucket should be created."
+        },
+        "existingLustre": {
+          "$ref": "ExistingLustreConfig",
+          "description": "Optional. Immutable. If set, indicates that an existing Managed Lustre instance should be imported."
+        },
+        "existingFilestore": {
+          "description": "Optional. Immutable. If set, indicates that an existing Filestore instance should be imported.",
+          "$ref": "ExistingFilestoreConfig"
+        },
+        "newFilestore": {
+          "$ref": "NewFilestoreConfig",
+          "description": "Optional. Immutable. If set, indicates that a new Filestore instance should be created."
+        },
+        "newLustre": {
+          "$ref": "NewLustreConfig",
+          "description": "Optional. Immutable. If set, indicates that a new Managed Lustre instance should be created."
+        },
+        "existingBucket": {
+          "description": "Optional. Immutable. If set, indicates that an existing Cloud Storage bucket should be imported.",
+          "$ref": "ExistingBucketConfig"
+        }
+      },
+      "description": "Describes how a storage resource should be initialized. Each storage resource can either be imported from an existing Google Cloud resource or initialized when the cluster is created."
+    },
+    "OperationProgress": {
+      "description": "Message describing the progress of a cluster mutation long-running operation.",
+      "id": "OperationProgress",
+      "type": "object",
+      "properties": {
+        "steps": {
+          "type": "array",
+          "items": {
+            "$ref": "OperationStep"
+          },
+          "description": "Output only. Steps and status of the operation.",
+          "readOnly": true
+        }
+      }
     },
     "BootDisk": {
-      "type": "object",
       "description": "A [Persistent disk](https://cloud.google.com/compute/docs/disks) used as the boot disk for a Compute Engine VM instance.",
-      "id": "BootDisk",
+      "type": "object",
       "properties": {
+        "type": {
+          "type": "string",
+          "description": "Optional. [Persistent disk type](https://cloud.google.com/compute/docs/disks#disk-types), in the format `projects/{project}/zones/{zone}/diskTypes/{disk_type}`."
+        },
         "sizeGb": {
           "format": "int64",
           "description": "Optional. The size of the disk in gigabytes (GB), which must be at least 40 GB.",
           "type": "string"
-        },
-        "type": {
-          "description": "Optional. [Persistent disk type](https://cloud.google.com/compute/docs/disks#disk-types), in the format `projects/{project}/zones/{zone}/diskTypes/{disk_type}`.",
-          "type": "string"
         }
-      }
+      },
+      "id": "BootDisk"
+    },
+    "CreateOrchestrator": {
+      "type": "object",
+      "properties": {},
+      "description": "When set in OperationStep, indicates that an orchestrator should be created.",
+      "id": "CreateOrchestrator"
+    },
+    "Orchestrator": {
+      "properties": {
+        "slurm": {
+          "description": "Optional. If set, indicates that the cluster should use Slurm as the orchestrator.",
+          "$ref": "SlurmOrchestrator"
+        }
+      },
+      "id": "Orchestrator",
+      "description": "The component responsible for scheduling and running workloads on the cluster as well as providing the user interface for interacting with the cluster at runtime.",
+      "type": "object"
+    },
+    "NewReservedInstancesConfig": {
+      "type": "object",
+      "properties": {
+        "reservation": {
+          "type": "string",
+          "description": "Optional. Immutable. Name of the reservation from which VM instances should be created, in the format `projects/{project}/zones/{zone}/reservations/{reservation}`."
+        }
+      },
+      "description": "When set in a ComputeResourceConfig, indicates that VM instances should be created from a [reservation](https://cloud.google.com/compute/docs/instances/reservations-overview).",
+      "id": "NewReservedInstancesConfig"
+    },
+    "NewNetworkConfig": {
+      "id": "NewNetworkConfig",
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Optional. Immutable. Description of the network. Maximum of 2048 characters."
+        },
+        "network": {
+          "type": "string",
+          "description": "Required. Immutable. Name of the network to create, in the format `projects/{project}/global/networks/{network}`."
+        }
+      },
+      "description": "When set in a NetworkResourceConfig, indicates that a new network should be created.",
+      "type": "object"
     },
     "NetworkResource": {
-      "type": "object",
       "id": "NetworkResource",
       "description": "A resource representing a network that connects the various components of a cluster together.",
       "properties": {
-        "config": {
-          "description": "Immutable. Configuration for this network resource, which describes how it should be created or imported. This field only controls how the network resource is initially created or imported. Subsequent changes to the network resource should be made via the resource's API and will not be reflected in the configuration.",
-          "$ref": "NetworkResourceConfig"
-        },
         "network": {
           "readOnly": true,
           "description": "Output only. A reference to a network in Google Compute Engine.",
           "$ref": "NetworkReference"
+        },
+        "config": {
+          "description": "Immutable. Configuration for this network resource, which describes how it should be created or imported. This field only controls how the network resource is initially created or imported. Subsequent changes to the network resource should be made via the resource's API and will not be reflected in the configuration.",
+          "$ref": "NetworkResourceConfig"
         }
-      }
+      },
+      "type": "object"
+    },
+    "CheckClusterHealth": {
+      "type": "object",
+      "id": "CheckClusterHealth",
+      "description": "When set in OperationStep, indicates that cluster health check should be performed.",
+      "properties": {}
+    },
+    "UpdatePartition": {
+      "type": "object",
+      "id": "UpdatePartition",
+      "properties": {
+        "partitions": {
+          "readOnly": true,
+          "description": "Output only. Name of the partition to update",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "When set in OperationStep, indicates that a partition should be updated."
+    },
+    "NetworkReference": {
+      "type": "object",
+      "id": "NetworkReference",
+      "properties": {
+        "network": {
+          "type": "string",
+          "description": "Output only. Name of the network, in the format `projects/{project}/global/networks/{network}`.",
+          "readOnly": true
+        },
+        "subnetwork": {
+          "type": "string",
+          "readOnly": true,
+          "description": "Output only. Name of the particular subnetwork being used by the cluster, in the format `projects/{project}/regions/{region}/subnetworks/{subnetwork}`."
+        }
+      },
+      "description": "A reference to a [VPC network](https://cloud.google.com/vpc/docs/vpc) in Google Compute Engine."
+    },
+    "CreateLustreInstance": {
+      "properties": {
+        "lustre": {
+          "type": "string",
+          "description": "Output only. Name of the Managed Lustre instance, in the format `projects/{project}/locations/{location}/instances/{instance}`",
+          "readOnly": true
+        }
+      },
+      "type": "object",
+      "id": "CreateLustreInstance",
+      "description": "When set in OperationStep, indicates that a new lustre instance should be created."
+    },
+    "DeletePrivateServiceAccess": {
+      "type": "object",
+      "id": "DeletePrivateServiceAccess",
+      "description": "When set in OperationStep, indicates private service access deletion step.",
+      "properties": {}
     },
     "NewBucketConfig": {
+      "type": "object",
       "id": "NewBucketConfig",
       "description": "When set in a StorageResourceConfig, indicates that a new [Google Cloud Storage](https://cloud.google.com/storage) bucket should be created.",
       "properties": {
-        "bucket": {
-          "type": "string",
-          "description": "Required. Immutable. Name of the Cloud Storage bucket to create."
-        },
         "storageClass": {
-          "type": "string",
           "description": "Optional. Immutable. If set, uses the provided storage class as the bucket's default storage class.",
           "enumDescriptions": [
             "Not set.",
@@ -446,44 +1026,97 @@
             "COLDLINE",
             "ARCHIVE",
             "RAPID"
-          ]
+          ],
+          "type": "string"
         },
         "autoclass": {
           "$ref": "GcsAutoclassConfig",
           "description": "Optional. Immutable. If set, indicates that the bucket should use [Autoclass](https://cloud.google.com/storage/docs/autoclass)."
         },
+        "bucket": {
+          "type": "string",
+          "description": "Required. Immutable. Name of the Cloud Storage bucket to create."
+        },
         "hierarchicalNamespace": {
-          "description": "Optional. Immutable. If set, indicates that the bucket should use [hierarchical namespaces](https://cloud.google.com/storage/docs/hns-overview).",
-          "$ref": "GcsHierarchicalNamespaceConfig"
+          "$ref": "GcsHierarchicalNamespaceConfig",
+          "description": "Optional. Immutable. If set, indicates that the bucket should use [hierarchical namespaces](https://cloud.google.com/storage/docs/hns-overview)."
+        }
+      }
+    },
+    "SlurmNodeSet": {
+      "properties": {
+        "computeInstance": {
+          "description": "Optional. If set, indicates that the nodeset should be backed by Compute Engine instances.",
+          "$ref": "ComputeInstanceSlurmNodeSet"
+        },
+        "id": {
+          "description": "Required. The ID for the nodeset, which allows it to be referenced by cluster partitions. The nodeset ID must start with a lowercase letter (`a`-`z`), use only lowercase letters or numbers, and contain up to 15 characters. For example, specify `nodeset001`.",
+          "type": "string"
+        },
+        "maxDynamicNodeCount": {
+          "format": "int64",
+          "type": "string",
+          "description": "Optional. Controls how many additional nodes a cluster can bring online to handle workloads. Set this value to enable dynamic node creation and limit the number of additional nodes the cluster can bring online. Leave empty if you do not want the cluster to create nodes dynamically, and instead rely only on static nodes."
+        },
+        "computeId": {
+          "description": "Required. The ID of the compute resource on which this nodeset runs. Must match a key in the cluster's compute_resources.",
+          "type": "string"
+        },
+        "staticNodeCount": {
+          "format": "int64",
+          "type": "string",
+          "description": "Optional. Number of nodes to be statically created for this nodeset. The cluster will attempt to ensure that at least this many nodes exist at all times."
+        },
+        "storageConfigs": {
+          "type": "array",
+          "description": "Optional. How storage resources should be mounted on each compute node.",
+          "items": {
+            "$ref": "StorageConfig"
+          }
         }
       },
+      "id": "SlurmNodeSet",
+      "description": "Configuration for Slurm nodesets in the cluster. Nodesets are groups of compute nodes used by Slurm that are responsible for running workloads submitted to the cluster.",
       "type": "object"
     },
-    "ExistingLustreConfig": {
+    "ComputeInstanceSlurmNodeSet": {
       "type": "object",
-      "description": "When set in a StorageResourceConfig, indicates that an existing [Managed Lustre](https://cloud.google.com/products/managed-lustre) instance should be imported.",
+      "description": "When set in a SlurmNodeSet, indicates that the nodeset should be backed by Compute Engine VM instances.",
       "properties": {
-        "lustre": {
-          "description": "Required. Immutable. Name of the Managed Lustre instance to import, in the format `projects/{project}/locations/{location}/instances/{instance}`",
+        "labels": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object",
+          "description": "Optional. [Labels](https://cloud.google.com/compute/docs/labeling-resources) that should be applied to each VM instance in the nodeset."
+        },
+        "bootDisk": {
+          "$ref": "BootDisk",
+          "description": "Optional. Boot disk for the compute instance"
+        },
+        "startupScript": {
+          "description": "Optional. [Startup script](https://cloud.google.com/compute/docs/instances/startup-scripts/linux) to be run on each VM instance in the nodeset. Max 256KB.",
           "type": "string"
         }
       },
-      "id": "ExistingLustreConfig"
+      "id": "ComputeInstanceSlurmNodeSet"
     },
-    "NewReservedInstancesConfig": {
-      "id": "NewReservedInstancesConfig",
-      "type": "object",
+    "StorageConfig": {
       "properties": {
-        "reservation": {
-          "description": "Optional. Immutable. Name of the reservation from which VM instances should be created, in the format `projects/{project}/zones/{zone}/reservations/{reservation}`.",
+        "id": {
+          "description": "Required. ID of the storage resource to mount, which must match a key in the cluster's storage_resources.",
+          "type": "string"
+        },
+        "localMount": {
+          "description": "Required. A directory inside the VM instance's file system where the storage resource should be mounted (e.g., `/mnt/share`).",
           "type": "string"
         }
       },
-      "description": "When set in a ComputeResourceConfig, indicates that VM instances should be created from a [reservation](https://cloud.google.com/compute/docs/instances/reservations-overview)."
+      "description": "Description of how a storage resource should be mounted on a VM instance.",
+      "id": "StorageConfig",
+      "type": "object"
     },
     "CreateNodeset": {
-      "type": "object",
-      "description": "When set in OperationStep, indicates that a nodeset should be created.",
       "properties": {
         "nodesets": {
           "items": {
@@ -494,633 +1127,53 @@
           "type": "array"
         }
       },
-      "id": "CreateNodeset"
-    },
-    "Empty": {
-      "type": "object",
-      "properties": {},
-      "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
-      "id": "Empty"
-    },
-    "StorageConfig": {
-      "type": "object",
-      "description": "Description of how a storage resource should be mounted on a VM instance.",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Required. ID of the storage resource to mount, which must match a key in the cluster's storage_resources."
-        },
-        "localMount": {
-          "description": "Required. A directory inside the VM instance's file system where the storage resource should be mounted (e.g., `/mnt/share`).",
-          "type": "string"
-        }
-      },
-      "id": "StorageConfig"
-    },
-    "Status": {
-      "id": "Status",
-      "type": "object",
-      "properties": {
-        "message": {
-          "type": "string",
-          "description": "A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client."
-        },
-        "code": {
-          "type": "integer",
-          "format": "int32",
-          "description": "The status code, which should be an enum value of google.rpc.Code."
-        },
-        "details": {
-          "items": {
-            "type": "object",
-            "additionalProperties": {
-              "description": "Properties of the object. Contains field @type with type URL.",
-              "type": "any"
-            }
-          },
-          "description": "A list of messages that carry the error details. There is a common set of message types for APIs to use.",
-          "type": "array"
-        }
-      },
-      "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors)."
-    },
-    "DeletePartition": {
-      "properties": {
-        "partitions": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array",
-          "readOnly": true,
-          "description": "Output only. Name of the partition to delete"
-        }
-      },
-      "type": "object",
-      "description": "When set in OperationStep, indicates that a partition should be deleted.",
-      "id": "DeletePartition"
-    },
-    "ExistingFilestoreConfig": {
-      "id": "ExistingFilestoreConfig",
-      "description": "When set in a StorageResourceConfig, indicates that an existing [Filestore](https://cloud.google.com/filestore) instance should be imported.",
-      "properties": {
-        "filestore": {
-          "description": "Required. Immutable. Name of the Filestore instance to import, in the format `projects/{project}/locations/{location}/instances/{instance}`",
-          "type": "string"
-        }
-      },
+      "description": "When set in OperationStep, indicates that a nodeset should be created.",
+      "id": "CreateNodeset",
       "type": "object"
     },
-    "ComputeResource": {
-      "type": "object",
-      "id": "ComputeResource",
+    "NewSpotInstancesConfig": {
       "properties": {
-        "config": {
-          "description": "Required. Immutable. Configuration for this compute resource, which describes how it should be created at runtime.",
-          "$ref": "ComputeResourceConfig"
-        }
-      },
-      "description": "A resource defining how virtual machines and accelerators should be provisioned for the cluster."
-    },
-    "LustreReference": {
-      "properties": {
-        "lustre": {
-          "description": "Output only. Name of the Managed Lustre instance, in the format `projects/{project}/locations/{location}/instances/{instance}`",
-          "readOnly": true,
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "id": "LustreReference",
-      "description": "A reference to a [Managed Lustre](https://cloud.google.com/products/managed-lustre) instance."
-    },
-    "CreatePartition": {
-      "type": "object",
-      "properties": {
-        "partitions": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Output only. Name of the partition to create",
-          "readOnly": true
-        }
-      },
-      "description": "When set in OperationStep, indicates that a partition should be created.",
-      "id": "CreatePartition"
-    },
-    "CancelOperationRequest": {
-      "id": "CancelOperationRequest",
-      "properties": {},
-      "description": "The request message for Operations.CancelOperation.",
-      "type": "object"
-    },
-    "CreateStorageBucket": {
-      "id": "CreateStorageBucket",
-      "properties": {
-        "bucket": {
-          "description": "Output only. Name of the bucket.",
-          "type": "string",
-          "readOnly": true
-        }
-      },
-      "description": "When set in OperationStep, indicates that a new storage bucket should be created.",
-      "type": "object"
-    },
-    "OperationMetadata": {
-      "description": "Represents the metadata of the long-running operation.",
-      "id": "OperationMetadata",
-      "type": "object",
-      "properties": {
-        "createTime": {
-          "format": "google-datetime",
-          "type": "string",
-          "description": "Output only. The time the operation was created.",
-          "readOnly": true
-        },
-        "apiVersion": {
-          "type": "string",
-          "description": "Output only. API version used to start the operation.",
-          "readOnly": true
-        },
-        "endTime": {
-          "format": "google-datetime",
-          "type": "string",
-          "readOnly": true,
-          "description": "Output only. The time the operation finished running."
-        },
-        "progress": {
-          "$ref": "OperationProgress",
-          "description": "Output only. Progress of the operation.",
-          "readOnly": true
-        },
-        "requestedCancellation": {
-          "readOnly": true,
-          "type": "boolean",
-          "description": "Output only. Identifies whether the user has requested cancellation of the operation. Operations that have been cancelled successfully have google.longrunning.Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`."
-        },
-        "target": {
-          "readOnly": true,
-          "description": "Output only. Server-defined resource path for the target of the operation.",
+        "zone": {
+          "description": "Required. Immutable. Name of the zone in which VM instances should run, e.g., `us-central1-a`. Must be in the same region as the cluster, and must match the zone of any other resources specified in the cluster.",
           "type": "string"
         },
-        "verb": {
-          "description": "Output only. Name of the verb executed by the operation.",
-          "readOnly": true,
-          "type": "string"
-        }
-      }
-    },
-    "NetworkResourceConfig": {
-      "type": "object",
-      "id": "NetworkResourceConfig",
-      "description": "Describes how a network resource should be initialized. Each network resource can either be imported from an existing Google Cloud resource or initialized when the cluster is created.",
-      "properties": {
-        "newNetwork": {
-          "description": "Optional. Immutable. If set, indicates that a new network should be created.",
-          "$ref": "NewNetworkConfig"
-        },
-        "existingNetwork": {
-          "description": "Optional. Immutable. If set, indicates that an existing network should be imported.",
-          "$ref": "ExistingNetworkConfig"
-        }
-      }
-    },
-    "StorageResourceConfig": {
-      "description": "Describes how a storage resource should be initialized. Each storage resource can either be imported from an existing Google Cloud resource or initialized when the cluster is created.",
-      "type": "object",
-      "properties": {
-        "existingFilestore": {
-          "description": "Optional. Immutable. If set, indicates that an existing Filestore instance should be imported.",
-          "$ref": "ExistingFilestoreConfig"
-        },
-        "newBucket": {
-          "description": "Optional. Immutable. If set, indicates that a new Cloud Storage bucket should be created.",
-          "$ref": "NewBucketConfig"
-        },
-        "newLustre": {
-          "description": "Optional. Immutable. If set, indicates that a new Managed Lustre instance should be created.",
-          "$ref": "NewLustreConfig"
-        },
-        "existingBucket": {
-          "$ref": "ExistingBucketConfig",
-          "description": "Optional. Immutable. If set, indicates that an existing Cloud Storage bucket should be imported."
-        },
-        "existingLustre": {
-          "description": "Optional. Immutable. If set, indicates that an existing Managed Lustre instance should be imported.",
-          "$ref": "ExistingLustreConfig"
-        },
-        "newFilestore": {
-          "description": "Optional. Immutable. If set, indicates that a new Filestore instance should be created.",
-          "$ref": "NewFilestoreConfig"
-        }
-      },
-      "id": "StorageResourceConfig"
-    },
-    "StorageResource": {
-      "properties": {
-        "filestore": {
-          "$ref": "FilestoreReference",
-          "readOnly": true,
-          "description": "Output only. A reference to a Filestore instance. Populated if and only if the storage resource was configured to use Filestore."
-        },
-        "bucket": {
-          "description": "Output only. A reference to a Google Cloud Storage bucket. Populated if and only if the storage resource was configured to use Google Cloud Storage.",
-          "readOnly": true,
-          "$ref": "BucketReference"
-        },
-        "config": {
-          "description": "Required. Immutable. Configuration for this storage resource, which describes how it should be created or imported. This field only controls how the storage resource is initially created or imported. Subsequent changes to the storage resource should be made via the resource's API and will not be reflected in the configuration.",
-          "$ref": "StorageResourceConfig"
-        },
-        "lustre": {
-          "$ref": "LustreReference",
-          "readOnly": true,
-          "description": "Output only. A reference to a Managed Lustre instance. Populated if and only if the storage resource was configured to use Managed Lustre."
-        }
-      },
-      "description": "Represents a form of persistent storage that you can mount onto compute resources in the cluster.",
-      "id": "StorageResource",
-      "type": "object"
-    },
-    "Operation": {
-      "properties": {
-        "response": {
-          "description": "The normal, successful response of the operation. If the original method returns no data on success, such as `Delete`, the response is `google.protobuf.Empty`. If the original method is standard `Get`/`Create`/`Update`, the response should be the resource. For other methods, the response should have the type `XxxResponse`, where `Xxx` is the original method name. For example, if the original method name is `TakeSnapshot()`, the inferred response type is `TakeSnapshotResponse`.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "any",
-            "description": "Properties of the object. Contains field @type with type URL."
-          }
-        },
-        "done": {
-          "description": "If the value is `false`, it means the operation is still in progress. If `true`, the operation is completed, and either `error` or `response` is available.",
-          "type": "boolean"
-        },
-        "error": {
-          "description": "The error result of the operation in case of failure or cancellation.",
-          "$ref": "Status"
-        },
-        "metadata": {
-          "type": "object",
-          "description": "Service-specific metadata associated with the operation. It typically contains progress information and common metadata such as create time. Some services might not provide such metadata. Any method that returns a long-running operation should document the metadata type, if any.",
-          "additionalProperties": {
-            "description": "Properties of the object. Contains field @type with type URL.",
-            "type": "any"
-          }
-        },
-        "name": {
-          "type": "string",
-          "description": "The server-assigned name, which is only unique within the same service that originally returns it. If you use the default HTTP mapping, the `name` should be a resource name ending with `operations/{unique_id}`."
-        }
-      },
-      "type": "object",
-      "description": "This resource represents a long-running operation that is the result of a network API call.",
-      "id": "Operation"
-    },
-    "NewNetworkConfig": {
-      "properties": {
-        "network": {
-          "type": "string",
-          "description": "Required. Immutable. Name of the network to create, in the format `projects/{project}/global/networks/{network}`."
-        },
-        "description": {
-          "description": "Optional. Immutable. Description of the network. Maximum of 2048 characters.",
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "description": "When set in a NetworkResourceConfig, indicates that a new network should be created.",
-      "id": "NewNetworkConfig"
-    },
-    "CreateOrchestrator": {
-      "properties": {},
-      "id": "CreateOrchestrator",
-      "description": "When set in OperationStep, indicates that an orchestrator should be created.",
-      "type": "object"
-    },
-    "SlurmNodeSet": {
-      "properties": {
-        "computeInstance": {
-          "description": "Optional. If set, indicates that the nodeset should be backed by Compute Engine instances.",
-          "$ref": "ComputeInstanceSlurmNodeSet"
-        },
-        "maxDynamicNodeCount": {
-          "format": "int64",
-          "type": "string",
-          "description": "Optional. Controls how many additional nodes a cluster can bring online to handle workloads. Set this value to enable dynamic node creation and limit the number of additional nodes the cluster can bring online. Leave empty if you do not want the cluster to create nodes dynamically, and instead rely only on static nodes."
-        },
-        "storageConfigs": {
-          "description": "Optional. How storage resources should be mounted on each compute node.",
-          "items": {
-            "$ref": "StorageConfig"
-          },
-          "type": "array"
-        },
-        "staticNodeCount": {
-          "format": "int64",
-          "description": "Optional. Number of nodes to be statically created for this nodeset. The cluster will attempt to ensure that at least this many nodes exist at all times.",
+        "machineType": {
+          "description": "Required. Immutable. Name of the Compute Engine [machine type](https://cloud.google.com/compute/docs/machine-resource) to use, e.g. `n2-standard-2`.",
           "type": "string"
         },
-        "id": {
-          "description": "Required. The ID for the nodeset, which allows it to be referenced by cluster partitions. The nodeset ID must start with a lowercase letter (`a`-`z`), use only lowercase letters or numbers, and contain up to 15 characters. For example, specify `nodeset001`.",
-          "type": "string"
-        },
-        "computeId": {
-          "type": "string",
-          "description": "Required. The ID of the compute resource on which this nodeset runs. Must match a key in the cluster's compute_resources."
-        }
-      },
-      "id": "SlurmNodeSet",
-      "type": "object",
-      "description": "Configuration for Slurm nodesets in the cluster. Nodesets are groups of compute nodes used by Slurm that are responsible for running workloads submitted to the cluster."
-    },
-    "OperationStep": {
-      "id": "OperationStep",
-      "properties": {
-        "createOrchestrator": {
-          "readOnly": true,
-          "$ref": "CreateOrchestrator",
-          "description": "Output only. If set, indicates that orchestrator creation is part of the operation."
-        },
-        "createLoginNode": {
-          "readOnly": true,
-          "description": "Output only. If set, indicates that new login node creation is part of the operation.",
-          "$ref": "CreateLoginNode"
-        },
-        "createLustreInstance": {
-          "description": "Output only. If set, indicates that new Lustre instance creation is part of the operation.",
-          "$ref": "CreateLustreInstance",
-          "readOnly": true
-        },
-        "updatePartition": {
-          "description": "Output only. If set, indicates that partition update is part of the operation.",
-          "readOnly": true,
-          "$ref": "UpdatePartition"
-        },
-        "state": {
-          "enumDescriptions": [
-            "Unspecified state.",
-            "Initial state before step execution starts.",
-            "Step execution is running in progress.",
-            "Step execution is completed."
-          ],
-          "type": "string",
-          "readOnly": true,
+        "terminationAction": {
           "enum": [
-            "STATE_UNSPECIFIED",
-            "WAITING",
-            "IN_PROGRESS",
-            "DONE"
+            "TERMINATION_ACTION_UNSPECIFIED",
+            "STOP",
+            "DELETE"
           ],
-          "description": "Output only. State of the operation step."
-        },
-        "createNetwork": {
-          "readOnly": true,
-          "description": "Output only. If set, indicates that new network creation is part of the operation.",
-          "$ref": "CreateNetwork"
-        },
-        "deleteStorageBucket": {
-          "$ref": "DeleteStorageBucket",
-          "description": "Output only. If set, indicates that Cloud Storage bucket deletion is part of the operation.",
-          "readOnly": true
-        },
-        "updateLoginNode": {
-          "$ref": "UpdateLoginNode",
-          "description": "Output only. If set, indicates that login node update is part of the operation.",
-          "readOnly": true
-        },
-        "createPartition": {
-          "$ref": "CreatePartition",
-          "readOnly": true,
-          "description": "Output only. If set, indicates that new partition creation is part of the operation."
-        },
-        "deleteOrchestrator": {
-          "description": "Output only. If set, indicates that orchestrator deletion is part of the operation.",
-          "readOnly": true,
-          "$ref": "DeleteOrchestrator"
-        },
-        "deleteFilestoreInstance": {
-          "readOnly": true,
-          "$ref": "DeleteFilestoreInstance",
-          "description": "Output only. If set, indicates that Filestore instance deletion is part of the operation."
-        },
-        "deleteNetwork": {
-          "description": "Output only. If set, indicates that network deletion is part of the operation.",
-          "$ref": "DeleteNetwork",
-          "readOnly": true
-        },
-        "createFilestoreInstance": {
-          "readOnly": true,
-          "$ref": "CreateFilestoreInstance",
-          "description": "Output only. If set, indicates that new Filestore instance creation is part of the operation."
-        },
-        "deleteLustreInstance": {
-          "readOnly": true,
-          "$ref": "DeleteLustreInstance",
-          "description": "Output only. If set, indicates that Lustre instance deletion is part of the operation."
-        },
-        "deletePrivateServiceAccess": {
-          "description": "Output only. If set, indicates that private service access deletion is part of the operation.",
-          "readOnly": true,
-          "$ref": "DeletePrivateServiceAccess"
-        },
-        "checkClusterHealth": {
-          "$ref": "CheckClusterHealth",
-          "description": "Output only. If set, indicates that cluster health check is part of the operation.",
-          "readOnly": true
-        },
-        "createNodeset": {
-          "description": "Output only. If set, indicates that new nodeset creation is part of the operation.",
-          "readOnly": true,
-          "$ref": "CreateNodeset"
-        },
-        "deleteNodeset": {
-          "description": "Output only. If set, indicates that nodeset deletion is part of the operation.",
-          "readOnly": true,
-          "$ref": "DeleteNodeset"
-        },
-        "createStorageBucket": {
-          "$ref": "CreateStorageBucket",
-          "readOnly": true,
-          "description": "Output only. If set, indicates that new Cloud Storage bucket creation is part of the operation."
-        },
-        "updateNodeset": {
-          "$ref": "UpdateNodeset",
-          "readOnly": true,
-          "description": "Output only. If set, indicates that nodeset update is part of the operation."
-        },
-        "createPrivateServiceAccess": {
-          "$ref": "CreatePrivateServiceAccess",
-          "description": "Output only. If set, indicates that new private service access creation is part of the operation.",
-          "readOnly": true
-        },
-        "deleteLoginNode": {
-          "$ref": "DeleteLoginNode",
-          "readOnly": true,
-          "description": "Output only. If set, indicates that login node deletion is part of the operation."
-        },
-        "deletePartition": {
-          "readOnly": true,
-          "description": "Output only. If set, indicates that partition deletion is part of the operation.",
-          "$ref": "DeletePartition"
-        },
-        "updateOrchestrator": {
-          "description": "Output only. If set, indicates that an orchestrator update is part of the operation.",
-          "readOnly": true,
-          "$ref": "UpdateOrchestrator"
-        }
-      },
-      "type": "object",
-      "description": "Message describing the status of a single step in a cluster mutation long-running operation."
-    },
-    "NewLustreConfig": {
-      "properties": {
-        "lustre": {
-          "description": "Required. Immutable. Name of the Managed Lustre instance to create, in the format `projects/{project}/locations/{location}/instances/{instance}`",
-          "type": "string"
-        },
-        "filesystem": {
-          "description": "Required. Immutable. Filesystem name for this instance. This name is used by client-side tools, including when mounting the instance. Must be 8 characters or less and can only contain letters and numbers.",
-          "type": "string"
-        },
-        "perUnitStorageThroughput": {
-          "type": "string",
-          "description": "Optional. Immutable. Throughput of the instance in MB/s/TiB. Valid values are 125, 250, 500, 1000. See [Performance tiers and maximum storage capacities](https://cloud.google.com/managed-lustre/docs/create-instance#performance-tiers) for more information.",
-          "format": "int64"
-        },
-        "description": {
-          "description": "Optional. Immutable. Description of the Managed Lustre instance. Maximum of 2048 characters.",
-          "type": "string"
-        },
-        "capacityGb": {
-          "description": "Required. Immutable. Storage capacity of the instance in gibibytes (GiB). Allowed values are between 18000 and 7632000.",
-          "format": "int64",
-          "type": "string"
-        }
-      },
-      "id": "NewLustreConfig",
-      "type": "object",
-      "description": "When set in a StorageResourceConfig, indicates that a new [Managed Lustre](https://cloud.google.com/products/managed-lustre) instance should be created."
-    },
-    "DeleteLoginNode": {
-      "id": "DeleteLoginNode",
-      "properties": {},
-      "description": "When set in OperationStep, indicates that a login node should be deleted.",
-      "type": "object"
-    },
-    "DeleteStorageBucket": {
-      "id": "DeleteStorageBucket",
-      "type": "object",
-      "description": "When set in OperationStep, indicates that Cloud Storage bucket should be deleted.",
-      "properties": {
-        "bucket": {
-          "description": "Output only. Name of the bucket.",
-          "type": "string",
-          "readOnly": true
-        }
-      }
-    },
-    "NewFilestoreConfig": {
-      "properties": {
-        "tier": {
-          "type": "string",
-          "description": "Required. Immutable. Service tier to use for the instance.",
-          "enumDescriptions": [
-            "Not set.",
-            "Offers expanded capacity and performance scaling capabilities suitable for high-performance computing application requirements.",
-            "Offers features and availability needed for mission-critical, high-performance computing workloads."
-          ],
-          "enum": [
-            "TIER_UNSPECIFIED",
-            "ZONAL",
-            "REGIONAL"
-          ]
-        },
-        "fileShares": {
-          "type": "array",
-          "description": "Required. Immutable. File system shares on the instance. Exactly one file share must be specified.",
-          "items": {
-            "$ref": "FileShareConfig"
-          }
-        },
-        "protocol": {
-          "description": "Optional. Immutable. Access protocol to use for all file shares in the instance. Defaults to NFS V3 if not set.",
           "type": "string",
           "enumDescriptions": [
             "Not set.",
-            "NFS 3.0.",
-            "NFS 4.1."
+            "Compute Engine stops the Spot VM on preemption.",
+            "Compute Engine deletes the Spot VM on preemption."
           ],
-          "enum": [
-            "PROTOCOL_UNSPECIFIED",
-            "NFSV3",
-            "NFSV41"
-          ]
-        },
-        "description": {
-          "type": "string",
-          "description": "Optional. Immutable. Description of the instance. Maximum of 2048 characters."
-        },
-        "filestore": {
-          "type": "string",
-          "description": "Required. Immutable. Name of the Filestore instance to create, in the format `projects/{project}/locations/{location}/instances/{instance}`."
+          "description": "Optional. Termination action for the instance. If not specified, Compute Engine sets the termination action to DELETE."
         }
       },
-      "description": "When set in a StorageResourceConfig, indicates that a new [Filestore](https://cloud.google.com/filestore) instance should be created.",
+      "id": "NewSpotInstancesConfig",
       "type": "object",
-      "id": "NewFilestoreConfig"
-    },
-    "ExistingBucketConfig": {
-      "id": "ExistingBucketConfig",
-      "type": "object",
-      "properties": {
-        "bucket": {
-          "type": "string",
-          "description": "Required. Immutable. Name of the Cloud Storage bucket to import."
-        }
-      },
-      "description": "When set in a StorageResourceConfig, indicates that an existing [Google Cloud Storage](https://cloud.google.com/storage) bucket should be imported."
-    },
-    "FileShareConfig": {
-      "properties": {
-        "capacityGb": {
-          "type": "string",
-          "format": "int64",
-          "description": "Required. Size of the filestore in GB. Must be between 1024 and 102400, and must meet scalability requirements described at https://cloud.google.com/filestore/docs/service-tiers."
-        },
-        "fileShare": {
-          "type": "string",
-          "description": "Required. Filestore share location"
-        }
-      },
-      "description": "Message describing filestore configuration",
-      "type": "object",
-      "id": "FileShareConfig"
-    },
-    "CreateNetwork": {
-      "description": "When set in OperationStep, indicates that a new network should be created.",
-      "properties": {
-        "network": {
-          "readOnly": true,
-          "description": "Output only. Name of the network to create, in the format `projects/{project}/global/networks/{network}`.",
-          "type": "string"
-        }
-      },
-      "type": "object",
-      "id": "CreateNetwork"
+      "description": "When set in a ComputeResourceConfig, indicates that [spot VM](https://cloud.google.com/compute/docs/instances/spot) instances should be created."
     },
     "ListClustersResponse": {
+      "id": "ListClustersResponse",
+      "description": "Response message for ListClusters.",
       "properties": {
         "nextPageToken": {
           "description": "A token that can be sent as `page_token` to retrieve the next page. If this field is absent, there are no subsequent pages.",
           "type": "string"
         },
         "unreachable": {
-          "description": "Locations that could not be reached.",
-          "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "type": "array",
+          "description": "Locations that could not be reached."
         },
         "clusters": {
           "type": "array",
@@ -1130,477 +1183,347 @@
           "description": "Clusters in the specified location."
         }
       },
-      "description": "Response message for ListClusters.",
-      "id": "ListClustersResponse",
       "type": "object"
-    },
-    "CreateLustreInstance": {
-      "id": "CreateLustreInstance",
-      "properties": {
-        "lustre": {
-          "description": "Output only. Name of the Managed Lustre instance, in the format `projects/{project}/locations/{location}/instances/{instance}`",
-          "readOnly": true,
-          "type": "string"
-        }
-      },
-      "description": "When set in OperationStep, indicates that a new lustre instance should be created.",
-      "type": "object"
-    },
-    "OperationProgress": {
-      "description": "Message describing the progress of a cluster mutation long-running operation.",
-      "type": "object",
-      "id": "OperationProgress",
-      "properties": {
-        "steps": {
-          "items": {
-            "$ref": "OperationStep"
-          },
-          "type": "array",
-          "readOnly": true,
-          "description": "Output only. Steps and status of the operation."
-        }
-      }
-    },
-    "DeleteOrchestrator": {
-      "properties": {},
-      "type": "object",
-      "id": "DeleteOrchestrator",
-      "description": "When set in OperationStep, indicates that an orchestrator should be deleted."
-    },
-    "SlurmLoginNodes": {
-      "type": "object",
-      "properties": {
-        "instances": {
-          "description": "Output only. Information about the login node instances that were created in Compute Engine.",
-          "type": "array",
-          "readOnly": true,
-          "items": {
-            "$ref": "ComputeInstance"
-          }
-        },
-        "startupScript": {
-          "type": "string",
-          "description": "Optional. [Startup script](https://cloud.google.com/compute/docs/instances/startup-scripts/linux) to be run on each login node instance. Max 256KB. The script must complete within the system-defined default timeout of 5 minutes. For tasks that require more time, consider running them in the background using methods such as `&` or `nohup`."
-        },
-        "bootDisk": {
-          "description": "Optional. Boot disk for the login node.",
-          "$ref": "BootDisk"
-        },
-        "machineType": {
-          "description": "Required. Name of the Compute Engine [machine type](https://cloud.google.com/compute/docs/machine-resource) to use for login nodes, e.g. `n2-standard-2`.",
-          "type": "string"
-        },
-        "labels": {
-          "type": "object",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "description": "Optional. [Labels](https://cloud.google.com/compute/docs/labeling-resources) that should be applied to each login node instance."
-        },
-        "enableOsLogin": {
-          "description": "Optional. Whether [OS Login](https://cloud.google.com/compute/docs/oslogin) should be enabled on login node instances.",
-          "type": "boolean"
-        },
-        "enablePublicIps": {
-          "description": "Optional. Whether login node instances should be assigned [external IP addresses](https://cloud.google.com/compute/docs/ip-addresses#externaladdresses).",
-          "type": "boolean"
-        },
-        "storageConfigs": {
-          "items": {
-            "$ref": "StorageConfig"
-          },
-          "description": "Optional. How storage resources should be mounted on each login node.",
-          "type": "array"
-        },
-        "zone": {
-          "type": "string",
-          "description": "Required. Name of the zone in which login nodes should run, e.g., `us-central1-a`. Must be in the same region as the cluster, and must match the zone of any other resources specified in the cluster."
-        },
-        "count": {
-          "format": "int64",
-          "type": "string",
-          "description": "Required. Number of login node instances to create."
-        }
-      },
-      "description": "Configuration for Slurm [login nodes](https://slurm.schedmd.com/quickstart_admin.html#login) in the cluster. Login nodes are Compute Engine VM instances that allow users to access the cluster over SSH.",
-      "id": "SlurmLoginNodes"
-    },
-    "NewFlexStartInstancesConfig": {
-      "type": "object",
-      "properties": {
-        "machineType": {
-          "description": "Required. Immutable. Name of the Compute Engine [machine type](https://cloud.google.com/compute/docs/machine-resource) to use, e.g. `n2-standard-2`.",
-          "type": "string"
-        },
-        "zone": {
-          "description": "Required. Immutable. Name of the zone in which VM instances should run, e.g., `us-central1-a`. Must be in the same region as the cluster, and must match the zone of any other resources specified in the cluster.",
-          "type": "string"
-        },
-        "maxDuration": {
-          "type": "string",
-          "format": "google-duration",
-          "description": "Required. Immutable. Specifies the time limit for created instances. Instances will be terminated at the end of this duration."
-        }
-      },
-      "id": "NewFlexStartInstancesConfig",
-      "description": "When set in a ComputeResourceConfig, indicates that VM instances should be created using [Flex Start](https://cloud.google.com/compute/docs/instances/provisioning-models)."
     },
     "DeleteFilestoreInstance": {
+      "description": "When set in OperationStep, indicates that a Filestore instance should be deleted.",
       "properties": {
         "filestore": {
+          "description": "Output only. Name of the Filestore instance, in the format `projects/{project}/locations/{location}/instances/{instance}`",
           "readOnly": true,
-          "type": "string",
-          "description": "Output only. Name of the Filestore instance, in the format `projects/{project}/locations/{location}/instances/{instance}`"
+          "type": "string"
         }
       },
-      "id": "DeleteFilestoreInstance",
       "type": "object",
-      "description": "When set in OperationStep, indicates that a Filestore instance should be deleted."
+      "id": "DeleteFilestoreInstance"
     },
-    "DeleteNodeset": {
-      "id": "DeleteNodeset",
-      "description": "When set in OperationStep, indicates that a nodeset should be deleted.",
-      "type": "object",
+    "ListLocationsResponse": {
       "properties": {
-        "nodesets": {
-          "items": {
-            "type": "string"
-          },
-          "description": "Output only. Name of the nodeset to delete",
-          "readOnly": true,
-          "type": "array"
-        }
-      }
-    },
-    "ListOperationsResponse": {
-      "id": "ListOperationsResponse",
-      "description": "The response message for Operations.ListOperations.",
-      "properties": {
-        "operations": {
-          "description": "A list of operations that matches the specified filter in the request.",
+        "locations": {
           "type": "array",
+          "description": "A list of locations that matches the specified filter in the request.",
           "items": {
-            "$ref": "Operation"
+            "$ref": "Location"
           }
         },
         "nextPageToken": {
-          "description": "The standard List next-page token.",
-          "type": "string"
-        },
-        "unreachable": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Unordered list. Unreachable resources. Populated when the request sets `ListOperationsRequest.return_partial_success` and reads across collections. For example, when attempting to list all resources across all supported locations."
-        }
-      },
-      "type": "object"
-    },
-    "ComputeResourceConfig": {
-      "id": "ComputeResourceConfig",
-      "type": "object",
-      "properties": {
-        "newReservedInstances": {
-          "$ref": "NewReservedInstancesConfig",
-          "description": "Optional. Immutable. If set, indicates that this resource should use reserved VMs."
-        },
-        "newFlexStartInstances": {
-          "$ref": "NewFlexStartInstancesConfig",
-          "description": "Optional. Immutable. If set, indicates that this resource should use flex-start VMs."
-        },
-        "newSpotInstances": {
-          "$ref": "NewSpotInstancesConfig",
-          "description": "Optional. Immutable. If set, indicates that this resource should use spot VMs."
-        },
-        "newOnDemandInstances": {
-          "$ref": "NewOnDemandInstancesConfig",
-          "description": "Optional. Immutable. If set, indicates that this resource should use on-demand VMs."
-        }
-      },
-      "description": "Describes how a compute resource should be created at runtime."
-    },
-    "Location": {
-      "id": "Location",
-      "type": "object",
-      "description": "A resource that represents a Google Cloud location.",
-      "properties": {
-        "locationId": {
-          "description": "The canonical id for this location. For example: `\"us-east1\"`.",
-          "type": "string"
-        },
-        "name": {
           "type": "string",
-          "description": "Resource name for the location, which may vary between implementations. For example: `\"projects/example-project/locations/us-east1\"`"
+          "description": "The standard List next-page token."
+        }
+      },
+      "type": "object",
+      "id": "ListLocationsResponse",
+      "description": "The response message for Locations.ListLocations."
+    },
+    "GcsAutoclassConfig": {
+      "id": "GcsAutoclassConfig",
+      "type": "object",
+      "description": "Message describing Google Cloud Storage autoclass configuration",
+      "properties": {
+        "terminalStorageClass": {
+          "enumDescriptions": [
+            "Unspecified terminal storage class",
+            "Nearline terminal storage class",
+            "Archive terminal storage class"
+          ],
+          "enum": [
+            "TERMINAL_STORAGE_CLASS_UNSPECIFIED",
+            "NEARLINE",
+            "ARCHIVE"
+          ],
+          "type": "string",
+          "description": "Optional. Terminal storage class of the autoclass bucket"
         },
-        "metadata": {
-          "type": "object",
-          "description": "Service-specific metadata. For example the available capacity at the given location.",
-          "additionalProperties": {
-            "description": "Properties of the object. Contains field @type with type URL.",
-            "type": "any"
-          }
-        },
-        "labels": {
-          "description": "Cross-service attributes for the location. For example {\"cloud.googleapis.com/region\": \"us-east1\"}",
-          "additionalProperties": {
-            "type": "string"
-          },
-          "type": "object"
-        },
-        "displayName": {
-          "description": "The friendly name for this location, typically a nearby city name. For example, \"Tokyo\".",
-          "type": "string"
+        "enabled": {
+          "description": "Required. Enables Auto-class feature.",
+          "type": "boolean"
         }
       }
     },
-    "SlurmOrchestrator": {
-      "description": "When set in Orchestrator, indicates that the cluster should use [Slurm](https://slurm.schedmd.com/) as the orchestrator.",
-      "id": "SlurmOrchestrator",
+    "OperationStep": {
+      "id": "OperationStep",
       "properties": {
-        "prologBashScripts": {
-          "description": "Optional. Slurm [prolog scripts](https://slurm.schedmd.com/prolog_epilog.html), which will be executed by compute nodes before a node begins running a new job. Values must not be empty.",
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
+        "deleteNetwork": {
+          "readOnly": true,
+          "description": "Output only. If set, indicates that network deletion is part of the operation.",
+          "$ref": "DeleteNetwork"
         },
-        "defaultPartition": {
-          "description": "Optional. Default partition to use for submitted jobs that do not explicitly specify a partition. Required if and only if there is more than one partition, in which case it must match the id of one of the partitions.",
-          "type": "string"
+        "deleteLoginNode": {
+          "readOnly": true,
+          "$ref": "DeleteLoginNode",
+          "description": "Output only. If set, indicates that login node deletion is part of the operation."
         },
-        "loginNodes": {
-          "$ref": "SlurmLoginNodes",
-          "description": "Required. Configuration for login nodes, which allow users to access the cluster over SSH."
+        "createLoginNode": {
+          "$ref": "CreateLoginNode",
+          "readOnly": true,
+          "description": "Output only. If set, indicates that new login node creation is part of the operation."
         },
-        "epilogBashScripts": {
-          "description": "Optional. Slurm [epilog scripts](https://slurm.schedmd.com/prolog_epilog.html), which will be executed by compute nodes whenever a node finishes running a job. Values must not be empty.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "updateLoginNode": {
+          "$ref": "UpdateLoginNode",
+          "description": "Output only. If set, indicates that login node update is part of the operation.",
+          "readOnly": true
         },
-        "partitions": {
-          "type": "array",
-          "description": "Optional. Configuration for the Slurm partitions in your cluster. Each partition can contain one or more nodesets, and you can submit separate jobs on each partition. If you don't specify at least one partition in your cluster, you can't submit jobs to the cluster.",
-          "items": {
-            "$ref": "SlurmPartition"
-          }
+        "deleteLustreInstance": {
+          "description": "Output only. If set, indicates that Lustre instance deletion is part of the operation.",
+          "readOnly": true,
+          "$ref": "DeleteLustreInstance"
         },
-        "nodeSets": {
-          "description": "Optional. Compute resource configuration for the Slurm nodesets in your cluster. If not specified, the cluster won't create any nodes.",
-          "items": {
-            "$ref": "SlurmNodeSet"
-          },
-          "type": "array"
+        "createOrchestrator": {
+          "description": "Output only. If set, indicates that orchestrator creation is part of the operation.",
+          "$ref": "CreateOrchestrator",
+          "readOnly": true
+        },
+        "deletePrivateServiceAccess": {
+          "readOnly": true,
+          "$ref": "DeletePrivateServiceAccess",
+          "description": "Output only. If set, indicates that private service access deletion is part of the operation."
+        },
+        "createNodeset": {
+          "description": "Output only. If set, indicates that new nodeset creation is part of the operation.",
+          "readOnly": true,
+          "$ref": "CreateNodeset"
+        },
+        "createLustreInstance": {
+          "$ref": "CreateLustreInstance",
+          "description": "Output only. If set, indicates that new Lustre instance creation is part of the operation.",
+          "readOnly": true
+        },
+        "deleteStorageBucket": {
+          "description": "Output only. If set, indicates that Cloud Storage bucket deletion is part of the operation.",
+          "$ref": "DeleteStorageBucket",
+          "readOnly": true
+        },
+        "updatePartition": {
+          "description": "Output only. If set, indicates that partition update is part of the operation.",
+          "$ref": "UpdatePartition",
+          "readOnly": true
+        },
+        "createPrivateServiceAccess": {
+          "description": "Output only. If set, indicates that new private service access creation is part of the operation.",
+          "$ref": "CreatePrivateServiceAccess",
+          "readOnly": true
+        },
+        "createPartition": {
+          "readOnly": true,
+          "$ref": "CreatePartition",
+          "description": "Output only. If set, indicates that new partition creation is part of the operation."
+        },
+        "createNetwork": {
+          "description": "Output only. If set, indicates that new network creation is part of the operation.",
+          "$ref": "CreateNetwork",
+          "readOnly": true
+        },
+        "updateNodeset": {
+          "$ref": "UpdateNodeset",
+          "readOnly": true,
+          "description": "Output only. If set, indicates that nodeset update is part of the operation."
+        },
+        "deleteFilestoreInstance": {
+          "$ref": "DeleteFilestoreInstance",
+          "description": "Output only. If set, indicates that Filestore instance deletion is part of the operation.",
+          "readOnly": true
+        },
+        "createFilestoreInstance": {
+          "$ref": "CreateFilestoreInstance",
+          "readOnly": true,
+          "description": "Output only. If set, indicates that new Filestore instance creation is part of the operation."
+        },
+        "state": {
+          "enumDescriptions": [
+            "Unspecified state.",
+            "Initial state before step execution starts.",
+            "Step execution is running in progress.",
+            "Step execution is completed."
+          ],
+          "readOnly": true,
+          "enum": [
+            "STATE_UNSPECIFIED",
+            "WAITING",
+            "IN_PROGRESS",
+            "DONE"
+          ],
+          "type": "string",
+          "description": "Output only. State of the operation step."
+        },
+        "updateOrchestrator": {
+          "$ref": "UpdateOrchestrator",
+          "readOnly": true,
+          "description": "Output only. If set, indicates that an orchestrator update is part of the operation."
+        },
+        "deleteOrchestrator": {
+          "$ref": "DeleteOrchestrator",
+          "description": "Output only. If set, indicates that orchestrator deletion is part of the operation.",
+          "readOnly": true
+        },
+        "deletePartition": {
+          "description": "Output only. If set, indicates that partition deletion is part of the operation.",
+          "$ref": "DeletePartition",
+          "readOnly": true
+        },
+        "deleteNodeset": {
+          "description": "Output only. If set, indicates that nodeset deletion is part of the operation.",
+          "$ref": "DeleteNodeset",
+          "readOnly": true
+        },
+        "createStorageBucket": {
+          "description": "Output only. If set, indicates that new Cloud Storage bucket creation is part of the operation.",
+          "readOnly": true,
+          "$ref": "CreateStorageBucket"
+        },
+        "checkClusterHealth": {
+          "$ref": "CheckClusterHealth",
+          "readOnly": true,
+          "description": "Output only. If set, indicates that cluster health check is part of the operation."
         }
       },
+      "description": "Message describing the status of a single step in a cluster mutation long-running operation.",
       "type": "object"
+    },
+    "Status": {
+      "id": "Status",
+      "properties": {
+        "message": {
+          "description": "A developer-facing error message, which should be in English. Any user-facing error message should be localized and sent in the google.rpc.Status.details field, or localized by the client.",
+          "type": "string"
+        },
+        "details": {
+          "items": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "any",
+              "description": "Properties of the object. Contains field @type with type URL."
+            }
+          },
+          "description": "A list of messages that carry the error details. There is a common set of message types for APIs to use.",
+          "type": "array"
+        },
+        "code": {
+          "description": "The status code, which should be an enum value of google.rpc.Code.",
+          "format": "int32",
+          "type": "integer"
+        }
+      },
+      "description": "The `Status` type defines a logical error model that is suitable for different programming environments, including REST APIs and RPC APIs. It is used by [gRPC](https://github.com/grpc). Each `Status` message contains three pieces of data: error code, error message, and error details. You can find out more about this error model and how to work with it in the [API Design Guide](https://cloud.google.com/apis/design/errors).",
+      "type": "object"
+    },
+    "DeleteOrchestrator": {
+      "properties": {},
+      "description": "When set in OperationStep, indicates that an orchestrator should be deleted.",
+      "type": "object",
+      "id": "DeleteOrchestrator"
     }
   },
-  "mtlsRootUrl": "https://hypercomputecluster.mtls.googleapis.com/",
-  "batchPath": "batch",
-  "icons": {
-    "x16": "http://www.google.com/images/icons/product/search-16.gif",
-    "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  "ownerDomain": "google.com",
+  "parameters": {
+    "access_token": {
+      "location": "query",
+      "description": "OAuth access token.",
+      "type": "string"
+    },
+    "alt": {
+      "location": "query",
+      "description": "Data format for response.",
+      "enum": [
+        "json",
+        "media",
+        "proto"
+      ],
+      "enumDescriptions": [
+        "Responses with Content-Type of application/json",
+        "Media download with context-dependent Content-Type",
+        "Responses with Content-Type of application/x-protobuf"
+      ],
+      "type": "string",
+      "default": "json"
+    },
+    "callback": {
+      "description": "JSONP",
+      "location": "query",
+      "type": "string"
+    },
+    "quotaUser": {
+      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
+      "type": "string",
+      "location": "query"
+    },
+    "key": {
+      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
+      "type": "string",
+      "location": "query"
+    },
+    "oauth_token": {
+      "description": "OAuth 2.0 token for the current user.",
+      "location": "query",
+      "type": "string"
+    },
+    "fields": {
+      "description": "Selector specifying which fields to include in a partial response.",
+      "type": "string",
+      "location": "query"
+    },
+    "$.xgafv": {
+      "enum": [
+        "1",
+        "2"
+      ],
+      "type": "string",
+      "enumDescriptions": [
+        "v1 error format",
+        "v2 error format"
+      ],
+      "description": "V1 error format.",
+      "location": "query"
+    },
+    "uploadType": {
+      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
+      "type": "string",
+      "location": "query"
+    },
+    "upload_protocol": {
+      "location": "query",
+      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").",
+      "type": "string"
+    },
+    "prettyPrint": {
+      "default": "true",
+      "location": "query",
+      "type": "boolean",
+      "description": "Returns response with indentations and line breaks."
+    }
   },
   "rootUrl": "https://hypercomputecluster.googleapis.com/",
-  "fullyEncodeReservedExpansion": true,
-  "kind": "discovery#restDescription",
-  "discoveryVersion": "v1",
-  "version_module": true,
   "title": "Cluster Director API",
-  "ownerName": "Google",
+  "batchPath": "batch",
   "version": "v1",
-  "documentationLink": "https://docs.cloud.google.com/cluster-director/docs",
-  "baseUrl": "https://hypercomputecluster.googleapis.com/",
-  "description": "The Cluster Director API lets you deploy, manage, and monitor clusters that run artificial intelligence (AI), machine learning (ML), or high performance computing (HPC) workloads.",
-  "ownerDomain": "google.com",
-  "canonicalName": "Hypercompute Cluster",
-  "revision": "20260820",
-  "basePath": "",
-  "auth": {
-    "oauth2": {
-      "scopes": {
-        "https://www.googleapis.com/auth/cloud-platform": {
-          "description": "See, edit, configure, and delete your Google Cloud data and see the email address for your Google Account."
-        }
-      }
-    }
-  },
   "servicePath": "",
-  "protocol": "rest",
-  "id": "hypercomputecluster:v1",
+  "ownerName": "Google",
+  "kind": "discovery#restDescription",
+  "mtlsRootUrl": "https://hypercomputecluster.mtls.googleapis.com/",
   "resources": {
     "projects": {
       "resources": {
         "locations": {
-          "methods": {
-            "list": {
-              "description": "Lists information about the supported locations for this service. This method lists locations based on the resource scope provided in the ListLocationsRequest.name field: * **Global locations**: If `name` is empty, the method lists the public locations available to all projects. * **Project-specific locations**: If `name` follows the format `projects/{project}`, the method lists locations visible to that specific project. This includes public, private, or other project-specific locations enabled for the project. For gRPC and client library implementations, the resource name is passed as the `name` field. For direct service calls, the resource name is incorporated into the request path based on the specific service implementation and version.",
-              "path": "v1/{+name}/locations",
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ],
-              "response": {
-                "$ref": "ListLocationsResponse"
-              },
-              "parameterOrder": [
-                "name"
-              ],
-              "httpMethod": "GET",
-              "flatPath": "v1/projects/{projectsId}/locations",
-              "parameters": {
-                "extraLocationTypes": {
-                  "repeated": true,
-                  "description": "Optional. Do not use this field unless explicitly documented otherwise. This is primarily for internal usage.",
-                  "type": "string",
-                  "location": "query"
-                },
-                "name": {
-                  "pattern": "^projects/[^/]+$",
-                  "type": "string",
-                  "location": "path",
-                  "description": "The resource that owns the locations collection, if applicable.",
-                  "required": true
-                },
-                "pageSize": {
-                  "format": "int32",
-                  "location": "query",
-                  "description": "The maximum number of results to return. If not set, the service selects a default.",
-                  "type": "integer"
-                },
-                "filter": {
-                  "type": "string",
-                  "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
-                  "location": "query"
-                },
-                "pageToken": {
-                  "type": "string",
-                  "location": "query",
-                  "description": "A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page."
-                }
-              },
-              "id": "hypercomputecluster.projects.locations.list"
-            },
-            "get": {
-              "httpMethod": "GET",
-              "id": "hypercomputecluster.projects.locations.get",
-              "parameterOrder": [
-                "name"
-              ],
-              "parameters": {
-                "name": {
-                  "type": "string",
-                  "location": "path",
-                  "required": true,
-                  "pattern": "^projects/[^/]+/locations/[^/]+$",
-                  "description": "Resource name for the location."
-                }
-              },
-              "flatPath": "v1/projects/{projectsId}/locations/{locationsId}",
-              "path": "v1/{+name}",
-              "response": {
-                "$ref": "Location"
-              },
-              "description": "Gets information about a location.",
-              "scopes": [
-                "https://www.googleapis.com/auth/cloud-platform"
-              ]
-            }
-          },
           "resources": {
             "clusters": {
               "methods": {
-                "create": {
-                  "path": "v1/{+parent}/clusters",
-                  "parameters": {
-                    "requestId": {
-                      "location": "query",
-                      "type": "string",
-                      "description": "Optional. A unique identifier for this request. A random UUID is recommended. This request is idempotent if and only if `request_id` is provided."
-                    },
-                    "parent": {
-                      "pattern": "^projects/[^/]+/locations/[^/]+$",
-                      "type": "string",
-                      "required": true,
-                      "description": "Required. Parent location in which the cluster should be created, in the format `projects/{project}/locations/{location}`.",
-                      "location": "path"
-                    },
-                    "clusterId": {
-                      "location": "query",
-                      "type": "string",
-                      "description": "Required. The ID of the cluster to create. The cluster ID must start with a lowercase letter (`a`-`z`), use only lowercase letters or numbers, and contain up to 10 characters. For example, specify `cluster001`."
-                    }
-                  },
-                  "description": "Creates a new Cluster in a given project and location.",
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "id": "hypercomputecluster.projects.locations.clusters.create",
-                  "httpMethod": "POST",
-                  "parameterOrder": [
-                    "parent"
-                  ],
-                  "response": {
-                    "$ref": "Operation"
-                  },
-                  "request": {
-                    "$ref": "Cluster"
-                  },
-                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/clusters"
-                },
-                "get": {
-                  "response": {
-                    "$ref": "Cluster"
-                  },
-                  "parameterOrder": [
-                    "name"
-                  ],
-                  "id": "hypercomputecluster.projects.locations.clusters.get",
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/clusters/{clustersId}",
-                  "description": "Gets details of a single Cluster.",
-                  "parameters": {
-                    "name": {
-                      "location": "path",
-                      "description": "Required. Name of the cluster to retrieve, in the format `projects/{project}/locations/{location}/clusters/{cluster}`.",
-                      "pattern": "^projects/[^/]+/locations/[^/]+/clusters/[^/]+$",
-                      "type": "string",
-                      "required": true
-                    }
-                  },
-                  "path": "v1/{+name}",
-                  "httpMethod": "GET"
-                },
                 "list": {
-                  "id": "hypercomputecluster.projects.locations.clusters.list",
-                  "parameterOrder": [
-                    "parent"
-                  ],
                   "response": {
                     "$ref": "ListClustersResponse"
                   },
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "description": "Lists Clusters in a given project and location.",
-                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/clusters",
+                  "id": "hypercomputecluster.projects.locations.clusters.list",
                   "parameters": {
+                    "pageSize": {
+                      "type": "integer",
+                      "format": "int32",
+                      "location": "query",
+                      "description": "Optional. Maximum number of clusters to return. The service may return fewer than this value."
+                    },
                     "parent": {
-                      "type": "string",
-                      "location": "path",
                       "description": "Required. Parent location of the clusters to list, in the format `projects/{project}/locations/{location}`.",
                       "pattern": "^projects/[^/]+/locations/[^/]+$",
-                      "required": true
-                    },
-                    "pageSize": {
-                      "description": "Optional. Maximum number of clusters to return. The service may return fewer than this value.",
-                      "type": "integer",
-                      "location": "query",
-                      "format": "int32"
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
                     },
                     "filter": {
                       "description": "Optional. [Filter](https://google.aip.dev/160) to apply to the returned results.",
@@ -1609,298 +1532,375 @@
                     },
                     "orderBy": {
                       "location": "query",
-                      "type": "string",
-                      "description": "Optional. How to order the resulting clusters. Must be one of the following strings: * `name` * `name desc` * `create_time` * `create_time desc` If not specified, clusters will be returned in an arbitrary order."
+                      "description": "Optional. How to order the resulting clusters. Must be one of the following strings: * `name` * `name desc` * `create_time` * `create_time desc` If not specified, clusters will be returned in an arbitrary order.",
+                      "type": "string"
                     },
                     "pageToken": {
-                      "type": "string",
                       "description": "Optional. A page token received from a previous `ListClusters` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListClusters` must match the call that provided the page token.",
-                      "location": "query"
+                      "location": "query",
+                      "type": "string"
                     }
                   },
                   "path": "v1/{+parent}/clusters",
-                  "httpMethod": "GET"
-                },
-                "delete": {
-                  "httpMethod": "DELETE",
-                  "description": "Deletes a single Cluster.",
-                  "id": "hypercomputecluster.projects.locations.clusters.delete",
-                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/clusters/{clustersId}",
+                  "httpMethod": "GET",
+                  "parameterOrder": [
+                    "parent"
+                  ],
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
-                  "parameters": {
-                    "requestId": {
-                      "description": "Optional. A unique identifier for this request. A random UUID is recommended. This request is idempotent if and only if `request_id` is provided.",
-                      "type": "string",
-                      "location": "query"
-                    },
-                    "name": {
-                      "pattern": "^projects/[^/]+/locations/[^/]+/clusters/[^/]+$",
-                      "required": true,
-                      "description": "Required. Name of the cluster to delete, in the format `projects/{project}/locations/{location}/clusters/{cluster}`.",
-                      "type": "string",
-                      "location": "path"
-                    }
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/clusters",
+                  "description": "Lists Clusters in a given project and location."
+                },
+                "get": {
+                  "response": {
+                    "$ref": "Cluster"
                   },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "id": "hypercomputecluster.projects.locations.clusters.get",
                   "parameterOrder": [
                     "name"
                   ],
-                  "response": {
-                    "$ref": "Operation"
+                  "path": "v1/{+name}",
+                  "httpMethod": "GET",
+                  "parameters": {
+                    "name": {
+                      "type": "string",
+                      "description": "Required. Name of the cluster to retrieve, in the format `projects/{project}/locations/{location}/clusters/{cluster}`.",
+                      "location": "path",
+                      "required": true,
+                      "pattern": "^projects/[^/]+/locations/[^/]+/clusters/[^/]+$"
+                    }
                   },
-                  "path": "v1/{+name}"
+                  "description": "Gets details of a single Cluster.",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/clusters/{clustersId}"
                 },
                 "patch": {
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "description": "Updates the parameters of a single Cluster.",
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "parameters": {
+                    "name": {
+                      "pattern": "^projects/[^/]+/locations/[^/]+/clusters/[^/]+$",
+                      "description": "Identifier. [Relative resource name](https://google.aip.dev/122) of the cluster, in the format `projects/{project}/locations/{location}/clusters/{cluster}`.",
+                      "location": "path",
+                      "required": true,
+                      "type": "string"
+                    },
+                    "requestId": {
+                      "type": "string",
+                      "description": "Optional. A unique identifier for this request. A random UUID is recommended. This request is idempotent if and only if `request_id` is provided.",
+                      "location": "query"
+                    },
+                    "updateMask": {
+                      "location": "query",
+                      "format": "google-fieldmask",
+                      "description": "Optional. Mask specifying which fields in the cluster to update. All paths must be specified explicitly - wildcards are not supported. At least one path must be provided.",
+                      "type": "string"
+                    }
+                  },
+                  "httpMethod": "PATCH",
                   "request": {
                     "$ref": "Cluster"
+                  },
+                  "id": "hypercomputecluster.projects.locations.clusters.patch",
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/clusters/{clustersId}"
+                },
+                "delete": {
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Deletes a single Cluster.",
+                  "httpMethod": "DELETE",
+                  "id": "hypercomputecluster.projects.locations.clusters.delete",
+                  "response": {
+                    "$ref": "Operation"
+                  },
+                  "parameters": {
+                    "name": {
+                      "description": "Required. Name of the cluster to delete, in the format `projects/{project}/locations/{location}/clusters/{cluster}`.",
+                      "type": "string",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/clusters/[^/]+$",
+                      "location": "path",
+                      "required": true
+                    },
+                    "requestId": {
+                      "location": "query",
+                      "description": "Optional. A unique identifier for this request. A random UUID is recommended. This request is idempotent if and only if `request_id` is provided.",
+                      "type": "string"
+                    }
+                  },
+                  "path": "v1/{+name}",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/clusters/{clustersId}",
+                  "parameterOrder": [
+                    "name"
+                  ]
+                },
+                "create": {
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "description": "Creates a new Cluster in a given project and location.",
+                  "path": "v1/{+parent}/clusters",
+                  "parameters": {
+                    "clusterId": {
+                      "location": "query",
+                      "type": "string",
+                      "description": "Required. The ID of the cluster to create. The cluster ID must start with a lowercase letter (`a`-`z`), use only lowercase letters or numbers, and contain up to 10 characters. For example, specify `cluster001`."
+                    },
+                    "requestId": {
+                      "description": "Optional. A unique identifier for this request. A random UUID is recommended. This request is idempotent if and only if `request_id` is provided.",
+                      "location": "query",
+                      "type": "string"
+                    },
+                    "parent": {
+                      "type": "string",
+                      "pattern": "^projects/[^/]+/locations/[^/]+$",
+                      "location": "path",
+                      "required": true,
+                      "description": "Required. Parent location in which the cluster should be created, in the format `projects/{project}/locations/{location}`."
+                    }
                   },
                   "response": {
                     "$ref": "Operation"
                   },
-                  "path": "v1/{+name}",
+                  "httpMethod": "POST",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/clusters",
+                  "id": "hypercomputecluster.projects.locations.clusters.create",
                   "parameterOrder": [
-                    "name"
+                    "parent"
                   ],
-                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/clusters/{clustersId}",
-                  "parameters": {
-                    "requestId": {
-                      "location": "query",
-                      "type": "string",
-                      "description": "Optional. A unique identifier for this request. A random UUID is recommended. This request is idempotent if and only if `request_id` is provided."
-                    },
-                    "name": {
-                      "type": "string",
-                      "required": true,
-                      "description": "Identifier. [Relative resource name](https://google.aip.dev/122) of the cluster, in the format `projects/{project}/locations/{location}/clusters/{cluster}`.",
-                      "location": "path",
-                      "pattern": "^projects/[^/]+/locations/[^/]+/clusters/[^/]+$"
-                    },
-                    "updateMask": {
-                      "description": "Optional. Mask specifying which fields in the cluster to update. All paths must be specified explicitly - wildcards are not supported. At least one path must be provided.",
-                      "type": "string",
-                      "format": "google-fieldmask",
-                      "location": "query"
-                    }
-                  },
-                  "id": "hypercomputecluster.projects.locations.clusters.patch",
-                  "description": "Updates the parameters of a single Cluster.",
-                  "httpMethod": "PATCH"
+                  "request": {
+                    "$ref": "Cluster"
+                  }
                 }
               }
             },
             "operations": {
               "methods": {
-                "get": {
+                "delete": {
+                  "description": "Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`.",
+                  "httpMethod": "DELETE",
+                  "id": "hypercomputecluster.projects.locations.operations.delete",
+                  "parameters": {
+                    "name": {
+                      "location": "path",
+                      "required": true,
+                      "description": "The name of the operation resource to be deleted.",
+                      "type": "string",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$"
+                    }
+                  },
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "path": "v1/{+name}",
+                  "response": {
+                    "$ref": "Empty"
+                  },
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}"
+                },
+                "list": {
+                  "parameterOrder": [
+                    "name"
+                  ],
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations",
+                  "id": "hypercomputecluster.projects.locations.operations.list",
+                  "response": {
+                    "$ref": "ListOperationsResponse"
+                  },
+                  "path": "v1/{+name}/operations",
+                  "parameters": {
+                    "name": {
+                      "location": "path",
+                      "required": true,
+                      "description": "The name of the operation's parent resource.",
+                      "type": "string",
+                      "pattern": "^projects/[^/]+/locations/[^/]+$"
+                    },
+                    "pageSize": {
+                      "type": "integer",
+                      "format": "int32",
+                      "location": "query",
+                      "description": "The standard list page size."
+                    },
+                    "returnPartialSuccess": {
+                      "location": "query",
+                      "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `\"projects/example/locations/-\"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
+                      "type": "boolean"
+                    },
+                    "filter": {
+                      "type": "string",
+                      "description": "The standard list filter.",
+                      "location": "query"
+                    },
+                    "pageToken": {
+                      "description": "The standard list page token.",
+                      "location": "query",
+                      "type": "string"
+                    }
+                  },
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
                   ],
                   "httpMethod": "GET",
-                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
-                  "path": "v1/{+name}",
-                  "description": "Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.",
-                  "response": {
-                    "$ref": "Operation"
-                  },
-                  "parameters": {
-                    "name": {
-                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
-                      "type": "string",
-                      "location": "path",
-                      "required": true,
-                      "description": "The name of the operation resource."
-                    }
-                  },
-                  "id": "hypercomputecluster.projects.locations.operations.get",
-                  "parameterOrder": [
-                    "name"
-                  ]
+                  "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`."
                 },
                 "cancel": {
+                  "path": "v1/{+name}:cancel",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel",
                   "description": "Starts asynchronous cancellation on a long-running operation. The server makes a best effort to cancel the operation, but success is not guaranteed. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`. Clients can use Operations.GetOperation or other methods to check whether the cancellation succeeded or whether the operation completed despite cancellation. On successful cancellation, the operation is not deleted; instead, it becomes an operation with an Operation.error value with a google.rpc.Status.code of `1`, corresponding to `Code.CANCELLED`.",
-                  "httpMethod": "POST",
                   "parameters": {
                     "name": {
                       "location": "path",
-                      "type": "string",
+                      "required": true,
                       "description": "The name of the operation resource to be cancelled.",
                       "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
-                      "required": true
+                      "type": "string"
                     }
                   },
-                  "path": "v1/{+name}:cancel",
-                  "parameterOrder": [
-                    "name"
-                  ],
-                  "id": "hypercomputecluster.projects.locations.operations.cancel",
                   "scopes": [
                     "https://www.googleapis.com/auth/cloud-platform"
+                  ],
+                  "httpMethod": "POST",
+                  "id": "hypercomputecluster.projects.locations.operations.cancel",
+                  "parameterOrder": [
+                    "name"
                   ],
                   "response": {
                     "$ref": "Empty"
                   },
                   "request": {
                     "$ref": "CancelOperationRequest"
-                  },
-                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}:cancel"
-                },
-                "delete": {
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "description": "Deletes a long-running operation. This method indicates that the client is no longer interested in the operation result. It does not cancel the operation. If the server doesn't support this method, it returns `google.rpc.Code.UNIMPLEMENTED`.",
-                  "parameters": {
-                    "name": {
-                      "type": "string",
-                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
-                      "required": true,
-                      "location": "path",
-                      "description": "The name of the operation resource to be deleted."
-                    }
-                  },
-                  "path": "v1/{+name}",
-                  "httpMethod": "DELETE",
-                  "id": "hypercomputecluster.projects.locations.operations.delete",
-                  "parameterOrder": [
-                    "name"
-                  ],
-                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
-                  "response": {
-                    "$ref": "Empty"
                   }
                 },
-                "list": {
-                  "scopes": [
-                    "https://www.googleapis.com/auth/cloud-platform"
-                  ],
-                  "description": "Lists operations that match the specified filter in the request. If the server doesn't support this method, it returns `UNIMPLEMENTED`.",
+                "get": {
+                  "httpMethod": "GET",
+                  "path": "v1/{+name}",
                   "parameters": {
-                    "pageToken": {
-                      "location": "query",
-                      "type": "string",
-                      "description": "The standard list page token."
-                    },
-                    "returnPartialSuccess": {
-                      "description": "When set to `true`, operations that are reachable are returned as normal, and those that are unreachable are returned in the ListOperationsResponse.unreachable field. This can only be `true` when reading across collections. For example, when `parent` is set to `\"projects/example/locations/-\"`. This field is not supported by default and will result in an `UNIMPLEMENTED` error if set unless explicitly documented otherwise in service or product specific documentation.",
-                      "location": "query",
-                      "type": "boolean"
-                    },
-                    "filter": {
-                      "type": "string",
-                      "location": "query",
-                      "description": "The standard list filter."
-                    },
-                    "pageSize": {
-                      "description": "The standard list page size.",
-                      "location": "query",
-                      "type": "integer",
-                      "format": "int32"
-                    },
                     "name": {
-                      "description": "The name of the operation's parent resource.",
+                      "pattern": "^projects/[^/]+/locations/[^/]+/operations/[^/]+$",
+                      "location": "path",
                       "required": true,
-                      "pattern": "^projects/[^/]+/locations/[^/]+$",
-                      "type": "string",
-                      "location": "path"
+                      "description": "The name of the operation resource.",
+                      "type": "string"
                     }
                   },
-                  "path": "v1/{+name}/operations",
-                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations",
-                  "id": "hypercomputecluster.projects.locations.operations.list",
                   "response": {
-                    "$ref": "ListOperationsResponse"
+                    "$ref": "Operation"
                   },
-                  "httpMethod": "GET",
                   "parameterOrder": [
                     "name"
+                  ],
+                  "description": "Gets the latest state of a long-running operation. Clients can use this method to poll the operation result at intervals as recommended by the API service.",
+                  "flatPath": "v1/projects/{projectsId}/locations/{locationsId}/operations/{operationsId}",
+                  "id": "hypercomputecluster.projects.locations.operations.get",
+                  "scopes": [
+                    "https://www.googleapis.com/auth/cloud-platform"
                   ]
                 }
               }
+            }
+          },
+          "methods": {
+            "list": {
+              "response": {
+                "$ref": "ListLocationsResponse"
+              },
+              "path": "v1/{+name}/locations",
+              "description": "Lists information about the supported locations for this service. This method lists locations based on the resource scope provided in the ListLocationsRequest.name field: * **Global locations**: If `name` is empty, the method lists the public locations available to all projects. * **Project-specific locations**: If `name` follows the format `projects/{project}`, the method lists locations visible to that specific project. This includes public, private, or other project-specific locations enabled for the project. For gRPC and client library implementations, the resource name is passed as the `name` field. For direct service calls, the resource name is incorporated into the request path based on the specific service implementation and version.",
+              "id": "hypercomputecluster.projects.locations.list",
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ],
+              "httpMethod": "GET",
+              "parameters": {
+                "pageSize": {
+                  "format": "int32",
+                  "description": "The maximum number of results to return. If not set, the service selects a default.",
+                  "type": "integer",
+                  "location": "query"
+                },
+                "extraLocationTypes": {
+                  "location": "query",
+                  "repeated": true,
+                  "description": "Optional. Do not use this field unless explicitly documented otherwise. This is primarily for internal usage.",
+                  "type": "string"
+                },
+                "pageToken": {
+                  "description": "A page token received from the `next_page_token` field in the response. Send that page token to receive the subsequent page.",
+                  "location": "query",
+                  "type": "string"
+                },
+                "filter": {
+                  "description": "A filter to narrow down results to a preferred subset. The filtering language accepts strings like `\"displayName=tokyo\"`, and is documented in more detail in [AIP-160](https://google.aip.dev/160).",
+                  "location": "query",
+                  "type": "string"
+                },
+                "name": {
+                  "pattern": "^projects/[^/]+$",
+                  "location": "path",
+                  "required": true,
+                  "description": "The resource that owns the locations collection, if applicable.",
+                  "type": "string"
+                }
+              },
+              "parameterOrder": [
+                "name"
+              ],
+              "flatPath": "v1/projects/{projectsId}/locations"
+            },
+            "get": {
+              "response": {
+                "$ref": "Location"
+              },
+              "path": "v1/{+name}",
+              "id": "hypercomputecluster.projects.locations.get",
+              "description": "Gets information about a location.",
+              "httpMethod": "GET",
+              "parameterOrder": [
+                "name"
+              ],
+              "parameters": {
+                "name": {
+                  "location": "path",
+                  "required": true,
+                  "description": "Resource name for the location.",
+                  "type": "string",
+                  "pattern": "^projects/[^/]+/locations/[^/]+$"
+                }
+              },
+              "flatPath": "v1/projects/{projectsId}/locations/{locationsId}",
+              "scopes": [
+                "https://www.googleapis.com/auth/cloud-platform"
+              ]
             }
           }
         }
       }
     }
   },
-  "name": "hypercomputecluster",
-  "parameters": {
-    "callback": {
-      "description": "JSONP",
-      "location": "query",
-      "type": "string"
-    },
-    "$.xgafv": {
-      "enumDescriptions": [
-        "v1 error format",
-        "v2 error format"
-      ],
-      "description": "V1 error format.",
-      "enum": [
-        "1",
-        "2"
-      ],
-      "type": "string",
-      "location": "query"
-    },
-    "access_token": {
-      "type": "string",
-      "description": "OAuth access token.",
-      "location": "query"
-    },
-    "quotaUser": {
-      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
-      "type": "string",
-      "location": "query"
-    },
-    "upload_protocol": {
-      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").",
-      "location": "query",
-      "type": "string"
-    },
-    "prettyPrint": {
-      "type": "boolean",
-      "default": "true",
-      "location": "query",
-      "description": "Returns response with indentations and line breaks."
-    },
-    "oauth_token": {
-      "location": "query",
-      "description": "OAuth 2.0 token for the current user.",
-      "type": "string"
-    },
-    "uploadType": {
-      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
-      "location": "query",
-      "type": "string"
-    },
-    "fields": {
-      "description": "Selector specifying which fields to include in a partial response.",
-      "location": "query",
-      "type": "string"
-    },
-    "alt": {
-      "location": "query",
-      "enumDescriptions": [
-        "Responses with Content-Type of application/json",
-        "Media download with context-dependent Content-Type",
-        "Responses with Content-Type of application/x-protobuf"
-      ],
-      "description": "Data format for response.",
-      "enum": [
-        "json",
-        "media",
-        "proto"
-      ],
-      "default": "json",
-      "type": "string"
-    },
-    "key": {
-      "type": "string",
-      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
-      "location": "query"
-    }
+  "protocol": "rest",
+  "documentationLink": "https://docs.cloud.google.com/cluster-director/docs",
+  "description": "The Cluster Director API lets you deploy, manage, and monitor clusters that run artificial intelligence (AI), machine learning (ML), or high performance computing (HPC) workloads.",
+  "baseUrl": "https://hypercomputecluster.googleapis.com/",
+  "canonicalName": "Hypercompute Cluster",
+  "fullyEncodeReservedExpansion": true,
+  "icons": {
+    "x16": "http://www.google.com/images/icons/product/search-16.gif",
+    "x32": "http://www.google.com/images/icons/product/search-32.gif"
   }
 }
