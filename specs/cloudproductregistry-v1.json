@@ -1,41 +1,66 @@
 {
-  "rootUrl": "https://cloudproductregistry.googleapis.com/",
+  "protocol": "rest",
+  "documentationLink": "https://docs.cloud.google.com/product-registry",
+  "batchPath": "batch",
   "schemas": {
-    "ListLogicalProductsResponse": {
+    "ListLogicalProductVariantsResponse": {
       "type": "object",
-      "description": "Response message for ListLogicalProducts.",
+      "description": "Response message for ListLogicalProductVariants.",
+      "properties": {
+        "logicalProductVariants": {
+          "type": "array",
+          "items": {
+            "$ref": "LogicalProductVariant"
+          },
+          "description": "Matched LogicalProductVariants"
+        },
+        "nextPageToken": {
+          "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+          "type": "string"
+        }
+      },
+      "id": "ListLogicalProductVariantsResponse"
+    },
+    "ListProductSuitesResponse": {
       "properties": {
         "nextPageToken": {
           "type": "string",
           "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages."
         },
-        "logicalProducts": {
-          "description": "Matched LogicalProducts",
+        "productSuites": {
+          "description": "Matched ProductSuites",
           "type": "array",
           "items": {
-            "$ref": "LogicalProduct"
+            "$ref": "ProductSuite"
           }
         }
       },
-      "id": "ListLogicalProductsResponse"
+      "description": "Response message for ListProductSuites.",
+      "type": "object",
+      "id": "ListProductSuitesResponse"
     },
-    "LogicalProductVariant": {
-      "id": "LogicalProductVariant",
-      "description": "Represents a distinct offering derived from a primary product that retains core functionalities but offers specialized features for a specific market segment.",
+    "LogicalProduct": {
       "properties": {
-        "replacement": {
-          "description": "Output only. The resource name of the Logical Entity that the logical product variant is replaced by. This field is only populated when this logical product variant is replaced by some other type. Eg: logicalProducts/{logical_product}, productSuites/{product_suite}, etc.",
-          "type": "string",
-          "readOnly": true
-        },
-        "title": {
-          "description": "Display name of the LogicalProductVariant.",
-          "type": "string"
+        "variants": {
+          "readOnly": true,
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Output only. Child variant resource references. Format: logicalProducts/{logical_product}/variants/{variant}"
         },
         "replaced": {
+          "description": "Output only. Indicates whether the logical product has been replaced. If `false`, the product is active. If `true`, the product has been replaced by another type, and the `replacement` field contains the resource name of that replacement.",
           "readOnly": true,
-          "description": "Output only. Indicates whether the logical product variant has been replaced. If `false`, the variant is active. If `true`, the variant has been replaced by another type, and the `replacement` field contains the resource name of that replacement.",
           "type": "boolean"
+        },
+        "name": {
+          "description": "Identifier. The resource name of the LogicalProduct. Format: logicalProducts/{logical_product}.",
+          "type": "string"
+        },
+        "title": {
+          "description": "Display name of the LogicalProduct.",
+          "type": "string"
         },
         "lifecycleState": {
           "enumDescriptions": [
@@ -45,7 +70,69 @@
             "The entity is Generally Available. It is fully supported, stable, and available to all customers.",
             "The entity is deprecated. It is no longer recommended for use and may be removed in a future version."
           ],
+          "description": "Output only. Current Lifecycle state of the logical product.",
+          "enum": [
+            "LIFECYCLE_STATE_UNSPECIFIED",
+            "LIFECYCLE_STATE_PUBLIC_PREVIEW",
+            "LIFECYCLE_STATE_PRIVATE_GA",
+            "LIFECYCLE_STATE_GA",
+            "LIFECYCLE_STATE_DEPRECATED"
+          ],
+          "readOnly": true,
+          "type": "string"
+        },
+        "productSuite": {
           "type": "string",
+          "description": "Product suite associated with the logical product. Format: productSuites/{product_suite}."
+        },
+        "replacement": {
+          "readOnly": true,
+          "description": "Output only. The resource name of the Logical Entity that the logical product is replaced by. This field is only populated when this logical product is replaced by some other type. Eg: logicalProducts/{logical_product}/variants/{variant}, productSuites/{product_suite}, etc.",
+          "type": "string"
+        }
+      },
+      "description": "Represents an independent service offering that can be provisioned by a customer.",
+      "id": "LogicalProduct",
+      "type": "object"
+    },
+    "ListLogicalProductsResponse": {
+      "id": "ListLogicalProductsResponse",
+      "description": "Response message for ListLogicalProducts.",
+      "properties": {
+        "logicalProducts": {
+          "type": "array",
+          "description": "Matched LogicalProducts",
+          "items": {
+            "$ref": "LogicalProduct"
+          }
+        },
+        "nextPageToken": {
+          "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "LogicalProductVariant": {
+      "properties": {
+        "replaced": {
+          "type": "boolean",
+          "description": "Output only. Indicates whether the logical product variant has been replaced. If `false`, the variant is active. If `true`, the variant has been replaced by another type, and the `replacement` field contains the resource name of that replacement.",
+          "readOnly": true
+        },
+        "replacement": {
+          "description": "Output only. The resource name of the Logical Entity that the logical product variant is replaced by. This field is only populated when this logical product variant is replaced by some other type. Eg: logicalProducts/{logical_product}, productSuites/{product_suite}, etc.",
+          "type": "string",
+          "readOnly": true
+        },
+        "lifecycleState": {
+          "enumDescriptions": [
+            "The default value. This value is used if the lifecycle state is not set.",
+            "The entity is in Public Preview. It is available to all customers, but may not be feature-complete or have full support guarantees.",
+            "The entity is in Private General Availability. It is fully supported and stable, but only available to a select group of customers.",
+            "The entity is Generally Available. It is fully supported, stable, and available to all customers.",
+            "The entity is deprecated. It is no longer recommended for use and may be removed in a future version."
+          ],
           "enum": [
             "LIFECYCLE_STATE_UNSPECIFIED",
             "LIFECYCLE_STATE_PUBLIC_PREVIEW",
@@ -54,210 +141,173 @@
             "LIFECYCLE_STATE_DEPRECATED"
           ],
           "description": "Output only. Current Lifecycle state of the logical product variant.",
-          "readOnly": true
+          "readOnly": true,
+          "type": "string"
         },
         "name": {
-          "type": "string",
-          "description": "Identifier. The resource name of the LogicalProductVariant. Format: logicalProducts/{logical_product}/variants/{variant}"
-        }
-      },
-      "type": "object"
-    },
-    "LookupEntityResponse": {
-      "id": "LookupEntityResponse",
-      "description": "Response message for LookupEntity.",
-      "properties": {
-        "productSuite": {
-          "description": "Matched ProductSuite.",
-          "$ref": "ProductSuite"
+          "description": "Identifier. The resource name of the LogicalProductVariant. Format: logicalProducts/{logical_product}/variants/{variant}",
+          "type": "string"
         },
-        "logicalProduct": {
-          "$ref": "LogicalProduct",
-          "description": "Matched LogicalProduct."
-        },
-        "logicalProductVariant": {
-          "$ref": "LogicalProductVariant",
-          "description": "Matched LogicalProductVariant."
-        }
-      },
-      "type": "object"
-    },
-    "LogicalProduct": {
-      "id": "LogicalProduct",
-      "properties": {
         "title": {
-          "description": "Display name of the LogicalProduct.",
-          "type": "string"
-        },
-        "replacement": {
-          "description": "Output only. The resource name of the Logical Entity that the logical product is replaced by. This field is only populated when this logical product is replaced by some other type. Eg: logicalProducts/{logical_product}/variants/{variant}, productSuites/{product_suite}, etc.",
           "type": "string",
-          "readOnly": true
-        },
-        "lifecycleState": {
-          "readOnly": true,
-          "description": "Output only. Current Lifecycle state of the logical product.",
-          "enumDescriptions": [
-            "The default value. This value is used if the lifecycle state is not set.",
-            "The entity is in Public Preview. It is available to all customers, but may not be feature-complete or have full support guarantees.",
-            "The entity is in Private General Availability. It is fully supported and stable, but only available to a select group of customers.",
-            "The entity is Generally Available. It is fully supported, stable, and available to all customers.",
-            "The entity is deprecated. It is no longer recommended for use and may be removed in a future version."
-          ],
-          "type": "string",
-          "enum": [
-            "LIFECYCLE_STATE_UNSPECIFIED",
-            "LIFECYCLE_STATE_PUBLIC_PREVIEW",
-            "LIFECYCLE_STATE_PRIVATE_GA",
-            "LIFECYCLE_STATE_GA",
-            "LIFECYCLE_STATE_DEPRECATED"
-          ]
-        },
-        "variants": {
-          "type": "array",
-          "description": "Output only. Child variant resource references. Format: logicalProducts/{logical_product}/variants/{variant}",
-          "readOnly": true,
-          "items": {
-            "type": "string"
-          }
-        },
-        "replaced": {
-          "type": "boolean",
-          "readOnly": true,
-          "description": "Output only. Indicates whether the logical product has been replaced. If `false`, the product is active. If `true`, the product has been replaced by another type, and the `replacement` field contains the resource name of that replacement."
-        },
-        "name": {
-          "description": "Identifier. The resource name of the LogicalProduct. Format: logicalProducts/{logical_product}.",
-          "type": "string"
-        },
-        "productSuite": {
-          "description": "Product suite associated with the logical product. Format: productSuites/{product_suite}.",
-          "type": "string"
-        }
-      },
-      "description": "Represents an independent service offering that can be provisioned by a customer.",
-      "type": "object"
-    },
-    "ListProductSuitesResponse": {
-      "id": "ListProductSuitesResponse",
-      "properties": {
-        "nextPageToken": {
-          "type": "string",
-          "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages."
-        },
-        "productSuites": {
-          "items": {
-            "$ref": "ProductSuite"
-          },
-          "description": "Matched ProductSuites",
-          "type": "array"
+          "description": "Display name of the LogicalProductVariant."
         }
       },
       "type": "object",
-      "description": "Response message for ListProductSuites."
-    },
-    "ListLogicalProductVariantsResponse": {
-      "id": "ListLogicalProductVariantsResponse",
-      "properties": {
-        "logicalProductVariants": {
-          "description": "Matched LogicalProductVariants",
-          "type": "array",
-          "items": {
-            "$ref": "LogicalProductVariant"
-          }
-        },
-        "nextPageToken": {
-          "description": "A token, which can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages.",
-          "type": "string"
-        }
-      },
-      "description": "Response message for ListLogicalProductVariants.",
-      "type": "object"
+      "description": "Represents a distinct offering derived from a primary product that retains core functionalities but offers specialized features for a specific market segment.",
+      "id": "LogicalProductVariant"
     },
     "ProductSuite": {
-      "id": "ProductSuite",
       "type": "object",
       "description": "Represents a unified grouping of products sharing a common brand and market positioning.",
       "properties": {
-        "replaced": {
-          "readOnly": true,
-          "type": "boolean",
-          "description": "Output only. Indicates whether the product suite has been replaced. If `false`, the product suite is active. If `true`, the product suite has been replaced by another type, and the `replacement` field contains the resource name of that replacement."
-        },
         "logicalProducts": {
-          "type": "array",
-          "description": "Output only. LogicalProducts under this suite. Format: logicalProducts/{logical_product}",
           "items": {
             "type": "string"
           },
-          "readOnly": true
+          "readOnly": true,
+          "type": "array",
+          "description": "Output only. LogicalProducts under this suite. Format: logicalProducts/{logical_product}"
         },
         "title": {
-          "type": "string",
-          "description": "Title of the ProductSuite."
+          "description": "Title of the ProductSuite.",
+          "type": "string"
         },
-        "replacement": {
+        "replaced": {
+          "type": "boolean",
           "readOnly": true,
-          "type": "string",
-          "description": "Output only. The resource name of the Logical Entity that the product suite is replaced by. This field is only populated when this product suite is replaced by some other type. Eg: logicalProducts/{logical_product}, logicalProducts/{logical_product}/variants/{variant}, etc."
+          "description": "Output only. Indicates whether the product suite has been replaced. If `false`, the product suite is active. If `true`, the product suite has been replaced by another type, and the `replacement` field contains the resource name of that replacement."
         },
         "name": {
           "description": "Identifier. The resource name of the ProductSuite. Format: productSuites/{product_suite}",
           "type": "string"
+        },
+        "replacement": {
+          "description": "Output only. The resource name of the Logical Entity that the product suite is replaced by. This field is only populated when this product suite is replaced by some other type. Eg: logicalProducts/{logical_product}, logicalProducts/{logical_product}/variants/{variant}, etc.",
+          "type": "string",
+          "readOnly": true
         }
-      }
+      },
+      "id": "ProductSuite"
+    },
+    "LookupEntityResponse": {
+      "type": "object",
+      "id": "LookupEntityResponse",
+      "properties": {
+        "logicalProduct": {
+          "$ref": "LogicalProduct",
+          "description": "Matched LogicalProduct."
+        },
+        "productSuite": {
+          "$ref": "ProductSuite",
+          "description": "Matched ProductSuite."
+        },
+        "logicalProductVariant": {
+          "description": "Matched LogicalProductVariant.",
+          "$ref": "LogicalProductVariant"
+        }
+      },
+      "description": "Response message for LookupEntity."
     }
   },
-  "version_module": true,
-  "batchPath": "batch",
-  "ownerDomain": "google.com",
-  "servicePath": "",
-  "baseUrl": "https://cloudproductregistry.googleapis.com/",
-  "icons": {
-    "x16": "http://www.google.com/images/icons/product/search-16.gif",
-    "x32": "http://www.google.com/images/icons/product/search-32.gif"
-  },
-  "ownerName": "Google",
-  "canonicalName": "Cloud Product Registry",
+  "discoveryVersion": "v1",
   "resources": {
     "logicalProducts": {
+      "methods": {
+        "lookupEntity": {
+          "parameters": {
+            "lookupUri": {
+              "description": "Required. Entity uri to look up. Supported Formats: logicalProducts/{logical_product} logicalProducts/{logical_product}/variants/{variant} productSuites/{product_suite}",
+              "type": "string",
+              "location": "path",
+              "required": true,
+              "pattern": "^logicalProducts/[^/]+$"
+            }
+          },
+          "parameterOrder": [
+            "lookupUri"
+          ],
+          "path": "v1/{+lookupUri}:lookupEntity",
+          "flatPath": "v1/logicalProducts/{logicalProductsId}:lookupEntity",
+          "description": "Look up entities.",
+          "response": {
+            "$ref": "LookupEntityResponse"
+          },
+          "id": "cloudproductregistry.logicalProducts.lookupEntity",
+          "httpMethod": "GET"
+        },
+        "list": {
+          "flatPath": "v1/logicalProducts",
+          "parameters": {
+            "pageSize": {
+              "description": "Optional. The maximum number of logical products to return. The service may return fewer than this value. If unspecified, at most 100 logical products will be returned. The maximum value is 500; values above 500 will be coerced to 500.",
+              "type": "integer",
+              "location": "query",
+              "format": "int32"
+            },
+            "pageToken": {
+              "description": "Optional. A page token, received from a previous `ListLogicalProducts` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListLogicalProducts` must match the call that provided the page token.",
+              "location": "query",
+              "type": "string"
+            },
+            "filter": {
+              "description": "Optional. The filter expression for listing logical products. Filter syntax: https://google.aip.dev/160 Supported fields: suite_id",
+              "location": "query",
+              "type": "string"
+            }
+          },
+          "id": "cloudproductregistry.logicalProducts.list",
+          "description": "Lists LogicalProducts matching given criteria.",
+          "parameterOrder": [],
+          "response": {
+            "$ref": "ListLogicalProductsResponse"
+          },
+          "path": "v1/logicalProducts",
+          "httpMethod": "GET"
+        },
+        "get": {
+          "response": {
+            "$ref": "LogicalProduct"
+          },
+          "description": "Gets details of a LogicalProduct.",
+          "parameterOrder": [
+            "name"
+          ],
+          "httpMethod": "GET",
+          "id": "cloudproductregistry.logicalProducts.get",
+          "parameters": {
+            "name": {
+              "location": "path",
+              "pattern": "^logicalProducts/[^/]+$",
+              "required": true,
+              "description": "Required. The name of the LogicalProduct to retrieve. Format: logicalProducts/{logical_product}",
+              "type": "string"
+            }
+          },
+          "path": "v1/{+name}",
+          "flatPath": "v1/logicalProducts/{logicalProductsId}"
+        }
+      },
       "resources": {
         "variants": {
           "methods": {
-            "lookupEntity": {
-              "id": "cloudproductregistry.logicalProducts.variants.lookupEntity",
-              "response": {
-                "$ref": "LookupEntityResponse"
-              },
-              "flatPath": "v1/logicalProducts/{logicalProductsId}/variants/{variantsId}:lookupEntity",
-              "description": "Look up entities.",
-              "httpMethod": "GET",
-              "parameters": {
-                "lookupUri": {
-                  "pattern": "^logicalProducts/[^/]+/variants/[^/]+$",
-                  "type": "string",
-                  "description": "Required. Entity uri to look up. Supported Formats: logicalProducts/{logical_product} logicalProducts/{logical_product}/variants/{variant} productSuites/{product_suite}",
-                  "location": "path",
-                  "required": true
-                }
-              },
-              "parameterOrder": [
-                "lookupUri"
-              ],
-              "path": "v1/{+lookupUri}:lookupEntity"
-            },
             "list": {
-              "response": {
-                "$ref": "ListLogicalProductVariantsResponse"
-              },
-              "path": "v1/{+parent}/variants",
               "parameterOrder": [
                 "parent"
               ],
-              "id": "cloudproductregistry.logicalProducts.variants.list",
-              "flatPath": "v1/logicalProducts/{logicalProductsId}/variants",
               "description": "Lists LogicalProductVariants matching given criteria.",
+              "response": {
+                "$ref": "ListLogicalProductVariantsResponse"
+              },
+              "id": "cloudproductregistry.logicalProducts.variants.list",
+              "httpMethod": "GET",
+              "path": "v1/{+parent}/variants",
               "parameters": {
+                "pageToken": {
+                  "type": "string",
+                  "location": "query",
+                  "description": "Optional. A page token, received from a previous `ListLogicalProductVariants` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListLogicalProductVariants` must match the call that provided the page token."
+                },
                 "parent": {
                   "pattern": "^logicalProducts/[^/]+$",
                   "location": "path",
@@ -265,259 +315,208 @@
                   "type": "string",
                   "description": "Required. Parent logical product id. Format: logicalProducts/{logical_product}"
                 },
-                "pageToken": {
-                  "location": "query",
-                  "description": "Optional. A page token, received from a previous `ListLogicalProductVariants` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListLogicalProductVariants` must match the call that provided the page token.",
-                  "type": "string"
-                },
                 "pageSize": {
-                  "location": "query",
-                  "format": "int32",
                   "description": "Optional. The maximum number of logical product variants to return. The service may return fewer than this value. If unspecified, at most 100 logical product variants will be returned. The maximum value is 500; values above 500 will be coerced to 500.",
-                  "type": "integer"
+                  "format": "int32",
+                  "type": "integer",
+                  "location": "query"
                 }
               },
-              "httpMethod": "GET"
+              "flatPath": "v1/logicalProducts/{logicalProductsId}/variants"
             },
             "get": {
-              "response": {
-                "$ref": "LogicalProductVariant"
-              },
-              "description": "Get details of a LogicalProductVariant.",
+              "flatPath": "v1/logicalProducts/{logicalProductsId}/variants/{variantsId}",
               "parameters": {
                 "name": {
-                  "type": "string",
                   "location": "path",
                   "required": true,
-                  "description": "Required. The name of the LogicalProductVariant to retrieve. Format: logicalProducts/{logical_product}/variants/{variant}",
-                  "pattern": "^logicalProducts/[^/]+/variants/[^/]+$"
+                  "type": "string",
+                  "pattern": "^logicalProducts/[^/]+/variants/[^/]+$",
+                  "description": "Required. The name of the LogicalProductVariant to retrieve. Format: logicalProducts/{logical_product}/variants/{variant}"
                 }
               },
-              "id": "cloudproductregistry.logicalProducts.variants.get",
               "parameterOrder": [
                 "name"
               ],
+              "path": "v1/{+name}",
+              "id": "cloudproductregistry.logicalProducts.variants.get",
               "httpMethod": "GET",
-              "flatPath": "v1/logicalProducts/{logicalProductsId}/variants/{variantsId}",
-              "path": "v1/{+name}"
+              "response": {
+                "$ref": "LogicalProductVariant"
+              },
+              "description": "Get details of a LogicalProductVariant."
+            },
+            "lookupEntity": {
+              "parameters": {
+                "lookupUri": {
+                  "required": true,
+                  "location": "path",
+                  "description": "Required. Entity uri to look up. Supported Formats: logicalProducts/{logical_product} logicalProducts/{logical_product}/variants/{variant} productSuites/{product_suite}",
+                  "pattern": "^logicalProducts/[^/]+/variants/[^/]+$",
+                  "type": "string"
+                }
+              },
+              "id": "cloudproductregistry.logicalProducts.variants.lookupEntity",
+              "flatPath": "v1/logicalProducts/{logicalProductsId}/variants/{variantsId}:lookupEntity",
+              "parameterOrder": [
+                "lookupUri"
+              ],
+              "description": "Look up entities.",
+              "response": {
+                "$ref": "LookupEntityResponse"
+              },
+              "path": "v1/{+lookupUri}:lookupEntity",
+              "httpMethod": "GET"
             }
           }
-        }
-      },
-      "methods": {
-        "list": {
-          "id": "cloudproductregistry.logicalProducts.list",
-          "response": {
-            "$ref": "ListLogicalProductsResponse"
-          },
-          "description": "Lists LogicalProducts matching given criteria.",
-          "flatPath": "v1/logicalProducts",
-          "path": "v1/logicalProducts",
-          "parameterOrder": [],
-          "parameters": {
-            "filter": {
-              "description": "Optional. The filter expression for listing logical products. Filter syntax: https://google.aip.dev/160 Supported fields: suite_id",
-              "location": "query",
-              "type": "string"
-            },
-            "pageSize": {
-              "location": "query",
-              "type": "integer",
-              "format": "int32",
-              "description": "Optional. The maximum number of logical products to return. The service may return fewer than this value. If unspecified, at most 100 logical products will be returned. The maximum value is 500; values above 500 will be coerced to 500."
-            },
-            "pageToken": {
-              "type": "string",
-              "location": "query",
-              "description": "Optional. A page token, received from a previous `ListLogicalProducts` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListLogicalProducts` must match the call that provided the page token."
-            }
-          },
-          "httpMethod": "GET"
-        },
-        "get": {
-          "httpMethod": "GET",
-          "id": "cloudproductregistry.logicalProducts.get",
-          "description": "Gets details of a LogicalProduct.",
-          "parameterOrder": [
-            "name"
-          ],
-          "parameters": {
-            "name": {
-              "location": "path",
-              "required": true,
-              "type": "string",
-              "pattern": "^logicalProducts/[^/]+$",
-              "description": "Required. The name of the LogicalProduct to retrieve. Format: logicalProducts/{logical_product}"
-            }
-          },
-          "response": {
-            "$ref": "LogicalProduct"
-          },
-          "path": "v1/{+name}",
-          "flatPath": "v1/logicalProducts/{logicalProductsId}"
-        },
-        "lookupEntity": {
-          "parameterOrder": [
-            "lookupUri"
-          ],
-          "flatPath": "v1/logicalProducts/{logicalProductsId}:lookupEntity",
-          "path": "v1/{+lookupUri}:lookupEntity",
-          "response": {
-            "$ref": "LookupEntityResponse"
-          },
-          "id": "cloudproductregistry.logicalProducts.lookupEntity",
-          "httpMethod": "GET",
-          "parameters": {
-            "lookupUri": {
-              "pattern": "^logicalProducts/[^/]+$",
-              "description": "Required. Entity uri to look up. Supported Formats: logicalProducts/{logical_product} logicalProducts/{logical_product}/variants/{variant} productSuites/{product_suite}",
-              "type": "string",
-              "location": "path",
-              "required": true
-            }
-          },
-          "description": "Look up entities."
         }
       }
     },
     "productSuites": {
       "methods": {
-        "get": {
-          "description": "Get details of a ProductSuite.",
-          "flatPath": "v1/productSuites/{productSuitesId}",
-          "parameterOrder": [
-            "name"
-          ],
-          "parameters": {
-            "name": {
-              "location": "path",
-              "required": true,
-              "type": "string",
-              "pattern": "^productSuites/[^/]+$",
-              "description": "Required. The name of the ProductSuite to retrieve. Format: productSuites/{product_suite}"
-            }
-          },
-          "id": "cloudproductregistry.productSuites.get",
-          "path": "v1/{+name}",
-          "httpMethod": "GET",
-          "response": {
-            "$ref": "ProductSuite"
-          }
-        },
         "lookupEntity": {
-          "description": "Look up entities.",
-          "httpMethod": "GET",
-          "response": {
-            "$ref": "LookupEntityResponse"
-          },
           "parameterOrder": [
             "lookupUri"
           ],
+          "description": "Look up entities.",
+          "response": {
+            "$ref": "LookupEntityResponse"
+          },
+          "httpMethod": "GET",
+          "id": "cloudproductregistry.productSuites.lookupEntity",
           "path": "v1/{+lookupUri}:lookupEntity",
           "flatPath": "v1/productSuites/{productSuitesId}:lookupEntity",
           "parameters": {
             "lookupUri": {
+              "pattern": "^productSuites/[^/]+$",
               "description": "Required. Entity uri to look up. Supported Formats: logicalProducts/{logical_product} logicalProducts/{logical_product}/variants/{variant} productSuites/{product_suite}",
-              "type": "string",
-              "location": "path",
               "required": true,
-              "pattern": "^productSuites/[^/]+$"
+              "type": "string",
+              "location": "path"
+            }
+          }
+        },
+        "get": {
+          "flatPath": "v1/productSuites/{productSuitesId}",
+          "parameterOrder": [
+            "name"
+          ],
+          "description": "Get details of a ProductSuite.",
+          "path": "v1/{+name}",
+          "parameters": {
+            "name": {
+              "required": true,
+              "location": "path",
+              "description": "Required. The name of the ProductSuite to retrieve. Format: productSuites/{product_suite}",
+              "pattern": "^productSuites/[^/]+$",
+              "type": "string"
             }
           },
-          "id": "cloudproductregistry.productSuites.lookupEntity"
+          "httpMethod": "GET",
+          "response": {
+            "$ref": "ProductSuite"
+          },
+          "id": "cloudproductregistry.productSuites.get"
         },
         "list": {
+          "httpMethod": "GET",
+          "description": "Lists ProductSuites.",
+          "path": "v1/productSuites",
           "response": {
             "$ref": "ListProductSuitesResponse"
           },
-          "httpMethod": "GET",
+          "id": "cloudproductregistry.productSuites.list",
+          "flatPath": "v1/productSuites",
+          "parameterOrder": [],
           "parameters": {
             "pageSize": {
+              "format": "int32",
               "type": "integer",
               "description": "Optional. The maximum number of suites to return. The service may return fewer than this value. If unspecified, at most 100 suites will be returned. The maximum value is 500; values above 500 will be coerced to 500.",
-              "location": "query",
-              "format": "int32"
+              "location": "query"
             },
             "pageToken": {
               "location": "query",
-              "type": "string",
-              "description": "Optional. A page token, received from a previous `ListProductSuites` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListProductSuites` must match the call that provided the page token."
+              "description": "Optional. A page token, received from a previous `ListProductSuites` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListProductSuites` must match the call that provided the page token.",
+              "type": "string"
             }
-          },
-          "flatPath": "v1/productSuites",
-          "id": "cloudproductregistry.productSuites.list",
-          "path": "v1/productSuites",
-          "parameterOrder": [],
-          "description": "Lists ProductSuites."
+          }
         }
       }
     }
   },
-  "revision": "20260827",
-  "name": "cloudproductregistry",
-  "id": "cloudproductregistry:v1",
-  "discoveryVersion": "v1",
-  "mtlsRootUrl": "https://cloudproductregistry.mtls.googleapis.com/",
-  "documentationLink": "https://docs.cloud.google.com/product-registry",
-  "description": "Cloud Product Registry API provides capabilities to access all first Google Cloud products.",
-  "kind": "discovery#restDescription",
   "title": "Cloud Product Registry API",
+  "basePath": "",
+  "rootUrl": "https://cloudproductregistry.googleapis.com/",
+  "description": "Cloud Product Registry API provides capabilities to access all first Google Cloud products.",
+  "version_module": true,
+  "canonicalName": "Cloud Product Registry",
+  "version": "v1",
   "parameters": {
-    "key": {
-      "location": "query",
-      "type": "string",
-      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token."
-    },
-    "uploadType": {
-      "location": "query",
-      "type": "string",
-      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\")."
-    },
-    "prettyPrint": {
-      "default": "true",
-      "location": "query",
-      "type": "boolean",
-      "description": "Returns response with indentations and line breaks."
-    },
-    "fields": {
-      "description": "Selector specifying which fields to include in a partial response.",
-      "location": "query",
-      "type": "string"
-    },
-    "callback": {
-      "location": "query",
-      "type": "string",
-      "description": "JSONP"
-    },
-    "quotaUser": {
-      "location": "query",
-      "type": "string",
-      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters."
-    },
     "upload_protocol": {
       "type": "string",
       "location": "query",
       "description": "Upload protocol for media (e.g. \"raw\", \"multipart\")."
     },
-    "alt": {
+    "fields": {
+      "type": "string",
       "location": "query",
-      "description": "Data format for response.",
-      "default": "json",
+      "description": "Selector specifying which fields to include in a partial response."
+    },
+    "oauth_token": {
+      "description": "OAuth 2.0 token for the current user.",
+      "type": "string",
+      "location": "query"
+    },
+    "alt": {
       "type": "string",
       "enum": [
         "json",
         "media",
         "proto"
       ],
+      "description": "Data format for response.",
+      "default": "json",
       "enumDescriptions": [
         "Responses with Content-Type of application/json",
         "Media download with context-dependent Content-Type",
         "Responses with Content-Type of application/x-protobuf"
-      ]
+      ],
+      "location": "query"
     },
-    "$.xgafv": {
+    "quotaUser": {
       "location": "query",
       "type": "string",
+      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters."
+    },
+    "callback": {
+      "description": "JSONP",
+      "location": "query",
+      "type": "string"
+    },
+    "access_token": {
+      "location": "query",
+      "type": "string",
+      "description": "OAuth access token."
+    },
+    "key": {
+      "type": "string",
+      "location": "query",
+      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token."
+    },
+    "prettyPrint": {
+      "description": "Returns response with indentations and line breaks.",
+      "location": "query",
+      "type": "boolean",
+      "default": "true"
+    },
+    "uploadType": {
+      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
+      "type": "string",
+      "location": "query"
+    },
+    "$.xgafv": {
+      "description": "V1 error format.",
       "enum": [
         "1",
         "2"
@@ -526,21 +525,22 @@
         "v1 error format",
         "v2 error format"
       ],
-      "description": "V1 error format."
-    },
-    "oauth_token": {
-      "description": "OAuth 2.0 token for the current user.",
       "location": "query",
       "type": "string"
-    },
-    "access_token": {
-      "location": "query",
-      "type": "string",
-      "description": "OAuth access token."
     }
   },
+  "ownerName": "Google",
   "fullyEncodeReservedExpansion": true,
-  "basePath": "",
-  "version": "v1",
-  "protocol": "rest"
+  "baseUrl": "https://cloudproductregistry.googleapis.com/",
+  "id": "cloudproductregistry:v1",
+  "name": "cloudproductregistry",
+  "mtlsRootUrl": "https://cloudproductregistry.mtls.googleapis.com/",
+  "ownerDomain": "google.com",
+  "servicePath": "",
+  "revision": "20260903",
+  "kind": "discovery#restDescription",
+  "icons": {
+    "x16": "http://www.google.com/images/icons/product/search-16.gif",
+    "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  }
 }
