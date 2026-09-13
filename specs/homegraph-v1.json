@@ -1,65 +1,538 @@
 {
-  "ownerName": "Google",
-  "icons": {
-    "x16": "http://www.google.com/images/icons/product/search-16.gif",
-    "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  "auth": {
+    "oauth2": {
+      "scopes": {
+        "https://www.googleapis.com/auth/homegraph": {
+          "description": "Private Service: https://www.googleapis.com/auth/homegraph"
+        }
+      }
+    }
   },
+  "rootUrl": "https://homegraph.googleapis.com/",
   "kind": "discovery#restDescription",
   "basePath": "",
-  "batchPath": "batch",
+  "discoveryVersion": "v1",
+  "baseUrl": "https://homegraph.googleapis.com/",
   "schemas": {
-    "CommonEventDataStruct": {
+    "StructurePresenceStateChangeEvent": {
+      "id": "StructurePresenceStateChangeEvent",
       "type": "object",
       "properties": {
-        "trackId": {
-          "description": "Id of the track this object belongs to",
-          "type": "string"
+        "reason": {
+          "$ref": "StructurePresenceStateChangeReasonStruct",
+          "description": "Optional. Specifies the presence state change reason."
         },
-        "mediaUrls": {
-          "$ref": "MediaUrlsStruct",
-          "description": "Contains media urls for the event"
-        },
-        "sessionId": {
-          "description": "Camera event session id. Used for identifying a unique event session",
+        "presenceState": {
+          "enum": [
+            "STRUCTURE_PRESENCE_STATE_ENUM_UNSPECIFIED",
+            "HOME",
+            "AWAY"
+          ],
+          "enumDescriptions": [
+            "Indicates an unknown presence state.",
+            "Indicates home presence state.",
+            "Indicates away presence state."
+          ],
+          "description": "Required. Specifies the presence state.",
           "type": "string"
         }
       },
-      "description": "Common camera event data.",
-      "id": "CommonEventDataStruct"
+      "description": "Sent when the structure presence state changes."
     },
-    "Empty": {
-      "type": "object",
-      "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
-      "properties": {},
-      "id": "Empty"
-    },
-    "TraitData": {
-      "description": "Contains the trait payload for a single trait.",
-      "id": "TraitData",
-      "type": "object",
+    "SyncResponsePayload": {
       "properties": {
-        "commitTime": {
-          "description": "Other metadata for the trait. The time the client update was committed in the server.",
-          "format": "google-datetime",
+        "agentUserId": {
+          "description": "Third-party user ID",
           "type": "string"
         },
-        "providerUpdateTime": {
-          "description": "The custom timestamp supplied by the provider during a ReportStateAndNotification update (if provided). This field is returned as part of the `QueryResponse`.",
+        "devices": {
+          "items": {
+            "$ref": "Device"
+          },
+          "type": "array",
+          "description": "Devices associated with the third-party user."
+        }
+      },
+      "description": "Payload containing device information.",
+      "id": "SyncResponsePayload",
+      "type": "object"
+    },
+    "Empty": {
+      "description": "A generic empty message that you can re-use to avoid defining duplicated empty messages in your APIs. A typical example is to use it as the request or the response type of an API method. For instance: service Foo { rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty); }",
+      "properties": {},
+      "id": "Empty",
+      "type": "object"
+    },
+    "ZoneStruct": {
+      "properties": {
+        "zoneId": {
           "type": "string",
-          "format": "google-datetime"
+          "format": "int64",
+          "description": "Id of the zone"
         },
-        "trait": {
-          "description": "The Provider Home API trait payload.",
+        "label": {
+          "description": "Name of the zone.",
+          "type": "string"
+        }
+      },
+      "type": "object",
+      "id": "ZoneStruct"
+    },
+    "ReportStateAndNotificationRequest": {
+      "description": "Request type for the [`ReportStateAndNotification`](#google.home.graph.v1.HomeGraphApiService.ReportStateAndNotification) call. It may include states, notifications, home_traits, home_events, or any combination thereof. Smart Home Device Traits (SHDT) `states` and `notifications` are defined per `device_id` (for example, \"123\" and \"456\" in the following example). Google Home Traits `home_traits` and `home_events` are lists of updates or events, each associated with a `device_id` (for example, \"789\" in the following example). Example: ```json { \"requestId\": \"ff36a3cc-ec34-11e6-b1a0-64510650abcf\", \"agentUserId\": \"1234\", \"payload\": { \"devices\": { \"states\": { \"123\": { \"on\": true }, \"456\": { \"on\": true, \"brightness\": 10 }, }, \"homeTraits\": [ { \"deviceId\": \"789\", \"components\": [ { \"componentId\": \"main\", \"traitData\": [ { \"trait\": { \"@type\": \"type.googleapis.com/home.graph.v1.OnOffTrait\", \"onOff\": true } } ] } ] } ], \"homeEvents\": [ { \"deviceId\": \"789\", \"events\": [ { \"componentId\": \"main\", \"events\": [ { \"eventId\": \"event-123\", \"eventTime\": \"2026-01-01T00:00:00Z\", \"event\": { \"@type\": \"type.googleapis.com/home.graph.v1.DoorbellPressTrait.DoorbellPressedEvent\" } } ] } ] } ] } } } ```",
+      "id": "ReportStateAndNotificationRequest",
+      "properties": {
+        "requestId": {
+          "description": "Request ID used for debugging.",
+          "type": "string"
+        },
+        "agentUserId": {
+          "type": "string",
+          "description": "Required. Third-party user ID."
+        },
+        "payload": {
+          "description": "Required. State of devices to update and notification metadata for devices.",
+          "$ref": "StateAndNotificationPayload"
+        },
+        "followUpToken": {
+          "type": "string",
+          "deprecated": true,
+          "description": "Deprecated."
+        },
+        "eventId": {
+          "description": "Unique identifier per event (for example, a doorbell press).",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "EventData": {
+      "description": "Contains the details for a single event.",
+      "id": "EventData",
+      "properties": {
+        "eventTime": {
+          "format": "google-datetime",
+          "description": "Required. The timestamp of the event.",
+          "type": "string"
+        },
+        "event": {
           "additionalProperties": {
             "type": "any",
             "description": "Properties of the object. Contains field @type with type URL."
           },
+          "description": "Required. The actual event payload.",
           "type": "object"
+        },
+        "eventId": {
+          "type": "string",
+          "description": "Required. The unique event ID from the device provider."
+        }
+      },
+      "type": "object"
+    },
+    "DeviceNames": {
+      "id": "DeviceNames",
+      "type": "object",
+      "properties": {
+        "nicknames": {
+          "items": {
+            "type": "string"
+          },
+          "description": "Additional names provided by the user for the device.",
+          "type": "array"
+        },
+        "name": {
+          "description": "Primary name of the device, generally provided by the user. Names will be truncated if over the 60 Unicode code point (character) limit and no errors will be thrown. Developers are responsible for handling long names.",
+          "type": "string"
+        },
+        "defaultNames": {
+          "description": "List of names provided by the manufacturer rather than the user, such as serial numbers, SKUs, etc.",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "description": "Identifiers used to describe the device."
+    },
+    "UserBlameStruct": {
+      "properties": {
+        "blameType": {
+          "type": "string",
+          "enumDescriptions": [
+            "Indicates an unspecified user blame type.",
+            "Indicates phone location.",
+            "Indicates manual change."
+          ],
+          "description": "Required. Specifies the user blame type.",
+          "enum": [
+            "USER_BLAME_TYPE_ENUM_UNSPECIFIED",
+            "PHONE_LOCATION",
+            "MANUAL_CHANGE"
+          ]
+        },
+        "userEmail": {
+          "type": "string",
+          "description": "Required. Specifies the email of the user."
+        }
+      },
+      "description": "Contains metadata about the cause of presence state change attributed to a user.",
+      "id": "UserBlameStruct",
+      "type": "object"
+    },
+    "ComponentTraitUpdates": {
+      "properties": {
+        "traitData": {
+          "type": "array",
+          "items": {
+            "$ref": "TraitData"
+          },
+          "description": "Required. The updated trait data for the component."
+        },
+        "componentId": {
+          "type": "string",
+          "description": "Required. ID of the component from the device provider."
+        }
+      },
+      "type": "object",
+      "id": "ComponentTraitUpdates",
+      "description": "Contains the set of updates for a component."
+    },
+    "SyncResponse": {
+      "properties": {
+        "requestId": {
+          "description": "Request ID used for debugging. Copied from the request.",
+          "type": "string"
+        },
+        "payload": {
+          "description": "Devices associated with the third-party user.",
+          "$ref": "SyncResponsePayload"
+        }
+      },
+      "description": "Response type for the [`Sync`](#google.home.graph.v1.HomeGraphApiService.Sync) call. This should follow the same format as the Google smart home `action.devices.SYNC` [response](https://developers.home.google.com/cloud-to-cloud/intents/sync). Example: ```json { \"requestId\": \"ff36a3cc-ec34-11e6-b1a0-64510650abcf\", \"payload\": { \"agentUserId\": \"1836.15267389\", \"devices\": [{ \"id\": \"123\", \"type\": \"action.devices.types.OUTLET\", \"traits\": [ \"action.devices.traits.OnOff\" ], \"name\": { \"defaultNames\": [\"My Outlet 1234\"], \"name\": \"Night light\", \"nicknames\": [\"wall plug\"] }, \"willReportState\": false, \"deviceInfo\": { \"manufacturer\": \"lights-out-inc\", \"model\": \"hs1234\", \"hwVersion\": \"3.2\", \"swVersion\": \"11.4\" }, \"customData\": { \"fooValue\": 74, \"barValue\": true, \"bazValue\": \"foo\" } }] } } ```",
+      "id": "SyncResponse",
+      "type": "object"
+    },
+    "RequestSyncDevicesResponse": {
+      "id": "RequestSyncDevicesResponse",
+      "type": "object",
+      "description": "Response type for the [`RequestSyncDevices`](#google.home.graph.v1.HomeGraphApiService.RequestSyncDevices) call. Intentionally empty upon success. An HTTP response code is returned with more details upon failure.",
+      "properties": {}
+    },
+    "QueryRequestPayload": {
+      "properties": {
+        "devices": {
+          "items": {
+            "$ref": "AgentDeviceId"
+          },
+          "type": "array",
+          "description": "Third-party device IDs for which to get the device states."
+        }
+      },
+      "description": "Payload containing device IDs.",
+      "id": "QueryRequestPayload",
+      "type": "object"
+    },
+    "MediaUrlsStruct": {
+      "id": "MediaUrlsStruct",
+      "properties": {
+        "previewUrl": {
+          "description": "URL for animated preview clip representing the event session",
+          "type": "string"
+        },
+        "thumbnailUrl": {
+          "description": "URL for thumbnail image representing the event session",
+          "type": "string"
+        },
+        "dashManifestUrl": {
+          "description": "URL for a dash manifest for playback",
+          "type": "string"
+        },
+        "hlsMasterPlaylistUrl": {
+          "type": "string",
+          "description": "URL for a hls master playlist for playback"
+        }
+      },
+      "type": "object"
+    },
+    "QueryRequestInput": {
+      "id": "QueryRequestInput",
+      "type": "object",
+      "properties": {
+        "payload": {
+          "$ref": "QueryRequestPayload",
+          "description": "Payload containing third-party device IDs."
+        }
+      },
+      "description": "Device ID inputs to QueryRequest."
+    },
+    "AgentDeviceId": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "description": "Third-party device ID.",
+          "type": "string"
+        }
+      },
+      "id": "AgentDeviceId",
+      "description": "Third-party device ID for one device."
+    },
+    "QueryResponsePayload": {
+      "type": "object",
+      "properties": {
+        "deviceMetadata": {
+          "description": "Map from the Trait ID (e.g., \"action.devices.traits.OnOff\") to its last Spanner commit timestamp. If a trait has no recorded timestamp, it will be omitted from this map.",
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "DeviceMetadata"
+          }
+        },
+        "devices": {
+          "additionalProperties": {
+            "additionalProperties": {
+              "type": "any",
+              "description": "Properties of the object."
+            },
+            "type": "object"
+          },
+          "description": "States of the devices. Map of third-party device ID to struct of device states.",
+          "type": "object"
+        },
+        "homeTraitPayload": {
+          "type": "object",
+          "description": "Map of device IDs to their Unified Device Data Model (UDDM) trait payloads. This field is populated when `device_view` is set to HOME_TRAIT_ONLY or HOME_TRAIT_AND_SMART_HOME_TRAIT.",
+          "additionalProperties": {
+            "$ref": "HomeTraitPayload"
+          }
+        }
+      },
+      "id": "QueryResponsePayload",
+      "description": "Payload containing device states information."
+    },
+    "RequestSyncDevicesRequest": {
+      "description": "Request type for the [`RequestSyncDevices`](#google.home.graph.v1.HomeGraphApiService.RequestSyncDevices) call.",
+      "id": "RequestSyncDevicesRequest",
+      "type": "object",
+      "properties": {
+        "agentUserId": {
+          "type": "string",
+          "description": "Required. Third-party user ID."
+        },
+        "async": {
+          "description": "Optional. If set, the request will be added to a queue and a response will be returned immediately. This enables concurrent requests for the given `agent_user_id`, but the caller will not receive any error responses.",
+          "type": "boolean"
+        }
+      }
+    },
+    "Result": {
+      "type": "object",
+      "description": "Result of reporting state and notifications for a single device.",
+      "id": "Result",
+      "properties": {
+        "homeTraitCommitTime": {
+          "format": "google-datetime",
+          "type": "string",
+          "description": "The trait commit timestamp of the state update in Home Graph."
+        }
+      }
+    },
+    "HomeTraitPayload": {
+      "id": "HomeTraitPayload",
+      "type": "object",
+      "properties": {
+        "rootComponent": {
+          "$ref": "Component",
+          "description": "The root component of the device as reported by the provider."
+        }
+      },
+      "description": "Container for UDDM trait data associated with a device."
+    },
+    "QueryRequest": {
+      "description": "Request type for the [`Query`](#google.home.graph.v1.HomeGraphApiService.Query) call.",
+      "id": "QueryRequest",
+      "type": "object",
+      "properties": {
+        "inputs": {
+          "type": "array",
+          "description": "Required. Inputs containing third-party device IDs for which to get the device states.",
+          "items": {
+            "$ref": "QueryRequestInput"
+          }
+        },
+        "includeDeviceMetadata": {
+          "description": "Optional. If true, the response will include device metadata in the device_metadata field.",
+          "type": "boolean"
+        },
+        "requestId": {
+          "description": "Request ID used for debugging.",
+          "type": "string"
+        },
+        "agentUserId": {
+          "type": "string",
+          "description": "Required. Third-party user ID."
+        },
+        "deviceView": {
+          "enum": [
+            "DEVICE_VIEW_UNSPECIFIED",
+            "SMART_HOME_TRAIT_ONLY",
+            "HOME_TRAIT_ONLY",
+            "HOME_TRAIT_AND_SMART_HOME_TRAIT"
+          ],
+          "enumDescriptions": [
+            "Default value. Equivalent to SMART_HOME_TRAIT_ONLY.",
+            "Return only standard Smart Home traits in the `devices` map.",
+            "Return only Unified Device Data Model (UDDM) traits in the `home_trait_payload` map.",
+            "Return both standard Smart Home traits and UDDM traits."
+          ],
+          "type": "string",
+          "description": "Optional. Specifies the type of device data to be returned in the response. This allows callers to request traditional Smart Home traits, Unified Device Data Model (UDDM) traits, or both. If unspecified, defaults to SMART_HOME_TRAIT_ONLY."
+        }
+      }
+    },
+    "StateAndNotificationPayload": {
+      "type": "object",
+      "id": "StateAndNotificationPayload",
+      "properties": {
+        "devices": {
+          "$ref": "ReportStateAndNotificationDevice",
+          "description": "The devices for updating state and sending notifications."
+        }
+      },
+      "description": "Payload containing the state and notification information for devices."
+    },
+    "SyncRequest": {
+      "description": "Request type for the [`Sync`](#google.home.graph.v1.HomeGraphApiService.Sync) call.",
+      "properties": {
+        "requestId": {
+          "description": "Request ID used for debugging.",
+          "type": "string"
+        },
+        "agentUserId": {
+          "description": "Required. Third-party user ID.",
+          "type": "string"
+        }
+      },
+      "id": "SyncRequest",
+      "type": "object"
+    },
+    "Device": {
+      "description": "Third-party device definition.",
+      "type": "object",
+      "properties": {
+        "deviceInfo": {
+          "$ref": "DeviceInfo",
+          "description": "Device manufacturer, model, hardware version, and software version."
+        },
+        "willReportState": {
+          "type": "boolean",
+          "description": "Indicates whether your smart home Action will report state of this device to Google via ReportStateAndNotification."
+        },
+        "customData": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "any",
+            "description": "Properties of the object."
+          },
+          "description": "Custom device attributes stored in Home Graph and provided to your smart home Action in each [QUERY](https://developers.home.google.com/cloud-to-cloud/intents/query) and [EXECUTE](https://developers.home.google.com/cloud-to-cloud/intents/execute) intent. Data in this object has a few constraints: No sensitive information, including but not limited to Personally Identifiable Information."
+        },
+        "attributes": {
+          "additionalProperties": {
+            "description": "Properties of the object.",
+            "type": "any"
+          },
+          "description": "Attributes for the traits supported by the device.",
+          "type": "object"
+        },
+        "traits": {
+          "type": "array",
+          "description": "Traits supported by the device. See [device traits](https://developers.home.google.com/cloud-to-cloud/traits).",
+          "items": {
+            "type": "string"
+          }
+        },
+        "roomHint": {
+          "description": "Suggested name for the room where this device is installed. Google attempts to use this value during user setup.",
+          "type": "string"
+        },
+        "otherDeviceIds": {
+          "items": {
+            "$ref": "AgentOtherDeviceId"
+          },
+          "description": "Alternate IDs associated with this device. This is used to identify cloud synced devices enabled for [local fulfillment](https://developers.home.google.com/local-home/overview).",
+          "type": "array"
+        },
+        "notificationSupportedByAgent": {
+          "description": "Indicates whether your smart home Action will report notifications to Google for this device via ReportStateAndNotification. If your smart home Action enables users to control device notifications, you should update this field and call RequestSyncDevices.",
+          "type": "boolean"
+        },
+        "structureHint": {
+          "description": "Suggested name for the structure where this device is installed. Google attempts to use this value during user setup.",
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "description": "Third-party device ID."
+        },
+        "name": {
+          "$ref": "DeviceNames",
+          "description": "Names given to this device by your smart home Action."
+        },
+        "type": {
+          "description": "Hardware type of the device. See [device types](https://developers.home.google.com/cloud-to-cloud/guides).",
+          "type": "string"
+        }
+      },
+      "id": "Device"
+    },
+    "StructurePresenceStateChangeReasonStruct": {
+      "id": "StructurePresenceStateChangeReasonStruct",
+      "type": "object",
+      "description": "Contains the metadata about the cause of the structure presence state change.",
+      "properties": {
+        "userBlame": {
+          "$ref": "UserBlameStruct",
+          "description": "Optional. Contains metadata about the cause of presence state change attributed to a user."
+        },
+        "deviceBlame": {
+          "description": "Optional. Contains metadata about the cause of presence state change attributed to a device.",
+          "$ref": "DeviceBlameStruct"
+        }
+      }
+    },
+    "Component": {
+      "type": "object",
+      "description": "Component of a provider device.",
+      "id": "Component",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Required. ID of the component from the device provider."
+        },
+        "childComponents": {
+          "type": "array",
+          "description": "Optional. Child components.",
+          "items": {
+            "$ref": "Component"
+          }
+        },
+        "traitData": {
+          "type": "array",
+          "description": "Required. List of trait data associated with the component.",
+          "items": {
+            "$ref": "TraitData"
+          }
+        },
+        "deviceTypes": {
+          "description": "Required. List of Device types associated with this component. Supported device types are defined in cs//depot/google3/home/homeservicelayer/uddm/types/uddm_device_types.proto and the type string is the enum name, for example: ON_OFF_LIGHT => \"ON_OFF_LIGHT\".",
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       }
     },
     "QueryResponse": {
-      "id": "QueryResponse",
+      "type": "object",
       "properties": {
         "requestId": {
           "description": "Request ID used for debugging. Copied from the request.",
@@ -70,533 +543,194 @@
           "$ref": "QueryResponsePayload"
         }
       },
-      "type": "object",
+      "id": "QueryResponse",
       "description": "Response type for the [`Query`](#google.home.graph.v1.HomeGraphApiService.Query) call. This should follow the same format as the Google smart home `action.devices.QUERY` [response](https://developers.home.google.com/cloud-to-cloud/intents/query). Example: ```json { \"requestId\": \"ff36a3cc-ec34-11e6-b1a0-64510650abcf\", \"payload\": { \"devices\": { \"123\": { \"on\": true, \"online\": true }, \"456\": { \"on\": true, \"online\": true, \"brightness\": 80, \"color\": { \"name\": \"cerulean\", \"spectrumRGB\": 31655 } } } } } ```"
     },
-    "HomeTraitPayload": {
-      "type": "object",
-      "description": "Container for UDDM trait data associated with a device.",
-      "id": "HomeTraitPayload",
+    "PersonEvent": {
+      "description": "Represents a newly detected person event.",
       "properties": {
-        "rootComponent": {
-          "description": "The root component of the device as reported by the provider.",
-          "$ref": "Component"
-        }
-      }
-    },
-    "MotionEvent": {
-      "id": "MotionEvent",
-      "type": "object",
-      "properties": {
+        "commonEventData": {
+          "$ref": "CommonEventDataStruct"
+        },
         "zones": {
-          "description": "Zones where events are detected in.",
           "type": "array",
           "items": {
             "$ref": "ZoneStruct"
-          }
+          },
+          "description": "Zones where events are detected in."
         },
         "zonesIsEmpty": {
-          "type": "boolean",
-          "description": "If set, zones is an empty list."
-        },
-        "commonEventData": {
-          "$ref": "CommonEventDataStruct"
+          "description": "If set, zones is an empty list.",
+          "type": "boolean"
         }
       },
-      "description": "Represents a newly detected motion event."
+      "type": "object",
+      "id": "PersonEvent"
     },
-    "Events": {
-      "description": "Contains a set of events for a specific component.",
-      "id": "Events",
+    "ReportStateAndNotificationDevice": {
+      "description": "The states and notifications specific to a device.",
       "type": "object",
       "properties": {
-        "componentId": {
-          "description": "Optional. The ID of the provider component if the events are associated with a specific component. Optional for WHDM events, required for UDDM events.",
-          "type": "string"
-        },
-        "events": {
-          "items": {
-            "$ref": "EventData"
+        "states": {
+          "additionalProperties": {
+            "type": "any",
+            "description": "Properties of the object."
           },
-          "description": "Required. List of events associated with the component.",
-          "type": "array"
-        }
-      }
-    },
-    "HomeTraitUpdates": {
-      "id": "HomeTraitUpdates",
-      "type": "object",
-      "properties": {
-        "components": {
-          "description": "Required. Trait updates for each component.",
+          "type": "object",
+          "description": "States of devices to update. See the **Device STATES** section of the individual trait [reference guides](https://developers.home.google.com/cloud-to-cloud/traits)."
+        },
+        "homeTraits": {
+          "type": "array",
+          "description": "Optional. UDDM/WHDM trait updates.",
           "items": {
-            "$ref": "ComponentTraitUpdates"
+            "$ref": "HomeTraitUpdates"
+          }
+        },
+        "homeEvents": {
+          "type": "array",
+          "items": {
+            "$ref": "HomeEvents"
           },
-          "type": "array"
+          "description": "Optional. UDDM/WHDM trait events"
         },
-        "deviceId": {
-          "description": "Required. Unique identifier for the device.",
-          "type": "string"
+        "notifications": {
+          "type": "object",
+          "additionalProperties": {
+            "description": "Properties of the object.",
+            "type": "any"
+          },
+          "description": "Notifications metadata for devices. See the **Device NOTIFICATIONS** section of the individual trait [reference guides](https://developers.home.google.com/cloud-to-cloud/traits)."
         }
       },
-      "description": "Contains the set of updates for a device."
-    },
-    "UserBlameStruct": {
-      "properties": {
-        "blameType": {
-          "enum": [
-            "USER_BLAME_TYPE_ENUM_UNSPECIFIED",
-            "PHONE_LOCATION",
-            "MANUAL_CHANGE"
-          ],
-          "description": "Required. Specifies the user blame type.",
-          "enumDescriptions": [
-            "Indicates an unspecified user blame type.",
-            "Indicates phone location.",
-            "Indicates manual change."
-          ],
-          "type": "string"
-        },
-        "userEmail": {
-          "description": "Required. Specifies the email of the user.",
-          "type": "string"
-        }
-      },
-      "id": "UserBlameStruct",
-      "type": "object",
-      "description": "Contains metadata about the cause of presence state change attributed to a user."
+      "id": "ReportStateAndNotificationDevice"
     },
     "EveUtilityTrait": {
       "id": "EveUtilityTrait",
       "properties": {
-        "current": {
-          "format": "double",
-          "type": "number",
+        "statusFault": {
+          "type": "integer",
+          "format": "int32",
           "readOnly": true
         },
-        "acceptedCommandList": {
-          "readOnly": true,
-          "description": "Required. Output only. Accepted command list for this trait",
-          "type": "array",
-          "items": {
-            "enumDeprecated": [
-              true
-            ],
-            "enum": [
-              "COMMANDS_UNSPECIFIED"
-            ],
-            "enumDescriptions": [
-              "Deprecated: This enum exists only to conform to AIP guidelines and should never be used."
-            ],
-            "type": "string"
-          }
-        },
-        "airPressure": {
-          "format": "double",
-          "type": "number",
+        "getConfig": {
+          "type": "string",
+          "format": "byte",
           "readOnly": true
         },
-        "loggingMetadata": {
+        "loggingData": {
           "type": "string",
           "readOnly": true,
           "format": "byte"
         },
-        "wattAccumulated": {
-          "type": "number",
-          "format": "double",
+        "loggingMetadata": {
+          "format": "byte",
+          "type": "string",
           "readOnly": true
-        },
-        "obstructionDetected": {
-          "readOnly": true,
-          "type": "boolean"
-        },
-        "childLock": {
-          "type": "boolean"
         },
         "accumulatedControlPoint": {
           "format": "int64",
           "type": "string"
         },
-        "rloc16": {
-          "format": "int32",
+        "acceptedCommandList": {
+          "description": "Required. Output only. Accepted command list for this trait",
+          "readOnly": true,
+          "items": {
+            "enumDescriptions": [
+              "Deprecated: This enum exists only to conform to AIP guidelines and should never be used."
+            ],
+            "enum": [
+              "COMMANDS_UNSPECIFIED"
+            ],
+            "enumDeprecated": [
+              true
+            ],
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "voltage": {
+          "readOnly": true,
+          "type": "number",
+          "format": "double"
+        },
+        "motionSensitivity": {
           "type": "integer",
+          "format": "int32"
+        },
+        "obstructionDetected": {
+          "type": "boolean",
           "readOnly": true
+        },
+        "rloc16": {
+          "readOnly": true,
+          "type": "integer",
+          "format": "int32"
+        },
+        "holdPosition": {
+          "type": "boolean"
+        },
+        "loggingTime": {
+          "format": "byte",
+          "type": "string"
+        },
+        "current": {
+          "type": "number",
+          "format": "double",
+          "readOnly": true
+        },
+        "airPressure": {
+          "type": "number",
+          "readOnly": true,
+          "format": "double"
+        },
+        "childLock": {
+          "type": "boolean"
         },
         "openCount": {
           "type": "string",
           "format": "int64"
         },
-        "holdPosition": {
-          "type": "boolean"
-        },
         "altitude": {
           "type": "number",
           "format": "double"
-        },
-        "weatherTrend": {
-          "readOnly": true,
-          "format": "int32",
-          "type": "integer"
-        },
-        "lastEventTime": {
-          "format": "int64",
-          "type": "string",
-          "readOnly": true
-        },
-        "motionSensitivity": {
-          "format": "int32",
-          "type": "integer"
         },
         "watt": {
           "readOnly": true,
           "type": "number",
           "format": "double"
         },
-        "loggingControlPoint": {
+        "lastEventTime": {
+          "type": "string",
+          "format": "int64",
+          "readOnly": true
+        },
+        "setConfig": {
           "type": "string",
           "format": "byte"
         },
-        "voltage": {
+        "wattAccumulated": {
           "type": "number",
-          "format": "double",
-          "readOnly": true
-        },
-        "loggingTime": {
-          "format": "byte",
-          "type": "string"
-        },
-        "setConfig": {
-          "format": "byte",
-          "type": "string"
-        },
-        "statusFault": {
-          "format": "int32",
-          "type": "integer",
-          "readOnly": true
-        },
-        "loggingData": {
-          "format": "byte",
           "readOnly": true,
-          "type": "string"
+          "format": "double"
         },
-        "getConfig": {
-          "format": "byte",
+        "weatherTrend": {
+          "type": "integer",
+          "readOnly": true,
+          "format": "int32"
+        },
+        "loggingControlPoint": {
           "type": "string",
-          "readOnly": true
+          "format": "byte"
         }
       },
       "type": "object"
-    },
-    "PersonEvent": {
-      "id": "PersonEvent",
-      "description": "Represents a newly detected person event.",
-      "properties": {
-        "zonesIsEmpty": {
-          "description": "If set, zones is an empty list.",
-          "type": "boolean"
-        },
-        "zones": {
-          "type": "array",
-          "description": "Zones where events are detected in.",
-          "items": {
-            "$ref": "ZoneStruct"
-          }
-        },
-        "commonEventData": {
-          "$ref": "CommonEventDataStruct"
-        }
-      },
-      "type": "object"
-    },
-    "Component": {
-      "properties": {
-        "childComponents": {
-          "description": "Optional. Child components.",
-          "items": {
-            "$ref": "Component"
-          },
-          "type": "array"
-        },
-        "id": {
-          "description": "Required. ID of the component from the device provider.",
-          "type": "string"
-        },
-        "traitData": {
-          "type": "array",
-          "description": "Required. List of trait data associated with the component.",
-          "items": {
-            "$ref": "TraitData"
-          }
-        },
-        "deviceTypes": {
-          "items": {
-            "type": "string"
-          },
-          "description": "Required. List of Device types associated with this component. Supported device types are defined in cs//depot/google3/home/homeservicelayer/uddm/types/uddm_device_types.proto and the type string is the enum name, for example: ON_OFF_LIGHT => \"ON_OFF_LIGHT\".",
-          "type": "array"
-        }
-      },
-      "id": "Component",
-      "description": "Component of a provider device.",
-      "type": "object"
-    },
-    "CameraEventStreamTrait": {
-      "description": "This cluster defines the camera event stream used by GHP for their Cloud-to-Cloud eventing flow",
-      "properties": {},
-      "id": "CameraEventStreamTrait",
-      "type": "object"
-    },
-    "AgentDeviceId": {
-      "type": "object",
-      "id": "AgentDeviceId",
-      "properties": {
-        "id": {
-          "type": "string",
-          "description": "Third-party device ID."
-        }
-      },
-      "description": "Third-party device ID for one device."
-    },
-    "RequestSyncDevicesResponse": {
-      "properties": {},
-      "id": "RequestSyncDevicesResponse",
-      "description": "Response type for the [`RequestSyncDevices`](#google.home.graph.v1.HomeGraphApiService.RequestSyncDevices) call. Intentionally empty upon success. An HTTP response code is returned with more details upon failure.",
-      "type": "object"
-    },
-    "DeviceNames": {
-      "type": "object",
-      "id": "DeviceNames",
-      "description": "Identifiers used to describe the device.",
-      "properties": {
-        "nicknames": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array",
-          "description": "Additional names provided by the user for the device."
-        },
-        "defaultNames": {
-          "description": "List of names provided by the manufacturer rather than the user, such as serial numbers, SKUs, etc.",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "name": {
-          "description": "Primary name of the device, generally provided by the user. Names will be truncated if over the 60 Unicode code point (character) limit and no errors will be thrown. Developers are responsible for handling long names.",
-          "type": "string"
-        }
-      }
-    },
-    "ReportStateAndNotificationDevice": {
-      "id": "ReportStateAndNotificationDevice",
-      "properties": {
-        "states": {
-          "type": "object",
-          "description": "States of devices to update. See the **Device STATES** section of the individual trait [reference guides](https://developers.home.google.com/cloud-to-cloud/traits).",
-          "additionalProperties": {
-            "description": "Properties of the object.",
-            "type": "any"
-          }
-        },
-        "homeEvents": {
-          "description": "Optional. UDDM/WHDM trait events",
-          "items": {
-            "$ref": "HomeEvents"
-          },
-          "type": "array"
-        },
-        "notifications": {
-          "additionalProperties": {
-            "description": "Properties of the object.",
-            "type": "any"
-          },
-          "type": "object",
-          "description": "Notifications metadata for devices. See the **Device NOTIFICATIONS** section of the individual trait [reference guides](https://developers.home.google.com/cloud-to-cloud/traits)."
-        },
-        "homeTraits": {
-          "items": {
-            "$ref": "HomeTraitUpdates"
-          },
-          "description": "Optional. UDDM/WHDM trait updates.",
-          "type": "array"
-        }
-      },
-      "type": "object",
-      "description": "The states and notifications specific to a device."
-    },
-    "AgentOtherDeviceId": {
-      "properties": {
-        "deviceId": {
-          "description": "Unique third-party device ID.",
-          "type": "string"
-        },
-        "agentId": {
-          "type": "string",
-          "description": "Project ID for your smart home Action."
-        }
-      },
-      "id": "AgentOtherDeviceId",
-      "type": "object",
-      "description": "Alternate third-party device ID."
-    },
-    "EventData": {
-      "id": "EventData",
-      "description": "Contains the details for a single event.",
-      "type": "object",
-      "properties": {
-        "eventTime": {
-          "format": "google-datetime",
-          "description": "Required. The timestamp of the event.",
-          "type": "string"
-        },
-        "event": {
-          "description": "Required. The actual event payload.",
-          "additionalProperties": {
-            "description": "Properties of the object. Contains field @type with type URL.",
-            "type": "any"
-          },
-          "type": "object"
-        },
-        "eventId": {
-          "description": "Required. The unique event ID from the device provider.",
-          "type": "string"
-        }
-      }
-    },
-    "MediaUrlsStruct": {
-      "properties": {
-        "dashManifestUrl": {
-          "type": "string",
-          "description": "URL for a dash manifest for playback"
-        },
-        "previewUrl": {
-          "type": "string",
-          "description": "URL for animated preview clip representing the event session"
-        },
-        "thumbnailUrl": {
-          "description": "URL for thumbnail image representing the event session",
-          "type": "string"
-        },
-        "hlsMasterPlaylistUrl": {
-          "type": "string",
-          "description": "URL for a hls master playlist for playback"
-        }
-      },
-      "id": "MediaUrlsStruct",
-      "type": "object"
-    },
-    "QueryRequest": {
-      "type": "object",
-      "properties": {
-        "agentUserId": {
-          "description": "Required. Third-party user ID.",
-          "type": "string"
-        },
-        "includeDeviceMetadata": {
-          "type": "boolean",
-          "description": "Optional. If true, the response will include device metadata in the device_metadata field."
-        },
-        "inputs": {
-          "items": {
-            "$ref": "QueryRequestInput"
-          },
-          "type": "array",
-          "description": "Required. Inputs containing third-party device IDs for which to get the device states."
-        },
-        "deviceView": {
-          "enumDescriptions": [
-            "Default value. Equivalent to SMART_HOME_TRAIT_ONLY.",
-            "Return only standard Smart Home traits in the `devices` map.",
-            "Return only Unified Device Data Model (UDDM) traits in the `home_trait_payload` map.",
-            "Return both standard Smart Home traits and UDDM traits."
-          ],
-          "description": "Optional. Specifies the type of device data to be returned in the response. This allows callers to request traditional Smart Home traits, Unified Device Data Model (UDDM) traits, or both. If unspecified, defaults to SMART_HOME_TRAIT_ONLY.",
-          "enum": [
-            "DEVICE_VIEW_UNSPECIFIED",
-            "SMART_HOME_TRAIT_ONLY",
-            "HOME_TRAIT_ONLY",
-            "HOME_TRAIT_AND_SMART_HOME_TRAIT"
-          ],
-          "type": "string"
-        },
-        "requestId": {
-          "type": "string",
-          "description": "Request ID used for debugging."
-        }
-      },
-      "id": "QueryRequest",
-      "description": "Request type for the [`Query`](#google.home.graph.v1.HomeGraphApiService.Query) call."
-    },
-    "QueryResponsePayload": {
-      "id": "QueryResponsePayload",
-      "description": "Payload containing device states information.",
-      "properties": {
-        "devices": {
-          "additionalProperties": {
-            "type": "object",
-            "additionalProperties": {
-              "description": "Properties of the object.",
-              "type": "any"
-            }
-          },
-          "type": "object",
-          "description": "States of the devices. Map of third-party device ID to struct of device states."
-        },
-        "homeTraitPayload": {
-          "description": "Map of device IDs to their Unified Device Data Model (UDDM) trait payloads. This field is populated when `device_view` is set to HOME_TRAIT_ONLY or HOME_TRAIT_AND_SMART_HOME_TRAIT.",
-          "additionalProperties": {
-            "$ref": "HomeTraitPayload"
-          },
-          "type": "object"
-        },
-        "deviceMetadata": {
-          "description": "Map from the Trait ID (e.g., \"action.devices.traits.OnOff\") to its last Spanner commit timestamp. If a trait has no recorded timestamp, it will be omitted from this map.",
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "DeviceMetadata"
-          }
-        }
-      },
-      "type": "object"
-    },
-    "ReportStateAndNotificationResponse": {
-      "type": "object",
-      "description": "Response type for the [`ReportStateAndNotification`](#google.home.graph.v1.HomeGraphApiService.ReportStateAndNotification) call.",
-      "id": "ReportStateAndNotificationResponse",
-      "properties": {
-        "requestId": {
-          "description": "Request ID copied from ReportStateAndNotificationRequest.",
-          "type": "string"
-        },
-        "deviceResults": {
-          "description": "Map from agent device ID to the result of reporting state and notifications. This is only populated for UDDM updates for now.",
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "Result"
-          }
-        }
-      }
-    },
-    "StructurePresenceStateChangeReasonStruct": {
-      "properties": {
-        "userBlame": {
-          "description": "Optional. Contains metadata about the cause of presence state change attributed to a user.",
-          "$ref": "UserBlameStruct"
-        },
-        "deviceBlame": {
-          "description": "Optional. Contains metadata about the cause of presence state change attributed to a device.",
-          "$ref": "DeviceBlameStruct"
-        }
-      },
-      "type": "object",
-      "id": "StructurePresenceStateChangeReasonStruct",
-      "description": "Contains the metadata about the cause of the structure presence state change."
     },
     "DeviceInfo": {
+      "type": "object",
+      "description": "Device information.",
       "properties": {
-        "manufacturer": {
-          "description": "Device manufacturer.",
+        "model": {
+          "description": "Device model.",
           "type": "string"
         },
         "hwVersion": {
@@ -604,43 +738,87 @@
           "type": "string"
         },
         "swVersion": {
-          "type": "string",
-          "description": "Device software version."
+          "description": "Device software version.",
+          "type": "string"
         },
-        "model": {
-          "type": "string",
-          "description": "Device model."
-        }
-      },
-      "description": "Device information.",
-      "type": "object",
-      "id": "DeviceInfo"
-    },
-    "Result": {
-      "description": "Result of reporting state and notifications for a single device.",
-      "properties": {
-        "homeTraitCommitTime": {
-          "description": "The trait commit timestamp of the state update in Home Graph.",
-          "format": "google-datetime",
+        "manufacturer": {
+          "description": "Device manufacturer.",
           "type": "string"
         }
       },
-      "id": "Result",
+      "id": "DeviceInfo"
+    },
+    "TraitData": {
+      "id": "TraitData",
+      "type": "object",
+      "description": "Contains the trait payload for a single trait.",
+      "properties": {
+        "trait": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "any",
+            "description": "Properties of the object. Contains field @type with type URL."
+          },
+          "description": "The Provider Home API trait payload."
+        },
+        "commitTime": {
+          "type": "string",
+          "description": "Other metadata for the trait. The time the client update was committed in the server.",
+          "format": "google-datetime"
+        },
+        "providerUpdateTime": {
+          "type": "string",
+          "description": "The custom timestamp supplied by the provider during a ReportStateAndNotification update (if provided). This field is returned as part of the `QueryResponse`.",
+          "format": "google-datetime"
+        }
+      }
+    },
+    "CameraEventStreamTrait": {
+      "type": "object",
+      "properties": {},
+      "id": "CameraEventStreamTrait",
+      "description": "This cluster defines the camera event stream used by GHP for their Cloud-to-Cloud eventing flow"
+    },
+    "CommonEventDataStruct": {
+      "id": "CommonEventDataStruct",
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "description": "Camera event session id. Used for identifying a unique event session"
+        },
+        "mediaUrls": {
+          "$ref": "MediaUrlsStruct",
+          "description": "Contains media urls for the event"
+        },
+        "trackId": {
+          "description": "Id of the track this object belongs to",
+          "type": "string"
+        }
+      },
+      "description": "Common camera event data.",
+      "type": "object"
+    },
+    "HomeTraitUpdates": {
+      "id": "HomeTraitUpdates",
+      "description": "Contains the set of updates for a device.",
+      "properties": {
+        "deviceId": {
+          "type": "string",
+          "description": "Required. Unique identifier for the device."
+        },
+        "components": {
+          "items": {
+            "$ref": "ComponentTraitUpdates"
+          },
+          "description": "Required. Trait updates for each component.",
+          "type": "array"
+        }
+      },
       "type": "object"
     },
     "ThermostatFanControlTrait": {
-      "type": "object",
-      "description": "This cluster provides fan control capabilities for thermostats.",
       "properties": {
         "timerSpeed": {
-          "enum": [
-            "FAN_SPEED_SETTING_ENUM_UNSPECIFIED",
-            "FAN_SPEED_SETTING_OFF",
-            "FAN_SPEED_SETTING_STAGE1",
-            "FAN_SPEED_SETTING_STAGE2",
-            "FAN_SPEED_SETTING_STAGE3",
-            "FAN_SPEED_SETTING_AUTO"
-          ],
           "enumDescriptions": [
             "",
             "",
@@ -649,138 +827,56 @@
             "",
             ""
           ],
-          "type": "string"
-        },
-        "timerEnd": {
-          "format": "int64",
+          "enum": [
+            "FAN_SPEED_SETTING_ENUM_UNSPECIFIED",
+            "FAN_SPEED_SETTING_OFF",
+            "FAN_SPEED_SETTING_STAGE1",
+            "FAN_SPEED_SETTING_STAGE2",
+            "FAN_SPEED_SETTING_STAGE3",
+            "FAN_SPEED_SETTING_AUTO"
+          ],
           "type": "string"
         },
         "timerDuration": {
+          "format": "int64",
+          "type": "string"
+        },
+        "timerEnd": {
           "type": "string",
           "format": "int64"
         }
       },
-      "id": "ThermostatFanControlTrait"
-    },
-    "SyncResponse": {
+      "id": "ThermostatFanControlTrait",
       "type": "object",
-      "id": "SyncResponse",
-      "description": "Response type for the [`Sync`](#google.home.graph.v1.HomeGraphApiService.Sync) call. This should follow the same format as the Google smart home `action.devices.SYNC` [response](https://developers.home.google.com/cloud-to-cloud/intents/sync). Example: ```json { \"requestId\": \"ff36a3cc-ec34-11e6-b1a0-64510650abcf\", \"payload\": { \"agentUserId\": \"1836.15267389\", \"devices\": [{ \"id\": \"123\", \"type\": \"action.devices.types.OUTLET\", \"traits\": [ \"action.devices.traits.OnOff\" ], \"name\": { \"defaultNames\": [\"My Outlet 1234\"], \"name\": \"Night light\", \"nicknames\": [\"wall plug\"] }, \"willReportState\": false, \"deviceInfo\": { \"manufacturer\": \"lights-out-inc\", \"model\": \"hs1234\", \"hwVersion\": \"3.2\", \"swVersion\": \"11.4\" }, \"customData\": { \"fooValue\": 74, \"barValue\": true, \"bazValue\": \"foo\" } }] } } ```",
-      "properties": {
-        "payload": {
-          "description": "Devices associated with the third-party user.",
-          "$ref": "SyncResponsePayload"
-        },
-        "requestId": {
-          "description": "Request ID used for debugging. Copied from the request.",
-          "type": "string"
-        }
-      }
+      "description": "This cluster provides fan control capabilities for thermostats."
     },
-    "StateAndNotificationPayload": {
+    "AgentOtherDeviceId": {
       "type": "object",
+      "id": "AgentOtherDeviceId",
       "properties": {
-        "devices": {
-          "$ref": "ReportStateAndNotificationDevice",
-          "description": "The devices for updating state and sending notifications."
-        }
-      },
-      "id": "StateAndNotificationPayload",
-      "description": "Payload containing the state and notification information for devices."
-    },
-    "Device": {
-      "type": "object",
-      "properties": {
-        "structureHint": {
-          "description": "Suggested name for the structure where this device is installed. Google attempts to use this value during user setup.",
-          "type": "string"
-        },
-        "deviceInfo": {
-          "$ref": "DeviceInfo",
-          "description": "Device manufacturer, model, hardware version, and software version."
-        },
-        "willReportState": {
-          "type": "boolean",
-          "description": "Indicates whether your smart home Action will report state of this device to Google via ReportStateAndNotification."
-        },
-        "otherDeviceIds": {
-          "description": "Alternate IDs associated with this device. This is used to identify cloud synced devices enabled for [local fulfillment](https://developers.home.google.com/local-home/overview).",
-          "type": "array",
-          "items": {
-            "$ref": "AgentOtherDeviceId"
-          }
-        },
-        "name": {
-          "description": "Names given to this device by your smart home Action.",
-          "$ref": "DeviceNames"
-        },
-        "roomHint": {
+        "agentId": {
           "type": "string",
-          "description": "Suggested name for the room where this device is installed. Google attempts to use this value during user setup."
+          "description": "Project ID for your smart home Action."
         },
-        "notificationSupportedByAgent": {
-          "description": "Indicates whether your smart home Action will report notifications to Google for this device via ReportStateAndNotification. If your smart home Action enables users to control device notifications, you should update this field and call RequestSyncDevices.",
-          "type": "boolean"
-        },
-        "traits": {
-          "description": "Traits supported by the device. See [device traits](https://developers.home.google.com/cloud-to-cloud/traits).",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "attributes": {
-          "description": "Attributes for the traits supported by the device.",
-          "type": "object",
-          "additionalProperties": {
-            "type": "any",
-            "description": "Properties of the object."
-          }
-        },
-        "type": {
-          "description": "Hardware type of the device. See [device types](https://developers.home.google.com/cloud-to-cloud/guides).",
-          "type": "string"
-        },
-        "customData": {
-          "additionalProperties": {
-            "type": "any",
-            "description": "Properties of the object."
-          },
-          "type": "object",
-          "description": "Custom device attributes stored in Home Graph and provided to your smart home Action in each [QUERY](https://developers.home.google.com/cloud-to-cloud/intents/query) and [EXECUTE](https://developers.home.google.com/cloud-to-cloud/intents/execute) intent. Data in this object has a few constraints: No sensitive information, including but not limited to Personally Identifiable Information."
-        },
-        "id": {
-          "description": "Third-party device ID.",
+        "deviceId": {
+          "description": "Unique third-party device ID.",
           "type": "string"
         }
       },
-      "description": "Third-party device definition.",
-      "id": "Device"
-    },
-    "ComponentTraitUpdates": {
-      "description": "Contains the set of updates for a component.",
-      "properties": {
-        "componentId": {
-          "description": "Required. ID of the component from the device provider.",
-          "type": "string"
-        },
-        "traitData": {
-          "description": "Required. The updated trait data for the component.",
-          "items": {
-            "$ref": "TraitData"
-          },
-          "type": "array"
-        }
-      },
-      "type": "object",
-      "id": "ComponentTraitUpdates"
+      "description": "Alternate third-party device ID."
     },
     "DeviceBlameStruct": {
-      "id": "DeviceBlameStruct",
       "properties": {
         "blameType": {
+          "enum": [
+            "DEVICE_BLAME_TYPE_ENUM_UNSPECIFIED",
+            "LOCK",
+            "UNLOCK",
+            "MOTION_DETECTION",
+            "TOUCH_INTERACTION",
+            "VOICE_INTERACTION"
+          ],
           "description": "Required. Specifies the device blame type.",
-          "type": "string",
           "enumDescriptions": [
             "Indicates an unspecified device blame type.",
             "Indicates lock interaction.",
@@ -789,413 +885,317 @@
             "Indicates touch interaction.",
             "Indicates voice interaction."
           ],
-          "enum": [
-            "DEVICE_BLAME_TYPE_ENUM_UNSPECIFIED",
-            "LOCK",
-            "UNLOCK",
-            "MOTION_DETECTION",
-            "TOUCH_INTERACTION",
-            "VOICE_INTERACTION"
-          ]
+          "type": "string"
         }
       },
+      "id": "DeviceBlameStruct",
       "type": "object",
       "description": "Contains metadata about the cause of presence state change attributed to a device."
     },
-    "ReportStateAndNotificationRequest": {
-      "properties": {
-        "followUpToken": {
-          "deprecated": true,
-          "type": "string",
-          "description": "Deprecated."
-        },
-        "requestId": {
-          "type": "string",
-          "description": "Request ID used for debugging."
-        },
-        "payload": {
-          "description": "Required. State of devices to update and notification metadata for devices.",
-          "$ref": "StateAndNotificationPayload"
-        },
-        "agentUserId": {
-          "type": "string",
-          "description": "Required. Third-party user ID."
-        },
-        "eventId": {
-          "description": "Unique identifier per event (for example, a doorbell press).",
-          "type": "string"
-        }
-      },
-      "id": "ReportStateAndNotificationRequest",
-      "type": "object",
-      "description": "Request type for the [`ReportStateAndNotification`](#google.home.graph.v1.HomeGraphApiService.ReportStateAndNotification) call. It may include states, notifications, home_traits, home_events, or any combination thereof. Smart Home Device Traits (SHDT) `states` and `notifications` are defined per `device_id` (for example, \"123\" and \"456\" in the following example). Google Home Traits `home_traits` and `home_events` are lists of updates or events, each associated with a `device_id` (for example, \"789\" in the following example). Example: ```json { \"requestId\": \"ff36a3cc-ec34-11e6-b1a0-64510650abcf\", \"agentUserId\": \"1234\", \"payload\": { \"devices\": { \"states\": { \"123\": { \"on\": true }, \"456\": { \"on\": true, \"brightness\": 10 }, }, \"homeTraits\": [ { \"deviceId\": \"789\", \"components\": [ { \"componentId\": \"main\", \"traitData\": [ { \"trait\": { \"@type\": \"type.googleapis.com/home.graph.v1.OnOffTrait\", \"onOff\": true } } ] } ] } ], \"homeEvents\": [ { \"deviceId\": \"789\", \"events\": [ { \"componentId\": \"main\", \"events\": [ { \"eventId\": \"event-123\", \"eventTime\": \"2026-01-01T00:00:00Z\", \"event\": { \"@type\": \"type.googleapis.com/home.graph.v1.DoorbellPressTrait.DoorbellPressedEvent\" } } ] } ] } ] } } } ```"
-    },
-    "QueryRequestPayload": {
-      "description": "Payload containing device IDs.",
-      "properties": {
-        "devices": {
-          "description": "Third-party device IDs for which to get the device states.",
-          "type": "array",
-          "items": {
-            "$ref": "AgentDeviceId"
-          }
-        }
-      },
-      "id": "QueryRequestPayload",
-      "type": "object"
-    },
-    "ZoneStruct": {
-      "properties": {
-        "zoneId": {
-          "description": "Id of the zone",
-          "type": "string",
-          "format": "int64"
-        },
-        "label": {
-          "type": "string",
-          "description": "Name of the zone."
-        }
-      },
-      "id": "ZoneStruct",
-      "type": "object"
-    },
-    "RequestSyncDevicesRequest": {
-      "description": "Request type for the [`RequestSyncDevices`](#google.home.graph.v1.HomeGraphApiService.RequestSyncDevices) call.",
-      "type": "object",
-      "properties": {
-        "agentUserId": {
-          "description": "Required. Third-party user ID.",
-          "type": "string"
-        },
-        "async": {
-          "type": "boolean",
-          "description": "Optional. If set, the request will be added to a queue and a response will be returned immediately. This enables concurrent requests for the given `agent_user_id`, but the caller will not receive any error responses."
-        }
-      },
-      "id": "RequestSyncDevicesRequest"
-    },
-    "PartnerPresenceSignalTrait": {
-      "description": "Provides attributes and events related to partner presence signals. See PartnerPresenceSignal trait:",
-      "type": "object",
-      "properties": {},
-      "id": "PartnerPresenceSignalTrait"
-    },
-    "SyncRequest": {
-      "properties": {
-        "requestId": {
-          "description": "Request ID used for debugging.",
-          "type": "string"
-        },
-        "agentUserId": {
-          "type": "string",
-          "description": "Required. Third-party user ID."
-        }
-      },
-      "id": "SyncRequest",
-      "description": "Request type for the [`Sync`](#google.home.graph.v1.HomeGraphApiService.Sync) call.",
-      "type": "object"
-    },
-    "QueryRequestInput": {
-      "type": "object",
-      "id": "QueryRequestInput",
-      "properties": {
-        "payload": {
-          "description": "Payload containing third-party device IDs.",
-          "$ref": "QueryRequestPayload"
-        }
-      },
-      "description": "Device ID inputs to QueryRequest."
-    },
     "DeviceMetadata": {
-      "id": "DeviceMetadata",
       "properties": {
         "traitCommitTimestamps": {
+          "description": "Map from the Trait ID (e.g., \"action.devices.traits.OnOff\") to its last Spanner commit timestamp.",
           "additionalProperties": {
             "type": "string",
             "format": "google-datetime"
           },
-          "description": "Map from the Trait ID (e.g., \"action.devices.traits.OnOff\") to its last Spanner commit timestamp.",
           "type": "object"
         }
       },
+      "id": "DeviceMetadata",
       "description": "Metadata for traits of a single device.",
       "type": "object"
     },
-    "StructurePresenceStateChangeEvent": {
+    "PartnerPresenceSignalTrait": {
+      "description": "Provides attributes and events related to partner presence signals. See PartnerPresenceSignal trait:",
+      "properties": {},
+      "type": "object",
+      "id": "PartnerPresenceSignalTrait"
+    },
+    "Events": {
       "properties": {
-        "reason": {
-          "$ref": "StructurePresenceStateChangeReasonStruct",
-          "description": "Optional. Specifies the presence state change reason."
+        "events": {
+          "description": "Required. List of events associated with the component.",
+          "items": {
+            "$ref": "EventData"
+          },
+          "type": "array"
         },
-        "presenceState": {
-          "description": "Required. Specifies the presence state.",
-          "enumDescriptions": [
-            "Indicates an unknown presence state.",
-            "Indicates home presence state.",
-            "Indicates away presence state."
-          ],
-          "type": "string",
-          "enum": [
-            "STRUCTURE_PRESENCE_STATE_ENUM_UNSPECIFIED",
-            "HOME",
-            "AWAY"
-          ]
+        "componentId": {
+          "description": "Optional. The ID of the provider component if the events are associated with a specific component. Optional for WHDM events, required for UDDM events.",
+          "type": "string"
         }
       },
-      "id": "StructurePresenceStateChangeEvent",
-      "description": "Sent when the structure presence state changes.",
+      "id": "Events",
+      "description": "Contains a set of events for a specific component.",
       "type": "object"
     },
-    "HomeEvents": {
+    "MotionEvent": {
+      "id": "MotionEvent",
       "type": "object",
-      "id": "HomeEvents",
+      "description": "Represents a newly detected motion event.",
+      "properties": {
+        "zones": {
+          "type": "array",
+          "items": {
+            "$ref": "ZoneStruct"
+          },
+          "description": "Zones where events are detected in."
+        },
+        "zonesIsEmpty": {
+          "type": "boolean",
+          "description": "If set, zones is an empty list."
+        },
+        "commonEventData": {
+          "$ref": "CommonEventDataStruct"
+        }
+      }
+    },
+    "HomeEvents": {
       "properties": {
         "deviceId": {
-          "description": "Required. / Unique identifier for the device.",
-          "type": "string"
+          "type": "string",
+          "description": "Required. / Unique identifier for the device."
         },
         "events": {
-          "description": "Required. List of events for the item.",
-          "type": "array",
           "items": {
             "$ref": "Events"
-          }
+          },
+          "description": "Required. List of events for the item.",
+          "type": "array"
         }
       },
+      "id": "HomeEvents",
+      "type": "object",
       "description": "Contains the set of events for an item."
     },
-    "SyncResponsePayload": {
-      "type": "object",
+    "ReportStateAndNotificationResponse": {
       "properties": {
-        "agentUserId": {
-          "description": "Third-party user ID",
+        "requestId": {
+          "description": "Request ID copied from ReportStateAndNotificationRequest.",
           "type": "string"
         },
-        "devices": {
-          "type": "array",
-          "items": {
-            "$ref": "Device"
-          },
-          "description": "Devices associated with the third-party user."
-        }
-      },
-      "description": "Payload containing device information.",
-      "id": "SyncResponsePayload"
-    }
-  },
-  "resources": {
-    "devices": {
-      "methods": {
-        "requestSync": {
-          "description": "Requests Google to send an `action.devices.SYNC` [intent](https://developers.home.google.com/cloud-to-cloud/intents/sync) to your smart home Action to update device metadata for the given user. The third-party user's identity is passed via the `agent_user_id` (see RequestSyncDevicesRequest). This request must be authorized using service account credentials from your Actions console project.",
-          "parameters": {},
-          "request": {
-            "$ref": "RequestSyncDevicesRequest"
-          },
-          "id": "homegraph.devices.requestSync",
-          "path": "v1/devices:requestSync",
-          "parameterOrder": [],
-          "scopes": [
-            "https://www.googleapis.com/auth/homegraph"
-          ],
-          "flatPath": "v1/devices:requestSync",
-          "response": {
-            "$ref": "RequestSyncDevicesResponse"
-          },
-          "httpMethod": "POST"
-        },
-        "query": {
-          "parameters": {},
-          "httpMethod": "POST",
-          "id": "homegraph.devices.query",
-          "description": "Gets the current states in Home Graph for the given set of the third-party user's devices. The third-party user's identity is passed in via the `agent_user_id` (see QueryRequest). This request must be authorized using service account credentials from your Actions console project.",
-          "scopes": [
-            "https://www.googleapis.com/auth/homegraph"
-          ],
-          "flatPath": "v1/devices:query",
-          "response": {
-            "$ref": "QueryResponse"
-          },
-          "request": {
-            "$ref": "QueryRequest"
-          },
-          "parameterOrder": [],
-          "path": "v1/devices:query"
-        },
-        "sync": {
-          "flatPath": "v1/devices:sync",
-          "response": {
-            "$ref": "SyncResponse"
-          },
-          "httpMethod": "POST",
-          "request": {
-            "$ref": "SyncRequest"
-          },
-          "path": "v1/devices:sync",
-          "description": "Gets all the devices associated with the given third-party user. The third-party user's identity is passed in via the `agent_user_id` (see SyncRequest). This request must be authorized using service account credentials from your Actions console project.",
-          "scopes": [
-            "https://www.googleapis.com/auth/homegraph"
-          ],
-          "id": "homegraph.devices.sync",
-          "parameters": {},
-          "parameterOrder": []
-        },
-        "reportStateAndNotification": {
-          "path": "v1/devices:reportStateAndNotification",
-          "description": "Reports device state and optionally sends device notifications. Called by your smart home Action when the state of a third-party device changes or you need to send a notification about the device. See [Implement Report State](https://developers.home.google.com/cloud-to-cloud/integration/report-state) for more information. This method updates the device state according to its declared [traits](https://developers.home.google.com/cloud-to-cloud/primer/device-types-and-traits). Publishing a new state value outside of these traits will result in an `INVALID_ARGUMENT` error response. The third-party user's identity is passed in via the `agent_user_id` (see ReportStateAndNotificationRequest). This request must be authorized using service account credentials from your Actions console project.",
-          "parameters": {},
-          "id": "homegraph.devices.reportStateAndNotification",
-          "scopes": [
-            "https://www.googleapis.com/auth/homegraph"
-          ],
-          "parameterOrder": [],
-          "flatPath": "v1/devices:reportStateAndNotification",
-          "response": {
-            "$ref": "ReportStateAndNotificationResponse"
-          },
-          "httpMethod": "POST",
-          "request": {
-            "$ref": "ReportStateAndNotificationRequest"
+        "deviceResults": {
+          "type": "object",
+          "description": "Map from agent device ID to the result of reporting state and notifications. This is only populated for UDDM updates for now.",
+          "additionalProperties": {
+            "$ref": "Result"
           }
         }
-      }
-    },
-    "agentUsers": {
-      "methods": {
-        "delete": {
-          "id": "homegraph.agentUsers.delete",
-          "description": "Unlinks the given third-party user from your smart home Action. All data related to this user will be deleted. For more details on how users link their accounts, see [fulfillment and authentication](https://developers.home.google.com/cloud-to-cloud/primer/fulfillment). The third-party user's identity is passed in via the `agent_user_id` (see DeleteAgentUserRequest). This request must be authorized using service account credentials from your Actions console project.",
-          "httpMethod": "DELETE",
-          "parameters": {
-            "agentUserId": {
-              "required": true,
-              "type": "string",
-              "pattern": "^agentUsers/.*$",
-              "location": "path",
-              "description": "Required. Third-party user ID."
-            },
-            "requestId": {
-              "description": "Request ID used for debugging.",
-              "location": "query",
-              "type": "string"
-            }
-          },
-          "flatPath": "v1/agentUsers/{agentUsersId}",
-          "response": {
-            "$ref": "Empty"
-          },
-          "path": "v1/{+agentUserId}",
-          "scopes": [
-            "https://www.googleapis.com/auth/homegraph"
-          ],
-          "parameterOrder": [
-            "agentUserId"
-          ]
-        }
-      }
+      },
+      "type": "object",
+      "description": "Response type for the [`ReportStateAndNotification`](#google.home.graph.v1.HomeGraphApiService.ReportStateAndNotification) call.",
+      "id": "ReportStateAndNotificationResponse"
     }
   },
-  "canonicalName": "Home Graph Service",
-  "auth": {
-    "oauth2": {
-      "scopes": {
-        "https://www.googleapis.com/auth/homegraph": {
-          "description": "Private Service: https://www.googleapis.com/auth/homegraph"
-        }
-      }
-    }
-  },
-  "baseUrl": "https://homegraph.googleapis.com/",
-  "ownerDomain": "google.com",
-  "servicePath": "",
-  "revision": "20260909",
-  "mtlsRootUrl": "https://homegraph.mtls.googleapis.com/",
-  "fullyEncodeReservedExpansion": true,
-  "description": "",
-  "id": "homegraph:v1",
-  "discoveryVersion": "v1",
-  "name": "homegraph",
-  "protocol": "rest",
-  "rootUrl": "https://homegraph.googleapis.com/",
+  "ownerName": "Google",
   "documentationLink": "https://developers.home.google.com/cloud-to-cloud/get-started",
-  "version_module": true,
-  "title": "HomeGraph API",
-  "version": "v1",
   "parameters": {
-    "upload_protocol": {
-      "type": "string",
+    "access_token": {
       "location": "query",
-      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\")."
+      "description": "OAuth access token.",
+      "type": "string"
     },
-    "$.xgafv": {
-      "location": "query",
-      "type": "string",
-      "enum": [
-        "1",
-        "2"
-      ],
-      "description": "V1 error format.",
-      "enumDescriptions": [
-        "v1 error format",
-        "v2 error format"
-      ]
-    },
-    "alt": {
-      "description": "Data format for response.",
-      "enum": [
-        "json",
-        "media",
-        "proto"
-      ],
-      "location": "query",
-      "enumDescriptions": [
-        "Responses with Content-Type of application/json",
-        "Media download with context-dependent Content-Type",
-        "Responses with Content-Type of application/x-protobuf"
-      ],
-      "type": "string",
-      "default": "json"
+    "prettyPrint": {
+      "description": "Returns response with indentations and line breaks.",
+      "type": "boolean",
+      "default": "true",
+      "location": "query"
     },
     "quotaUser": {
       "type": "string",
       "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
       "location": "query"
     },
-    "oauth_token": {
+    "uploadType": {
+      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
       "location": "query",
-      "description": "OAuth 2.0 token for the current user.",
       "type": "string"
+    },
+    "oauth_token": {
+      "type": "string",
+      "location": "query",
+      "description": "OAuth 2.0 token for the current user."
+    },
+    "alt": {
+      "type": "string",
+      "enum": [
+        "json",
+        "media",
+        "proto"
+      ],
+      "enumDescriptions": [
+        "Responses with Content-Type of application/json",
+        "Media download with context-dependent Content-Type",
+        "Responses with Content-Type of application/x-protobuf"
+      ],
+      "description": "Data format for response.",
+      "default": "json",
+      "location": "query"
+    },
+    "callback": {
+      "description": "JSONP",
+      "type": "string",
+      "location": "query"
+    },
+    "$.xgafv": {
+      "location": "query",
+      "description": "V1 error format.",
+      "enumDescriptions": [
+        "v1 error format",
+        "v2 error format"
+      ],
+      "type": "string",
+      "enum": [
+        "1",
+        "2"
+      ]
+    },
+    "fields": {
+      "type": "string",
+      "location": "query",
+      "description": "Selector specifying which fields to include in a partial response."
+    },
+    "upload_protocol": {
+      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").",
+      "type": "string",
+      "location": "query"
     },
     "key": {
       "location": "query",
       "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
       "type": "string"
-    },
-    "callback": {
-      "description": "JSONP",
-      "location": "query",
-      "type": "string"
-    },
-    "fields": {
-      "location": "query",
-      "description": "Selector specifying which fields to include in a partial response.",
-      "type": "string"
-    },
-    "access_token": {
-      "location": "query",
-      "description": "OAuth access token.",
-      "type": "string"
-    },
-    "uploadType": {
-      "type": "string",
-      "location": "query",
-      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\")."
-    },
-    "prettyPrint": {
-      "type": "boolean",
-      "location": "query",
-      "default": "true",
-      "description": "Returns response with indentations and line breaks."
     }
-  }
+  },
+  "name": "homegraph",
+  "servicePath": "",
+  "title": "HomeGraph API",
+  "version_module": true,
+  "revision": "20260909",
+  "batchPath": "batch",
+  "icons": {
+    "x16": "http://www.google.com/images/icons/product/search-16.gif",
+    "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  },
+  "protocol": "rest",
+  "resources": {
+    "agentUsers": {
+      "methods": {
+        "delete": {
+          "path": "v1/{+agentUserId}",
+          "parameterOrder": [
+            "agentUserId"
+          ],
+          "httpMethod": "DELETE",
+          "flatPath": "v1/agentUsers/{agentUsersId}",
+          "scopes": [
+            "https://www.googleapis.com/auth/homegraph"
+          ],
+          "id": "homegraph.agentUsers.delete",
+          "description": "Unlinks the given third-party user from your smart home Action. All data related to this user will be deleted. For more details on how users link their accounts, see [fulfillment and authentication](https://developers.home.google.com/cloud-to-cloud/primer/fulfillment). The third-party user's identity is passed in via the `agent_user_id` (see DeleteAgentUserRequest). This request must be authorized using service account credentials from your Actions console project.",
+          "response": {
+            "$ref": "Empty"
+          },
+          "parameters": {
+            "agentUserId": {
+              "type": "string",
+              "required": true,
+              "description": "Required. Third-party user ID.",
+              "pattern": "^agentUsers/.*$",
+              "location": "path"
+            },
+            "requestId": {
+              "type": "string",
+              "location": "query",
+              "description": "Request ID used for debugging."
+            }
+          }
+        }
+      }
+    },
+    "devices": {
+      "methods": {
+        "query": {
+          "httpMethod": "POST",
+          "id": "homegraph.devices.query",
+          "path": "v1/devices:query",
+          "flatPath": "v1/devices:query",
+          "parameterOrder": [],
+          "scopes": [
+            "https://www.googleapis.com/auth/homegraph"
+          ],
+          "response": {
+            "$ref": "QueryResponse"
+          },
+          "request": {
+            "$ref": "QueryRequest"
+          },
+          "description": "Gets the current states in Home Graph for the given set of the third-party user's devices. The third-party user's identity is passed in via the `agent_user_id` (see QueryRequest). This request must be authorized using service account credentials from your Actions console project.",
+          "parameters": {}
+        },
+        "reportStateAndNotification": {
+          "parameterOrder": [],
+          "path": "v1/devices:reportStateAndNotification",
+          "httpMethod": "POST",
+          "response": {
+            "$ref": "ReportStateAndNotificationResponse"
+          },
+          "request": {
+            "$ref": "ReportStateAndNotificationRequest"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/homegraph"
+          ],
+          "id": "homegraph.devices.reportStateAndNotification",
+          "description": "Reports device state and optionally sends device notifications. Called by your smart home Action when the state of a third-party device changes or you need to send a notification about the device. See [Implement Report State](https://developers.home.google.com/cloud-to-cloud/integration/report-state) for more information. This method updates the device state according to its declared [traits](https://developers.home.google.com/cloud-to-cloud/primer/device-types-and-traits). Publishing a new state value outside of these traits will result in an `INVALID_ARGUMENT` error response. The third-party user's identity is passed in via the `agent_user_id` (see ReportStateAndNotificationRequest). This request must be authorized using service account credentials from your Actions console project.",
+          "flatPath": "v1/devices:reportStateAndNotification",
+          "parameters": {}
+        },
+        "sync": {
+          "description": "Gets all the devices associated with the given third-party user. The third-party user's identity is passed in via the `agent_user_id` (see SyncRequest). This request must be authorized using service account credentials from your Actions console project.",
+          "request": {
+            "$ref": "SyncRequest"
+          },
+          "scopes": [
+            "https://www.googleapis.com/auth/homegraph"
+          ],
+          "parameterOrder": [],
+          "httpMethod": "POST",
+          "response": {
+            "$ref": "SyncResponse"
+          },
+          "id": "homegraph.devices.sync",
+          "path": "v1/devices:sync",
+          "parameters": {},
+          "flatPath": "v1/devices:sync"
+        },
+        "requestSync": {
+          "flatPath": "v1/devices:requestSync",
+          "parameters": {},
+          "id": "homegraph.devices.requestSync",
+          "httpMethod": "POST",
+          "path": "v1/devices:requestSync",
+          "response": {
+            "$ref": "RequestSyncDevicesResponse"
+          },
+          "description": "Requests Google to send an `action.devices.SYNC` [intent](https://developers.home.google.com/cloud-to-cloud/intents/sync) to your smart home Action to update device metadata for the given user. The third-party user's identity is passed via the `agent_user_id` (see RequestSyncDevicesRequest). This request must be authorized using service account credentials from your Actions console project.",
+          "parameterOrder": [],
+          "scopes": [
+            "https://www.googleapis.com/auth/homegraph"
+          ],
+          "request": {
+            "$ref": "RequestSyncDevicesRequest"
+          }
+        }
+      }
+    }
+  },
+  "id": "homegraph:v1",
+  "ownerDomain": "google.com",
+  "mtlsRootUrl": "https://homegraph.mtls.googleapis.com/",
+  "version": "v1",
+  "fullyEncodeReservedExpansion": true,
+  "canonicalName": "Home Graph Service",
+  "description": ""
 }
