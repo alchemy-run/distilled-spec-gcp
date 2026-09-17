@@ -1,16 +1,25 @@
 {
-  "discoveryVersion": "v1",
+  "ownerDomain": "google.com",
+  "mtlsRootUrl": "https://readerrevenuesubscriptionlinking.mtls.googleapis.com/",
   "documentationLink": "https://developers.google.com/news/subscribe/subscription-linking/overview",
-  "ownerName": "Google",
-  "version_module": true,
-  "protocol": "rest",
   "schemas": {
+    "DeleteReaderResponse": {
+      "properties": {},
+      "id": "DeleteReaderResponse",
+      "description": "Response to deleting a reader of a publication.",
+      "type": "object"
+    },
     "Reader": {
       "properties": {
+        "name": {
+          "description": "Output only. The resource name of the reader. The last part of ppid in the resource name is the publisher provided id.",
+          "readOnly": true,
+          "type": "string"
+        },
         "publicationId": {
           "description": "Output only. The SwG publication id that the reader has linked their subscription to.",
-          "type": "string",
-          "readOnly": true
+          "readOnly": true,
+          "type": "string"
         },
         "originatingPublicationId": {
           "description": "Output only. The SwG publication id that the reader's subscription linking was originating from.",
@@ -18,15 +27,10 @@
           "readOnly": true
         },
         "createTime": {
-          "readOnly": true,
           "description": "Output only. Time the publication reader was created and associated with a Google user.",
-          "type": "string",
-          "format": "google-datetime"
-        },
-        "name": {
-          "type": "string",
           "readOnly": true,
-          "description": "Output only. The resource name of the reader. The last part of ppid in the resource name is the publisher provided id."
+          "format": "google-datetime",
+          "type": "string"
         },
         "ppid": {
           "description": "Output only. The publisher provided id of the reader.",
@@ -34,267 +38,326 @@
           "readOnly": true
         }
       },
+      "type": "object",
       "description": "A reader of a publication.",
-      "id": "Reader",
-      "type": "object"
+      "id": "Reader"
+    },
+    "ListReaderEntitlementsResponse": {
+      "id": "ListReaderEntitlementsResponse",
+      "type": "object",
+      "description": "Response containing the aggregated collection of matching ReaderEntitlements objects.",
+      "properties": {
+        "nextPageToken": {
+          "type": "string",
+          "description": "A token that can be sent as `page_token` to retrieve the next page. If this field is omitted, there are no subsequent pages."
+        },
+        "readerEntitlements": {
+          "description": "The collection of ReaderEntitlements found across the scoped child publications. Every element's `name` field will contain the canonical sub-publication path, never the wildcard dash.",
+          "items": {
+            "$ref": "ReaderEntitlements"
+          },
+          "type": "array"
+        }
+      }
     },
     "ReaderEntitlements": {
+      "description": "A singleton containing all of a reader's entitlements for a publication.",
       "properties": {
+        "name": {
+          "readOnly": true,
+          "description": "Output only. The resource name of the singleton.",
+          "type": "string"
+        },
         "entitlements": {
-          "description": "All of the entitlements for a publication reader.",
-          "type": "array",
           "items": {
             "$ref": "Entitlement"
-          }
-        },
-        "name": {
-          "type": "string",
-          "description": "Output only. The resource name of the singleton.",
-          "readOnly": true
+          },
+          "type": "array",
+          "description": "All of the entitlements for a publication reader."
         }
       },
-      "description": "A singleton containing all of a reader's entitlements for a publication.",
-      "type": "object",
-      "id": "ReaderEntitlements"
-    },
-    "DeleteReaderResponse": {
-      "id": "DeleteReaderResponse",
-      "description": "Response to deleting a reader of a publication.",
-      "type": "object",
-      "properties": {}
+      "id": "ReaderEntitlements",
+      "type": "object"
     },
     "Entitlement": {
-      "type": "object",
       "id": "Entitlement",
+      "type": "object",
+      "description": "A single entitlement for a publication reader",
       "properties": {
         "subscriptionToken": {
-          "type": "string",
-          "description": "A source-specific subscription token. This is an opaque string that the publisher provides to Google. This token is opaque and has no meaning to Google."
+          "description": "A source-specific subscription token. This is an opaque string that the publisher provides to Google. This token is opaque and has no meaning to Google.",
+          "type": "string"
         },
-        "expireTime": {
-          "format": "google-datetime",
+        "detail": {
           "type": "string",
-          "description": "Optional. Expiration time of the entitlement. If unset, the entitlement does not expire (indefinite entitlement). We need to support indefinite entitlements for platform publishers. dd: go/rrm-sl-notedotcom Entitlements that have expired over 30 days will be purged."
+          "description": "The detail field can carry a description of the SKU that corresponds to what the user has been granted access to. This description, which is opaque to Google, can be displayed in the Google user subscription console for users who linked the subscription to a Google Account. Max 80 character limit."
         },
         "productId": {
           "description": "Required. The publication's product ID that the user has access to. This is the same product ID as can be found in Schema.org markup (http://schema.org/productID). E.g. \"dailybugle.com:basic\"",
           "type": "string"
         },
-        "detail": {
-          "description": "The detail field can carry a description of the SKU that corresponds to what the user has been granted access to. This description, which is opaque to Google, can be displayed in the Google user subscription console for users who linked the subscription to a Google Account. Max 80 character limit.",
-          "type": "string"
-        }
-      },
-      "description": "A single entitlement for a publication reader"
-    }
-  },
-  "mtlsRootUrl": "https://readerrevenuesubscriptionlinking.mtls.googleapis.com/",
-  "rootUrl": "https://readerrevenuesubscriptionlinking.googleapis.com/",
-  "resources": {
-    "publications": {
-      "resources": {
-        "readers": {
-          "methods": {
-            "delete": {
-              "flatPath": "v1/publications/{publicationsId}/readers/{readersId}",
-              "httpMethod": "DELETE",
-              "response": {
-                "$ref": "DeleteReaderResponse"
-              },
-              "parameterOrder": [
-                "name"
-              ],
-              "description": "Removes a publication reader, effectively severing the association with a Google user. If `force` is set to true, any entitlements for this reader will also be deleted. (Otherwise, the request will only work if the reader has no entitlements.) - If the reader does not exist, return NOT_FOUND. - Return FAILED_PRECONDITION if the force field is false (or unset) and entitlements are present.",
-              "parameters": {
-                "name": {
-                  "required": true,
-                  "pattern": "^publications/[^/]+/readers/[^/]+$",
-                  "location": "path",
-                  "description": "Required. The resource name of the reader. Format: publications/{publication_id}/readers/{ppid}",
-                  "type": "string"
-                },
-                "force": {
-                  "type": "boolean",
-                  "description": "If set to true, any entitlements under the reader will also be purged.",
-                  "location": "query"
-                }
-              },
-              "id": "readerrevenuesubscriptionlinking.publications.readers.delete",
-              "path": "v1/{+name}"
-            },
-            "getEntitlements": {
-              "parameterOrder": [
-                "name"
-              ],
-              "description": "Gets the reader entitlements for a publication reader. - Returns PERMISSION_DENIED if the caller does not have access. - Returns NOT_FOUND if the reader does not exist.",
-              "flatPath": "v1/publications/{publicationsId}/readers/{readersId}/entitlements",
-              "response": {
-                "$ref": "ReaderEntitlements"
-              },
-              "httpMethod": "GET",
-              "id": "readerrevenuesubscriptionlinking.publications.readers.getEntitlements",
-              "path": "v1/{+name}",
-              "parameters": {
-                "name": {
-                  "required": true,
-                  "type": "string",
-                  "pattern": "^publications/[^/]+/readers/[^/]+/entitlements$",
-                  "description": "Required. The name of the reader entitlements to retrieve. Format: publications/{publication_id}/readers/{reader_id}/entitlements",
-                  "location": "path"
-                }
-              }
-            },
-            "updateEntitlements": {
-              "id": "readerrevenuesubscriptionlinking.publications.readers.updateEntitlements",
-              "request": {
-                "$ref": "ReaderEntitlements"
-              },
-              "flatPath": "v1/publications/{publicationsId}/readers/{readersId}/entitlements",
-              "response": {
-                "$ref": "ReaderEntitlements"
-              },
-              "path": "v1/{+name}",
-              "parameters": {
-                "name": {
-                  "location": "path",
-                  "type": "string",
-                  "description": "Output only. The resource name of the singleton.",
-                  "required": true,
-                  "pattern": "^publications/[^/]+/readers/[^/]+/entitlements$"
-                },
-                "updateMask": {
-                  "description": "Optional. The list of fields to update. Defaults to all fields.",
-                  "location": "query",
-                  "format": "google-fieldmask",
-                  "type": "string"
-                }
-              },
-              "parameterOrder": [
-                "name"
-              ],
-              "description": "Updates the reader entitlements for a publication reader. The entire reader entitlements will be overwritten by the new reader entitlements in the payload, like a PUT. - Returns PERMISSION_DENIED if the caller does not have access. - Returns NOT_FOUND if the reader does not exist.",
-              "httpMethod": "PATCH"
-            },
-            "get": {
-              "httpMethod": "GET",
-              "flatPath": "v1/publications/{publicationsId}/readers/{readersId}",
-              "id": "readerrevenuesubscriptionlinking.publications.readers.get",
-              "response": {
-                "$ref": "Reader"
-              },
-              "parameterOrder": [
-                "name"
-              ],
-              "parameters": {
-                "name": {
-                  "pattern": "^publications/[^/]+/readers/[^/]+$",
-                  "description": "Required. The resource name of the reader. Format: publications/{publication_id}/readers/{ppid}",
-                  "location": "path",
-                  "type": "string",
-                  "required": true
-                }
-              },
-              "path": "v1/{+name}",
-              "description": "Gets a reader of a publication. Returns NOT_FOUND if the reader does not exist."
-            }
-          }
+        "expireTime": {
+          "description": "Optional. Expiration time of the entitlement. If unset, the entitlement does not expire (indefinite entitlement). We need to support indefinite entitlements for platform publishers. dd: go/rrm-sl-notedotcom Entitlements that have expired over 30 days will be purged.",
+          "type": "string",
+          "format": "google-datetime"
         }
       }
     }
   },
   "name": "readerrevenuesubscriptionlinking",
-  "version": "v1",
-  "id": "readerrevenuesubscriptionlinking:v1",
-  "baseUrl": "https://readerrevenuesubscriptionlinking.googleapis.com/",
-  "basePath": "",
-  "ownerDomain": "google.com",
-  "fullyEncodeReservedExpansion": true,
-  "description": "readerrevenuesubscriptionlinking.googleapis.com API.",
-  "kind": "discovery#restDescription",
-  "icons": {
-    "x16": "http://www.google.com/images/icons/product/search-16.gif",
-    "x32": "http://www.google.com/images/icons/product/search-32.gif"
-  },
-  "servicePath": "",
-  "canonicalName": "Subscription Linking",
-  "title": "Reader Revenue Subscription Linking API",
-  "revision": "20260912",
+  "protocol": "rest",
   "batchPath": "batch",
+  "rootUrl": "https://readerrevenuesubscriptionlinking.googleapis.com/",
+  "id": "readerrevenuesubscriptionlinking:v1",
+  "version": "v1",
+  "version_module": true,
   "parameters": {
-    "key": {
+    "$.xgafv": {
+      "description": "V1 error format.",
+      "enumDescriptions": [
+        "v1 error format",
+        "v2 error format"
+      ],
       "type": "string",
-      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
-      "location": "query"
+      "location": "query",
+      "enum": [
+        "1",
+        "2"
+      ]
+    },
+    "prettyPrint": {
+      "location": "query",
+      "default": "true",
+      "description": "Returns response with indentations and line breaks.",
+      "type": "boolean"
+    },
+    "uploadType": {
+      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
+      "location": "query",
+      "type": "string"
     },
     "callback": {
       "location": "query",
       "description": "JSONP",
       "type": "string"
     },
-    "fields": {
-      "description": "Selector specifying which fields to include in a partial response.",
-      "type": "string",
-      "location": "query"
-    },
-    "oauth_token": {
-      "type": "string",
-      "description": "OAuth 2.0 token for the current user.",
-      "location": "query"
-    },
-    "$.xgafv": {
-      "type": "string",
-      "enum": [
-        "1",
-        "2"
-      ],
-      "location": "query",
-      "description": "V1 error format.",
-      "enumDescriptions": [
-        "v1 error format",
-        "v2 error format"
-      ]
-    },
-    "uploadType": {
-      "type": "string",
-      "location": "query",
-      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\")."
-    },
-    "prettyPrint": {
-      "location": "query",
-      "default": "true",
-      "type": "boolean",
-      "description": "Returns response with indentations and line breaks."
-    },
     "alt": {
       "location": "query",
+      "description": "Data format for response.",
+      "type": "string",
+      "default": "json",
       "enum": [
         "json",
         "media",
         "proto"
       ],
-      "type": "string",
-      "default": "json",
       "enumDescriptions": [
         "Responses with Content-Type of application/json",
         "Media download with context-dependent Content-Type",
         "Responses with Content-Type of application/x-protobuf"
-      ],
-      "description": "Data format for response."
-    },
-    "access_token": {
-      "type": "string",
-      "description": "OAuth access token.",
-      "location": "query"
-    },
-    "upload_protocol": {
-      "location": "query",
-      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\").",
-      "type": "string"
+      ]
     },
     "quotaUser": {
       "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
+      "location": "query",
+      "type": "string"
+    },
+    "fields": {
+      "description": "Selector specifying which fields to include in a partial response.",
+      "location": "query",
+      "type": "string"
+    },
+    "key": {
+      "location": "query",
+      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
+      "type": "string"
+    },
+    "upload_protocol": {
+      "type": "string",
+      "location": "query",
+      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\")."
+    },
+    "oauth_token": {
+      "description": "OAuth 2.0 token for the current user.",
+      "location": "query",
+      "type": "string"
+    },
+    "access_token": {
+      "description": "OAuth access token.",
       "type": "string",
       "location": "query"
     }
-  }
+  },
+  "description": "readerrevenuesubscriptionlinking.googleapis.com API.",
+  "baseUrl": "https://readerrevenuesubscriptionlinking.googleapis.com/",
+  "servicePath": "",
+  "resources": {
+    "publications": {
+      "resources": {
+        "-": {
+          "resources": {
+            "readers": {
+              "resources": {
+                "entitlements": {
+                  "methods": {
+                    "list": {
+                      "parameterOrder": [
+                        "parent"
+                      ],
+                      "parameters": {
+                        "pageToken": {
+                          "location": "query",
+                          "description": "Optional. A page token, received from a previous `ListReaderEntitlements` call. Provide this to retrieve the subsequent page. When paginating, all other parameters provided to `ListReaderEntitlements` must match the call that provided the page token.",
+                          "type": "string"
+                        },
+                        "parent": {
+                          "location": "path",
+                          "description": "Required. The parent reader scope. Format: \"publications/-/readers/{reader_id}\"",
+                          "pattern": "^publications/-/readers/[^/]+$",
+                          "required": true,
+                          "type": "string"
+                        },
+                        "pageSize": {
+                          "type": "integer",
+                          "location": "query",
+                          "description": "Optional. The maximum number of entitlements to return. The service may return fewer than this value. If unspecified, at most 50 entitlements will be returned. The maximum value is 1000; values above 1000 will be coerced to 1000.",
+                          "format": "int32"
+                        }
+                      },
+                      "flatPath": "v1/publications/-/readers/{readersId}/entitlements",
+                      "response": {
+                        "$ref": "ListReaderEntitlementsResponse"
+                      },
+                      "description": "Lists reader entitlements across parent publications via wildcard. - Returns PERMISSION_DENIED if the caller does not have access. - Returns NOT_FOUND if the reader does not exist.",
+                      "path": "v1/{+parent}/entitlements",
+                      "httpMethod": "GET",
+                      "id": "readerrevenuesubscriptionlinking.publications.-.readers.entitlements.list"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "readers": {
+          "methods": {
+            "get": {
+              "path": "v1/{+name}",
+              "id": "readerrevenuesubscriptionlinking.publications.readers.get",
+              "parameters": {
+                "name": {
+                  "description": "Required. The resource name of the reader. Format: publications/{publication_id}/readers/{ppid}",
+                  "required": true,
+                  "type": "string",
+                  "location": "path",
+                  "pattern": "^publications/[^/]+/readers/[^/]+$"
+                }
+              },
+              "description": "Gets a reader of a publication. Returns NOT_FOUND if the reader does not exist.",
+              "flatPath": "v1/publications/{publicationsId}/readers/{readersId}",
+              "response": {
+                "$ref": "Reader"
+              },
+              "httpMethod": "GET",
+              "parameterOrder": [
+                "name"
+              ]
+            },
+            "getEntitlements": {
+              "description": "Gets the reader entitlements for a publication reader. - Returns PERMISSION_DENIED if the caller does not have access. - Returns NOT_FOUND if the reader does not exist.",
+              "httpMethod": "GET",
+              "parameterOrder": [
+                "name"
+              ],
+              "path": "v1/{+name}",
+              "flatPath": "v1/publications/{publicationsId}/readers/{readersId}/entitlements",
+              "response": {
+                "$ref": "ReaderEntitlements"
+              },
+              "parameters": {
+                "name": {
+                  "location": "path",
+                  "description": "Required. The name of the reader entitlements to retrieve. Format: publications/{publication_id}/readers/{reader_id}/entitlements",
+                  "pattern": "^publications/[^/]+/readers/[^/]+/entitlements$",
+                  "type": "string",
+                  "required": true
+                }
+              },
+              "id": "readerrevenuesubscriptionlinking.publications.readers.getEntitlements"
+            },
+            "updateEntitlements": {
+              "parameters": {
+                "name": {
+                  "location": "path",
+                  "type": "string",
+                  "required": true,
+                  "pattern": "^publications/[^/]+/readers/[^/]+/entitlements$",
+                  "description": "Output only. The resource name of the singleton."
+                },
+                "updateMask": {
+                  "format": "google-fieldmask",
+                  "location": "query",
+                  "type": "string",
+                  "description": "Optional. The list of fields to update. Defaults to all fields."
+                }
+              },
+              "description": "Updates the reader entitlements for a publication reader. The entire reader entitlements will be overwritten by the new reader entitlements in the payload, like a PUT. - Returns PERMISSION_DENIED if the caller does not have access. - Returns NOT_FOUND if the reader does not exist.",
+              "id": "readerrevenuesubscriptionlinking.publications.readers.updateEntitlements",
+              "request": {
+                "$ref": "ReaderEntitlements"
+              },
+              "response": {
+                "$ref": "ReaderEntitlements"
+              },
+              "path": "v1/{+name}",
+              "parameterOrder": [
+                "name"
+              ],
+              "httpMethod": "PATCH",
+              "flatPath": "v1/publications/{publicationsId}/readers/{readersId}/entitlements"
+            },
+            "delete": {
+              "parameters": {
+                "force": {
+                  "location": "query",
+                  "description": "If set to true, any entitlements under the reader will also be purged.",
+                  "type": "boolean"
+                },
+                "name": {
+                  "required": true,
+                  "type": "string",
+                  "location": "path",
+                  "description": "Required. The resource name of the reader. Format: publications/{publication_id}/readers/{ppid}",
+                  "pattern": "^publications/[^/]+/readers/[^/]+$"
+                }
+              },
+              "description": "Removes a publication reader, effectively severing the association with a Google user. If `force` is set to true, any entitlements for this reader will also be deleted. (Otherwise, the request will only work if the reader has no entitlements.) - If the reader does not exist, return NOT_FOUND. - Return FAILED_PRECONDITION if the force field is false (or unset) and entitlements are present.",
+              "id": "readerrevenuesubscriptionlinking.publications.readers.delete",
+              "parameterOrder": [
+                "name"
+              ],
+              "flatPath": "v1/publications/{publicationsId}/readers/{readersId}",
+              "response": {
+                "$ref": "DeleteReaderResponse"
+              },
+              "path": "v1/{+name}",
+              "httpMethod": "DELETE"
+            }
+          }
+        }
+      }
+    }
+  },
+  "discoveryVersion": "v1",
+  "basePath": "",
+  "icons": {
+    "x16": "http://www.google.com/images/icons/product/search-16.gif",
+    "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  },
+  "title": "Reader Revenue Subscription Linking API",
+  "fullyEncodeReservedExpansion": true,
+  "canonicalName": "Subscription Linking",
+  "ownerName": "Google",
+  "revision": "20260915",
+  "kind": "discovery#restDescription"
 }
