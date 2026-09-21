@@ -1,245 +1,121 @@
 {
+  "canonicalName": "Merchant",
+  "description": "Programmatically manage your Merchant Center Accounts.",
   "schemas": {
-    "OrderTrackingSignal": {
-      "type": "object",
-      "description": "Represents a business trade from which signals are extracted, such as shipping.",
+    "DateTime": {
       "properties": {
-        "orderCreatedTime": {
-          "description": "Required. The time when the order was created on the businesses side. Include the year and timezone string, if available.",
-          "$ref": "DateTime"
+        "hours": {
+          "format": "int32",
+          "description": "Optional. Hours of day in 24 hour format. Should be from 0 to 23, defaults to 0 (midnight). An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
+          "type": "integer"
         },
-        "shippingInfo": {
-          "items": {
-            "$ref": "ShippingInfo"
-          },
-          "description": "Required. The shipping information for the order.",
-          "type": "array"
+        "seconds": {
+          "format": "int32",
+          "description": "Optional. Seconds of minutes of the time. Must normally be from 0 to 59, defaults to 0. An API may allow the value 60 if it allows leap-seconds.",
+          "type": "integer"
         },
-        "orderTrackingSignalId": {
-          "description": "Output only. The ID that uniquely identifies this order tracking signal.",
+        "timeZone": {
+          "description": "Time zone.",
+          "$ref": "TimeZone"
+        },
+        "nanos": {
+          "description": "Optional. Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999, defaults to 0.",
+          "format": "int32",
+          "type": "integer"
+        },
+        "year": {
+          "format": "int32",
+          "type": "integer",
+          "description": "Optional. Year of date. Must be from 1 to 9999, or 0 if specifying a datetime without a year."
+        },
+        "month": {
+          "format": "int32",
+          "type": "integer",
+          "description": "Optional. Month of year. Must be from 1 to 12, or 0 if specifying a datetime without a month."
+        },
+        "utcOffset": {
           "type": "string",
-          "readOnly": true,
-          "format": "int64"
+          "description": "UTC offset. Must be whole seconds, between -18 hours and +18 hours. For example, a UTC offset of -4:00 would be represented as { seconds: -14400 }.",
+          "format": "google-duration"
         },
-        "shipmentLineItemMapping": {
-          "items": {
-            "$ref": "ShipmentLineItemMapping"
-          },
-          "type": "array",
-          "description": "Optional. The mapping of the line items to the shipment information."
+        "minutes": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Optional. Minutes of hour of day. Must be from 0 to 59, defaults to 0."
         },
-        "deliveryPostalCode": {
-          "type": "string",
-          "description": "Optional. The delivery postal code, as a continuous string without spaces or dashes, for example \"95016\". This field will be anonymized in returned OrderTrackingSignal creation response."
-        },
-        "deliveryRegionCode": {
-          "description": "Optional. The [CLDR territory code] (http://www.unicode.org/repos/cldr/tags/latest/common/main/en.xml) for the shipping destination.",
-          "type": "string"
-        },
-        "merchantId": {
-          "description": "Optional. The Google Merchant Center ID of this order tracking signal. This value is optional. If left unset, the caller's Merchant Center ID is used. You must request access in order to provide data on behalf of another business. For more information, see [Submitting Order Tracking Signals](/shopping-content/guides/order-tracking-signals).",
-          "type": "string",
-          "format": "int64"
-        },
-        "orderId": {
-          "description": "Required. The ID of the order on the businesses side. This field will be hashed in returned OrderTrackingSignal creation response.",
-          "type": "string"
-        },
-        "lineItems": {
-          "items": {
-            "$ref": "LineItemDetails"
-          },
-          "type": "array",
-          "description": "Required. Information about line items in the order."
-        },
-        "customerShippingFee": {
-          "description": "Optional. The shipping fee of the order; this value should be set to zero in the case of free shipping.",
-          "$ref": "Price"
+        "day": {
+          "type": "integer",
+          "description": "Optional. Day of month. Must be from 1 to 31 and valid for the year and month, or 0 if specifying a datetime without a day.",
+          "format": "int32"
         }
       },
-      "id": "OrderTrackingSignal"
-    },
-    "ShippingInfo": {
       "type": "object",
-      "id": "ShippingInfo",
-      "properties": {
-        "originPostalCode": {
-          "description": "Required. The origin postal code, as a continuous string without spaces or dashes, for example \"95016\". This field will be anonymized in returned OrderTrackingSignal creation response.",
-          "type": "string"
-        },
-        "actualDeliveryTime": {
-          "description": "Optional. The time when the shipment was actually delivered. Include the year and timezone string, if available. This field is required, if one of the following fields is absent: tracking_id or carrier_name.",
-          "$ref": "DateTime"
-        },
-        "shippingStatus": {
-          "enumDescriptions": [
-            "The shipping status is not known to business.",
-            "All items are shipped.",
-            "The shipment is already delivered."
-          ],
-          "enum": [
-            "SHIPPING_STATE_UNSPECIFIED",
-            "SHIPPED",
-            "DELIVERED"
-          ],
-          "description": "Required. The status of the shipment.",
-          "type": "string"
-        },
-        "carrier": {
-          "description": "Optional. The name of the shipping carrier for the delivery. This field is required if one of the following fields is absent: earliest_delivery_promise_time, latest_delivery_promise_time, and actual_delivery_time.",
-          "type": "string"
-        },
-        "originRegionCode": {
-          "type": "string",
-          "description": "Required. The [CLDR territory code] (http://www.unicode.org/repos/cldr/tags/latest/common/main/en.xml) for the shipping origin."
-        },
-        "trackingId": {
-          "type": "string",
-          "description": "Optional. The tracking ID of the shipment. This field is required if one of the following fields is absent: earliest_delivery_promise_time, latest_delivery_promise_time, and actual_delivery_time."
-        },
-        "carrierService": {
-          "description": "Optional. The service type for fulfillment, such as GROUND, FIRST_CLASS, etc.",
-          "type": "string"
-        },
-        "shipmentId": {
-          "type": "string",
-          "description": "Required. The shipment ID. This field will be hashed in returned OrderTrackingSignal creation response."
-        },
-        "latestDeliveryPromiseTime": {
-          "description": "Optional. The latest delivery promised time. Include the year and timezone string, if available. This field is required, if one of the following fields is absent: tracking_id or carrier_name.",
-          "$ref": "DateTime"
-        },
-        "shippedTime": {
-          "$ref": "DateTime",
-          "description": "Optional. The time when the shipment was shipped. Include the year and timezone string, if available."
-        },
-        "earliestDeliveryPromiseTime": {
-          "$ref": "DateTime",
-          "description": "Optional. The earliest delivery promised time. Include the year and timezone string, if available. This field is required, if one of the following fields is absent: tracking_id or carrier_name."
-        }
-      },
-      "description": "The shipping information for the order."
-    },
-    "TimeZone": {
-      "properties": {
-        "version": {
-          "type": "string",
-          "description": "Optional. IANA Time Zone Database version number. For example \"2019a\"."
-        },
-        "id": {
-          "type": "string",
-          "description": "IANA Time Zone Database time zone. For example \"America/New_York\"."
-        }
-      },
-      "id": "TimeZone",
-      "description": "Represents a time zone from the [IANA Time Zone Database](https://www.iana.org/time-zones).",
-      "type": "object"
-    },
-    "LineItemDetails": {
-      "id": "LineItemDetails",
-      "type": "object",
-      "description": "The line items of the order.",
-      "properties": {
-        "brand": {
-          "description": "Optional. Brand of the product.",
-          "type": "string"
-        },
-        "productId": {
-          "description": "Required. The Content API REST ID of the product, in the form channel:contentLanguage:targetCountry:offerId.",
-          "type": "string"
-        },
-        "lineItemId": {
-          "description": "Required. The ID for this line item.",
-          "type": "string"
-        },
-        "productTitle": {
-          "type": "string",
-          "description": "Optional. Plain text title of this product."
-        },
-        "gtin": {
-          "description": "Optional. The Global Trade Item Number.",
-          "type": "string",
-          "deprecated": true
-        },
-        "gtins": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array",
-          "description": "Optional. The Global Trade Item Numbers."
-        },
-        "mpn": {
-          "description": "Optional. The manufacturer part number.",
-          "type": "string"
-        },
-        "quantity": {
-          "description": "Required. The quantity of the line item in the order.",
-          "type": "string",
-          "format": "int64"
-        }
-      }
+      "id": "DateTime",
+      "description": "Represents civil time (or occasionally physical time). This type can represent a civil time in one of a few possible ways: * When utc_offset is set and time_zone is unset: a civil time on a calendar day with a particular offset from UTC. * When time_zone is set and utc_offset is unset: a civil time on a calendar day in a particular time zone. * When neither time_zone nor utc_offset is set: a civil time on a calendar day in local time. The date is relative to the Proleptic Gregorian Calendar. If year, month, or day are 0, the DateTime is considered not to have a specific year, month, or day respectively. This type may also be used to represent a physical time if all the date and time fields are set and either case of the `time_offset` oneof is set. Consider using `Timestamp` message for physical time instead. If your use case also would like to store the user's timezone, that can be done in another field. This type is more flexible than some applications may want. Make sure to document and validate your application's limitations."
     },
     "ShipmentLineItemMapping": {
+      "description": "Represents how many items are in the shipment for the given shipment_id and line_item_id.",
       "properties": {
-        "lineItemId": {
-          "description": "Required. The line item ID.",
+        "quantity": {
+          "description": "Required. The line item quantity in the shipment.",
+          "format": "int64",
           "type": "string"
         },
         "shipmentId": {
           "description": "Required. The shipment ID. This field will be hashed in returned OrderTrackingSignal creation response.",
           "type": "string"
         },
-        "quantity": {
-          "format": "int64",
-          "description": "Required. The line item quantity in the shipment.",
-          "type": "string"
+        "lineItemId": {
+          "type": "string",
+          "description": "Required. The line item ID."
         }
       },
       "type": "object",
-      "id": "ShipmentLineItemMapping",
-      "description": "Represents how many items are in the shipment for the given shipment_id and line_item_id."
-    },
-    "Price": {
-      "properties": {
-        "currencyCode": {
-          "description": "The currency of the price using three-letter acronyms according to [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217).",
-          "type": "string"
-        },
-        "amountMicros": {
-          "type": "string",
-          "description": "The price represented as a number in micros (1 million micros is an equivalent to one's currency standard unit, for example, 1 USD = 1000000 micros).",
-          "format": "int64"
-        }
-      },
-      "id": "Price",
-      "description": "The price represented as a number and currency.",
-      "type": "object"
+      "id": "ShipmentLineItemMapping"
     },
     "ProductStatusChangeMessage": {
-      "type": "object",
-      "id": "ProductStatusChangeMessage",
       "description": "The message that the merchant will receive to notify about product status change event",
+      "type": "object",
       "properties": {
-        "changes": {
-          "description": "A message to describe the change that happened to the product",
-          "items": {
-            "$ref": "ProductChange"
-          },
-          "type": "array"
+        "managingAccount": {
+          "type": "string",
+          "description": "The account that manages the merchant's account. can be the same as merchant id if it is standalone account. Format : `accounts/{service_provider_id}`"
+        },
+        "resourceType": {
+          "enum": [
+            "RESOURCE_UNSPECIFIED",
+            "PRODUCT",
+            "ACCOUNT_SERVICE"
+          ],
+          "type": "string",
+          "description": "The resource that changed, in this case it will always be `Product`.",
+          "enumDescriptions": [
+            "Unspecified resource",
+            "Resource type : product",
+            "Account service"
+          ]
         },
         "expirationTime": {
-          "type": "string",
+          "format": "google-datetime",
           "description": "Optional. The product expiration time. This field will not be set if the notification is sent for a product deletion event.",
-          "format": "google-datetime"
+          "type": "string"
+        },
+        "resource": {
+          "type": "string",
+          "description": "The product name. Format: `accounts/{account}/products/{product}`"
         },
         "account": {
           "description": "The target account that owns the entity that changed. Format : `accounts/{merchant_id}`",
           "type": "string"
         },
-        "eventTime": {
-          "description": "The time at which the event was generated. If you want to order the notification messages you receive you should rely on this field not on the order of receiving the notifications.",
-          "format": "google-datetime",
+        "resourceId": {
+          "description": "The product id.",
           "type": "string"
+        },
+        "eventTime": {
+          "format": "google-datetime",
+          "type": "string",
+          "description": "The time at which the event was generated. If you want to order the notification messages you receive you should rely on this field not on the order of receiving the notifications."
         },
         "attribute": {
           "description": "The attribute in the resource that changed, in this case it will be always `Status`.",
@@ -253,62 +129,82 @@
             "Status of the changed entity"
           ]
         },
-        "resourceType": {
-          "enum": [
-            "RESOURCE_UNSPECIFIED",
-            "PRODUCT",
-            "ACCOUNT_SERVICE"
-          ],
-          "enumDescriptions": [
-            "Unspecified resource",
-            "Resource type : product",
-            "Account service"
-          ],
-          "description": "The resource that changed, in this case it will always be `Product`.",
+        "changes": {
+          "type": "array",
+          "description": "A message to describe the change that happened to the product",
+          "items": {
+            "$ref": "ProductChange"
+          }
+        }
+      },
+      "id": "ProductStatusChangeMessage"
+    },
+    "OrderTrackingSignal": {
+      "id": "OrderTrackingSignal",
+      "type": "object",
+      "properties": {
+        "shipmentLineItemMapping": {
+          "type": "array",
+          "description": "Optional. The mapping of the line items to the shipment information.",
+          "items": {
+            "$ref": "ShipmentLineItemMapping"
+          }
+        },
+        "shippingInfo": {
+          "description": "Required. The shipping information for the order.",
+          "type": "array",
+          "items": {
+            "$ref": "ShippingInfo"
+          }
+        },
+        "merchantId": {
+          "type": "string",
+          "format": "int64",
+          "description": "Optional. The Google Merchant Center ID of this order tracking signal. This value is optional. If left unset, the caller's Merchant Center ID is used. You must request access in order to provide data on behalf of another business. For more information, see [Submitting Order Tracking Signals](/shopping-content/guides/order-tracking-signals)."
+        },
+        "orderCreatedTime": {
+          "$ref": "DateTime",
+          "description": "Required. The time when the order was created on the businesses side. Include the year and timezone string, if available."
+        },
+        "lineItems": {
+          "type": "array",
+          "description": "Required. Information about line items in the order.",
+          "items": {
+            "$ref": "LineItemDetails"
+          }
+        },
+        "customerShippingFee": {
+          "$ref": "Price",
+          "description": "Optional. The shipping fee of the order; this value should be set to zero in the case of free shipping."
+        },
+        "orderId": {
+          "type": "string",
+          "description": "Required. The ID of the order on the businesses side. This field will be hashed in returned OrderTrackingSignal creation response."
+        },
+        "deliveryPostalCode": {
+          "description": "Optional. The delivery postal code, as a continuous string without spaces or dashes, for example \"95016\". This field will be anonymized in returned OrderTrackingSignal creation response.",
           "type": "string"
         },
-        "resource": {
+        "orderTrackingSignalId": {
           "type": "string",
-          "description": "The product name. Format: `accounts/{account}/products/{product}`"
+          "description": "Output only. The ID that uniquely identifies this order tracking signal.",
+          "format": "int64",
+          "readOnly": true
         },
-        "managingAccount": {
-          "type": "string",
-          "description": "The account that manages the merchant's account. can be the same as merchant id if it is standalone account. Format : `accounts/{service_provider_id}`"
-        },
-        "resourceId": {
-          "description": "The product id.",
+        "deliveryRegionCode": {
+          "description": "Optional. The [CLDR territory code] (http://www.unicode.org/repos/cldr/tags/latest/common/main/en.xml) for the shipping destination.",
           "type": "string"
         }
-      }
+      },
+      "description": "Represents a business trade from which signals are extracted, such as shipping."
     },
     "ProductChange": {
-      "id": "ProductChange",
-      "description": "The change that happened to the product including old value, new value, country code as the region code and reporting context.",
       "properties": {
+        "regionCode": {
+          "description": "Countries that have the change (if applicable). Represented in the ISO 3166 format.",
+          "type": "string"
+        },
         "reportingContext": {
-          "enum": [
-            "REPORTING_CONTEXT_ENUM_UNSPECIFIED",
-            "SHOPPING_ADS",
-            "DISCOVERY_ADS",
-            "DEMAND_GEN_ADS",
-            "DEMAND_GEN_ADS_DISCOVER_SURFACE",
-            "VIDEO_ADS",
-            "DISPLAY_ADS",
-            "LOCAL_INVENTORY_ADS",
-            "VEHICLE_INVENTORY_ADS",
-            "FREE_LISTINGS",
-            "FREE_LISTINGS_UCP_CHECKOUT",
-            "FREE_LOCAL_LISTINGS",
-            "FREE_LOCAL_VEHICLE_LISTINGS",
-            "YOUTUBE_AFFILIATE",
-            "YOUTUBE_SHOPPING",
-            "CLOUD_RETAIL",
-            "LOCAL_CLOUD_RETAIL",
-            "PRODUCT_REVIEWS",
-            "MERCHANT_REVIEWS",
-            "YOUTUBE_CHECKOUT",
-            "RENTAL_ADS"
-          ],
           "enumDeprecated": [
             false,
             false,
@@ -332,7 +228,6 @@
             false,
             false
           ],
-          "description": "Reporting contexts that have the change (if applicable). Currently this field supports only (`SHOPPING_ADS`, `LOCAL_INVENTORY_ADS`, `YOUTUBE_SHOPPING`, `YOUTUBE_CHECKOUT`, `YOUTUBE_AFFILIATE`) from the enum value [ReportingContextEnum](/merchant/api/reference/rest/Shared.Types/ReportingContextEnum)",
           "enumDescriptions": [
             "Not specified.",
             "[Shopping ads](https://support.google.com/merchants/answer/6149970).",
@@ -356,76 +251,322 @@
             "YouTube Checkout .",
             "Real Estate Rental Ads. ."
           ],
-          "type": "string"
+          "type": "string",
+          "enum": [
+            "REPORTING_CONTEXT_ENUM_UNSPECIFIED",
+            "SHOPPING_ADS",
+            "DISCOVERY_ADS",
+            "DEMAND_GEN_ADS",
+            "DEMAND_GEN_ADS_DISCOVER_SURFACE",
+            "VIDEO_ADS",
+            "DISPLAY_ADS",
+            "LOCAL_INVENTORY_ADS",
+            "VEHICLE_INVENTORY_ADS",
+            "FREE_LISTINGS",
+            "FREE_LISTINGS_UCP_CHECKOUT",
+            "FREE_LOCAL_LISTINGS",
+            "FREE_LOCAL_VEHICLE_LISTINGS",
+            "YOUTUBE_AFFILIATE",
+            "YOUTUBE_SHOPPING",
+            "CLOUD_RETAIL",
+            "LOCAL_CLOUD_RETAIL",
+            "PRODUCT_REVIEWS",
+            "MERCHANT_REVIEWS",
+            "YOUTUBE_CHECKOUT",
+            "RENTAL_ADS"
+          ],
+          "description": "Reporting contexts that have the change (if applicable). Currently this field supports only (`SHOPPING_ADS`, `LOCAL_INVENTORY_ADS`, `YOUTUBE_SHOPPING`, `YOUTUBE_CHECKOUT`, `YOUTUBE_AFFILIATE`) from the enum value [ReportingContextEnum](/merchant/api/reference/rest/Shared.Types/ReportingContextEnum)"
         },
         "newValue": {
-          "description": "The new value of the changed resource or attribute. If empty, it means that the product was deleted. Will have one of these values : (`approved`, `pending`, `disapproved`, ``)",
-          "type": "string"
-        },
-        "regionCode": {
-          "description": "Countries that have the change (if applicable). Represented in the ISO 3166 format.",
-          "type": "string"
+          "type": "string",
+          "description": "The new value of the changed resource or attribute. If empty, it means that the product was deleted. Will have one of these values : (`approved`, `pending`, `disapproved`, ``)"
         },
         "oldValue": {
-          "description": "The old value of the changed resource or attribute. If empty, it means that the product was created. Will have one of these values : (`approved`, `pending`, `disapproved`, ``)",
+          "type": "string",
+          "description": "The old value of the changed resource or attribute. If empty, it means that the product was created. Will have one of these values : (`approved`, `pending`, `disapproved`, ``)"
+        }
+      },
+      "description": "The change that happened to the product including old value, new value, country code as the region code and reporting context.",
+      "id": "ProductChange",
+      "type": "object"
+    },
+    "TimeZone": {
+      "id": "TimeZone",
+      "type": "object",
+      "description": "Represents a time zone from the [IANA Time Zone Database](https://www.iana.org/time-zones).",
+      "properties": {
+        "id": {
+          "description": "IANA Time Zone Database time zone. For example \"America/New_York\".",
           "type": "string"
+        },
+        "version": {
+          "type": "string",
+          "description": "Optional. IANA Time Zone Database version number. For example \"2019a\"."
+        }
+      }
+    },
+    "Price": {
+      "description": "The price represented as a number and currency.",
+      "id": "Price",
+      "properties": {
+        "currencyCode": {
+          "description": "The currency of the price using three-letter acronyms according to [ISO 4217](http://en.wikipedia.org/wiki/ISO_4217).",
+          "type": "string"
+        },
+        "amountMicros": {
+          "format": "int64",
+          "type": "string",
+          "description": "The price represented as a number in micros (1 million micros is an equivalent to one's currency standard unit, for example, 1 USD = 1000000 micros)."
         }
       },
       "type": "object"
     },
-    "DateTime": {
-      "type": "object",
-      "description": "Represents civil time (or occasionally physical time). This type can represent a civil time in one of a few possible ways: * When utc_offset is set and time_zone is unset: a civil time on a calendar day with a particular offset from UTC. * When time_zone is set and utc_offset is unset: a civil time on a calendar day in a particular time zone. * When neither time_zone nor utc_offset is set: a civil time on a calendar day in local time. The date is relative to the Proleptic Gregorian Calendar. If year, month, or day are 0, the DateTime is considered not to have a specific year, month, or day respectively. This type may also be used to represent a physical time if all the date and time fields are set and either case of the `time_offset` oneof is set. Consider using `Timestamp` message for physical time instead. If your use case also would like to store the user's timezone, that can be done in another field. This type is more flexible than some applications may want. Make sure to document and validate your application's limitations.",
+    "ShippingInfo": {
+      "description": "The shipping information for the order.",
       "properties": {
-        "nanos": {
-          "format": "int32",
-          "description": "Optional. Fractions of seconds in nanoseconds. Must be from 0 to 999,999,999, defaults to 0.",
-          "type": "integer"
+        "earliestDeliveryPromiseTime": {
+          "description": "Optional. The earliest delivery promised time. Include the year and timezone string, if available. This field is required, if one of the following fields is absent: tracking_id or carrier_name.",
+          "$ref": "DateTime"
         },
-        "timeZone": {
-          "$ref": "TimeZone",
-          "description": "Time zone."
+        "actualDeliveryTime": {
+          "description": "Optional. The time when the shipment was actually delivered. Include the year and timezone string, if available. This field is required, if one of the following fields is absent: tracking_id or carrier_name.",
+          "$ref": "DateTime"
         },
-        "year": {
-          "description": "Optional. Year of date. Must be from 1 to 9999, or 0 if specifying a datetime without a year.",
-          "type": "integer",
-          "format": "int32"
-        },
-        "utcOffset": {
-          "format": "google-duration",
-          "description": "UTC offset. Must be whole seconds, between -18 hours and +18 hours. For example, a UTC offset of -4:00 would be represented as { seconds: -14400 }.",
+        "originRegionCode": {
+          "description": "Required. The [CLDR territory code] (http://www.unicode.org/repos/cldr/tags/latest/common/main/en.xml) for the shipping origin.",
           "type": "string"
         },
-        "minutes": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Optional. Minutes of hour of day. Must be from 0 to 59, defaults to 0."
+        "carrier": {
+          "description": "Optional. The name of the shipping carrier for the delivery. This field is required if one of the following fields is absent: earliest_delivery_promise_time, latest_delivery_promise_time, and actual_delivery_time.",
+          "type": "string"
         },
-        "hours": {
-          "format": "int32",
-          "description": "Optional. Hours of day in 24 hour format. Should be from 0 to 23, defaults to 0 (midnight). An API may choose to allow the value \"24:00:00\" for scenarios like business closing time.",
-          "type": "integer"
+        "latestDeliveryPromiseTime": {
+          "$ref": "DateTime",
+          "description": "Optional. The latest delivery promised time. Include the year and timezone string, if available. This field is required, if one of the following fields is absent: tracking_id or carrier_name."
         },
-        "seconds": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Optional. Seconds of minutes of the time. Must normally be from 0 to 59, defaults to 0. An API may allow the value 60 if it allows leap-seconds."
+        "shippedTime": {
+          "description": "Optional. The time when the shipment was shipped. Include the year and timezone string, if available.",
+          "$ref": "DateTime"
         },
-        "month": {
-          "type": "integer",
-          "format": "int32",
-          "description": "Optional. Month of year. Must be from 1 to 12, or 0 if specifying a datetime without a month."
+        "shipmentId": {
+          "description": "Required. The shipment ID. This field will be hashed in returned OrderTrackingSignal creation response.",
+          "type": "string"
         },
-        "day": {
-          "format": "int32",
-          "type": "integer",
-          "description": "Optional. Day of month. Must be from 1 to 31 and valid for the year and month, or 0 if specifying a datetime without a day."
+        "shippingStatus": {
+          "enum": [
+            "SHIPPING_STATE_UNSPECIFIED",
+            "SHIPPED",
+            "DELIVERED"
+          ],
+          "type": "string",
+          "description": "Required. The status of the shipment.",
+          "enumDescriptions": [
+            "The shipping status is not known to business.",
+            "All items are shipped.",
+            "The shipment is already delivered."
+          ]
+        },
+        "trackingId": {
+          "type": "string",
+          "description": "Optional. The tracking ID of the shipment. This field is required if one of the following fields is absent: earliest_delivery_promise_time, latest_delivery_promise_time, and actual_delivery_time."
+        },
+        "originPostalCode": {
+          "type": "string",
+          "description": "Required. The origin postal code, as a continuous string without spaces or dashes, for example \"95016\". This field will be anonymized in returned OrderTrackingSignal creation response."
+        },
+        "carrierService": {
+          "description": "Optional. The service type for fulfillment, such as GROUND, FIRST_CLASS, etc.",
+          "type": "string"
         }
       },
-      "id": "DateTime"
+      "type": "object",
+      "id": "ShippingInfo"
+    },
+    "LineItemDetails": {
+      "id": "LineItemDetails",
+      "description": "The line items of the order.",
+      "properties": {
+        "mpn": {
+          "description": "Optional. The manufacturer part number.",
+          "type": "string"
+        },
+        "brand": {
+          "type": "string",
+          "description": "Optional. Brand of the product."
+        },
+        "productId": {
+          "description": "Required. The Content API REST ID of the product, in the form channel:contentLanguage:targetCountry:offerId.",
+          "type": "string"
+        },
+        "productTitle": {
+          "description": "Optional. Plain text title of this product.",
+          "type": "string"
+        },
+        "gtin": {
+          "description": "Optional. The Global Trade Item Number.",
+          "deprecated": true,
+          "type": "string"
+        },
+        "quantity": {
+          "format": "int64",
+          "type": "string",
+          "description": "Required. The quantity of the line item in the order."
+        },
+        "lineItemId": {
+          "description": "Required. The ID for this line item.",
+          "type": "string"
+        },
+        "gtins": {
+          "type": "array",
+          "description": "Optional. The Global Trade Item Numbers.",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "type": "object"
     }
   },
+  "parameters": {
+    "upload_protocol": {
+      "type": "string",
+      "location": "query",
+      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\")."
+    },
+    "access_token": {
+      "type": "string",
+      "location": "query",
+      "description": "OAuth access token."
+    },
+    "oauth_token": {
+      "type": "string",
+      "description": "OAuth 2.0 token for the current user.",
+      "location": "query"
+    },
+    "prettyPrint": {
+      "location": "query",
+      "description": "Returns response with indentations and line breaks.",
+      "type": "boolean",
+      "default": "true"
+    },
+    "alt": {
+      "enumDescriptions": [
+        "Responses with Content-Type of application/json",
+        "Media download with context-dependent Content-Type",
+        "Responses with Content-Type of application/x-protobuf"
+      ],
+      "default": "json",
+      "location": "query",
+      "description": "Data format for response.",
+      "type": "string",
+      "enum": [
+        "json",
+        "media",
+        "proto"
+      ]
+    },
+    "$.xgafv": {
+      "enum": [
+        "1",
+        "2"
+      ],
+      "enumDescriptions": [
+        "v1 error format",
+        "v2 error format"
+      ],
+      "type": "string",
+      "location": "query",
+      "description": "V1 error format."
+    },
+    "uploadType": {
+      "type": "string",
+      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
+      "location": "query"
+    },
+    "fields": {
+      "location": "query",
+      "type": "string",
+      "description": "Selector specifying which fields to include in a partial response."
+    },
+    "quotaUser": {
+      "location": "query",
+      "type": "string",
+      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters."
+    },
+    "key": {
+      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
+      "type": "string",
+      "location": "query"
+    },
+    "callback": {
+      "description": "JSONP",
+      "location": "query",
+      "type": "string"
+    }
+  },
+  "fullyEncodeReservedExpansion": true,
+  "documentationLink": "https://developers.google.com/merchant/api",
+  "name": "merchantapi",
+  "discoveryVersion": "v1",
+  "ownerName": "Google",
+  "resources": {
+    "accounts": {
+      "resources": {
+        "orderTrackingSignals": {
+          "methods": {
+            "create": {
+              "parameters": {
+                "parent": {
+                  "location": "path",
+                  "type": "string",
+                  "required": true,
+                  "pattern": "^accounts/[^/]+$",
+                  "description": "Required. The account of the business for which the order signal is created. Format: accounts/{account}"
+                },
+                "orderTrackingSignalId": {
+                  "description": "Output only. The ID that uniquely identifies this order tracking signal.",
+                  "location": "query",
+                  "type": "string"
+                }
+              },
+              "httpMethod": "POST",
+              "id": "merchantapi.accounts.orderTrackingSignals.create",
+              "flatPath": "ordertracking/v1beta/accounts/{accountsId}/orderTrackingSignals",
+              "path": "ordertracking/v1beta/{+parent}/orderTrackingSignals",
+              "scopes": [
+                "https://www.googleapis.com/auth/content"
+              ],
+              "request": {
+                "$ref": "OrderTrackingSignal"
+              },
+              "description": "Creates new order tracking signal.",
+              "response": {
+                "$ref": "OrderTrackingSignal"
+              },
+              "parameterOrder": [
+                "parent"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "revision": "20260910",
+  "batchPath": "batch",
+  "ownerDomain": "google.com",
+  "mtlsRootUrl": "https://merchantapi.mtls.googleapis.com/",
+  "version_module": true,
   "servicePath": "",
+  "id": "merchantapi:ordertracking_v1beta",
+  "protocol": "rest",
+  "version": "ordertracking_v1beta",
+  "icons": {
+    "x16": "http://www.google.com/images/icons/product/search-16.gif",
+    "x32": "http://www.google.com/images/icons/product/search-32.gif"
+  },
+  "basePath": "",
+  "kind": "discovery#restDescription",
   "auth": {
     "oauth2": {
       "scopes": {
@@ -435,148 +576,7 @@
       }
     }
   },
-  "name": "merchantapi",
-  "kind": "discovery#restDescription",
-  "version": "ordertracking_v1beta",
-  "parameters": {
-    "$.xgafv": {
-      "location": "query",
-      "enum": [
-        "1",
-        "2"
-      ],
-      "enumDescriptions": [
-        "v1 error format",
-        "v2 error format"
-      ],
-      "description": "V1 error format.",
-      "type": "string"
-    },
-    "upload_protocol": {
-      "type": "string",
-      "location": "query",
-      "description": "Upload protocol for media (e.g. \"raw\", \"multipart\")."
-    },
-    "access_token": {
-      "location": "query",
-      "description": "OAuth access token.",
-      "type": "string"
-    },
-    "fields": {
-      "location": "query",
-      "type": "string",
-      "description": "Selector specifying which fields to include in a partial response."
-    },
-    "callback": {
-      "description": "JSONP",
-      "type": "string",
-      "location": "query"
-    },
-    "alt": {
-      "location": "query",
-      "enumDescriptions": [
-        "Responses with Content-Type of application/json",
-        "Media download with context-dependent Content-Type",
-        "Responses with Content-Type of application/x-protobuf"
-      ],
-      "enum": [
-        "json",
-        "media",
-        "proto"
-      ],
-      "default": "json",
-      "description": "Data format for response.",
-      "type": "string"
-    },
-    "quotaUser": {
-      "description": "Available to use for quota purposes for server-side applications. Can be any arbitrary string assigned to a user, but should not exceed 40 characters.",
-      "location": "query",
-      "type": "string"
-    },
-    "uploadType": {
-      "location": "query",
-      "description": "Legacy upload protocol for media (e.g. \"media\", \"multipart\").",
-      "type": "string"
-    },
-    "prettyPrint": {
-      "type": "boolean",
-      "description": "Returns response with indentations and line breaks.",
-      "default": "true",
-      "location": "query"
-    },
-    "oauth_token": {
-      "type": "string",
-      "description": "OAuth 2.0 token for the current user.",
-      "location": "query"
-    },
-    "key": {
-      "type": "string",
-      "description": "API key. Your API key identifies your project and provides you with API access, quota, and reports. Required unless you provide an OAuth 2.0 token.",
-      "location": "query"
-    }
-  },
-  "icons": {
-    "x16": "http://www.google.com/images/icons/product/search-16.gif",
-    "x32": "http://www.google.com/images/icons/product/search-32.gif"
-  },
-  "description": "Programmatically manage your Merchant Center Accounts.",
-  "baseUrl": "https://merchantapi.googleapis.com/",
-  "version_module": true,
-  "documentationLink": "https://developers.google.com/merchant/api",
-  "batchPath": "batch",
-  "fullyEncodeReservedExpansion": true,
-  "revision": "20260910",
-  "resources": {
-    "accounts": {
-      "resources": {
-        "orderTrackingSignals": {
-          "methods": {
-            "create": {
-              "response": {
-                "$ref": "OrderTrackingSignal"
-              },
-              "parameterOrder": [
-                "parent"
-              ],
-              "flatPath": "ordertracking/v1beta/accounts/{accountsId}/orderTrackingSignals",
-              "httpMethod": "POST",
-              "scopes": [
-                "https://www.googleapis.com/auth/content"
-              ],
-              "parameters": {
-                "parent": {
-                  "location": "path",
-                  "required": true,
-                  "pattern": "^accounts/[^/]+$",
-                  "description": "Required. The account of the business for which the order signal is created. Format: accounts/{account}",
-                  "type": "string"
-                },
-                "orderTrackingSignalId": {
-                  "location": "query",
-                  "description": "Output only. The ID that uniquely identifies this order tracking signal.",
-                  "type": "string"
-                }
-              },
-              "request": {
-                "$ref": "OrderTrackingSignal"
-              },
-              "path": "ordertracking/v1beta/{+parent}/orderTrackingSignals",
-              "id": "merchantapi.accounts.orderTrackingSignals.create",
-              "description": "Creates new order tracking signal."
-            }
-          }
-        }
-      }
-    }
-  },
-  "ownerDomain": "google.com",
-  "ownerName": "Google",
   "rootUrl": "https://merchantapi.googleapis.com/",
-  "basePath": "",
-  "mtlsRootUrl": "https://merchantapi.mtls.googleapis.com/",
-  "discoveryVersion": "v1",
-  "id": "merchantapi:ordertracking_v1beta",
-  "canonicalName": "Merchant",
   "title": "Merchant API",
-  "protocol": "rest"
+  "baseUrl": "https://merchantapi.googleapis.com/"
 }
